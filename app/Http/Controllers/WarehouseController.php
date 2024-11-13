@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use App\Models\BinLocation;
 
 class WarehouseController extends Controller
 {
@@ -11,7 +12,13 @@ class WarehouseController extends Controller
  public function index()
 {
     $warehouses = Warehouse::all();
-    return response()->json(['warehouses' => $warehouses]);
+    $binLocations = BinLocation::all();
+    return response()->json([
+    'message' => 'Retrieved successfully',
+    'warehouses' => $warehouses,
+    'binLocations' => $binLocations
+], 200);
+
 }
 
 
