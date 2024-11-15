@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BinLocation;
 use Illuminate\Http\Request;
+use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Warehouse;
@@ -58,6 +59,9 @@ class BinLocationController extends Controller
     }
 
 
+
+
+
     public function store(Request $request)
     {
         // Dummy data (use this for testing purposes)
@@ -98,4 +102,38 @@ class BinLocationController extends Controller
             'bin_location' => $binLocation
         ], 201); // HTTP 201 Created
     }
+
+
+    public function form(Request $request)
+{
+    // Validate the request data
+    $validated = $request->validate([
+        'continent' => 'required|string|max:255',
+        'continental_region' => 'required|string|max:255',
+        'country' => 'required|string|max:255',
+        'country_calling_code' => 'required|string|max:255',
+        'state' => 'required|string|max:255',
+        'city' => 'required|string|max:255',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        // Save the validated data to the database
+        $country = Country::create($validated);
+
+        DB::commit();
+        return response()->json([
+            'success' => true,
+            'data' => $country, // Return the stored country data
+        ], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
+
+
+
 }

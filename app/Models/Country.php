@@ -10,7 +10,7 @@ class Country extends Model
     use HasFactory;
 
     // Define the table name (if it is not the default plural form of the model name)
-    protected $table = 'countries';
+    protected $table = 'country';
 
     // Define the primary key column if it's not 'id' (optional)
     protected $primaryKey = 'id'; // Optional if using the default 'id'
@@ -22,7 +22,5 @@ class Country extends Model
         'state',
         'city',
     ];
-
-    // Optionally, disable timestamps if you don't want 'created_at' and 'updated_at' columns
-    public $timestamps = true; 
+   public $timestamps = false; 
 }

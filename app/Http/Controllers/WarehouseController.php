@@ -56,29 +56,34 @@ class WarehouseController extends Controller
     }
 
     // Store a new warehouse record
-    public function store(Request $request)
-    {
-        // Validate the incoming request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            // Add other validation rules here as per your requirements
-        ]);
+    // public function store(Request $request)
+    // {
+    //     // Validate the incoming request
+    //    $data = validator::make($request->all(), [
+    //         'name' => 'required|string|max:255',
+    //         'location' => 'required|string|max:255',
+    //     ]);
 
-        // Create the new warehouse
-        $warehouse = Warehouse::create([
-            'name' => $request->name,
-            'location' => $request->location,
-            // Add other fields here
-        ]);
+    //     if($data = Warehouse::where('warehouse_name', $request->name)->first()){
+    //         return response()->json([
+    //             'status' => '400',
+    //             'message' => 'Warehouse already exists',
+    //         ], 400);
+    //     }
+    //     // Create the new warehouse
+    //     $warehouse = Warehouse::create([
+    //         'name' => $request->name,
+    //         'location' => $request->location,
+    //         // Add other fields here
+    //     ]);
 
-        // Return the newly created warehouse
-        return response()->json([
-            'status' => '201',
-            'message' => 'Warehouse created successfully',
-            'warehouse' => $warehouse
-        ], 201);
-    }
+    //     // Return the newly created warehouse
+    //     return response()->json([
+    //         'status' => '201',
+    //         'message' => 'Warehouse created successfully',
+    //         'warehouse' => $warehouse
+    //     ], 201);
+    // }
 
     // Update an existing warehouse record
     public function update(Request $request, $id)

@@ -7,15 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Employee extends Model
 {
-       use HasFactory;
-
-    // Define the table name (if it's not the default plural of the model name)
-    protected $table = 'employees';
-
-    // Define the primary key column if it's not 'id' (optional)
-    protected $primaryKey = 'id'; // Optional if using the default 'id'
-
-    // Define the fields that are mass assignable
+    use HasFactory;
+    protected $table = 'employee';
+    protected $primaryKey = 'id';
+    protected $keyType = 'string'; 
     protected $fillable = [
         'employee_name',
         'country_id',
@@ -25,4 +20,10 @@ class Employee extends Model
 
     // Optionally, disable timestamps if you don't want 'created_at' and 'updated_at' columns
     public $timestamps = true; 
+
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class, 'default_warehouse'); // Make sure the foreign key is correct
+    }
+
 }

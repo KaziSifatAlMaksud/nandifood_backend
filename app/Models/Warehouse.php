@@ -15,19 +15,18 @@ class Warehouse extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id','warehouse_name','global_default_warehouse', 'country_default_warehouse', 'country', 'city', 'zip_code', 'address1', 'address2', 'city', 'email','phone', 'warehouse_contact', 'warehouse_capacity_in_lb', 'warehouse_capacity_in_kg', 'status', 'created_by' ,'created_at', 'updated_at', 'updated_by'
+        'id','warehouse_name','global_default_warehouse', 'country_default_warehouse', 'country', 'city', 'zip_code', 'address1', 'address2', 'city', 'email','phone', 'warehouse_contact', 'warehouse_capacity_in_lb', 'warehouse_capacity_in_kg', 'status', 'created_by' ,'created_at', 'updated_at', 'updated_by','employee_phone', 'warehouse_manager','warehouse_supervisor','eff_date','loc_work_week','work_week_days','bus_hours_open','bus_hours_close'
     ];
 
-    // protected $dates = ['created_at', 'updated_at'];
 
-    // public function binLocations()
-    // {
-    //     return $this->hasMany(BinLocation::class); 
-    // }
 
        public function binLocations()
     {
         return $this->hasMany(BinLocation::class);
+    }
+        public function employee()
+    {
+        return $this->hasMany(Employee::class);
     }
 
       public function getWarehouseFullNameAttribute()
@@ -36,3 +35,4 @@ class Warehouse extends Model
         return $this->id . ' ' . $this->warehouse_name;
     }
 }
+
