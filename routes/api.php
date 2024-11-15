@@ -26,11 +26,15 @@ route::resource('/warehouse', WarehouseController::class);
 
 
 Route::post('/lavel/create', [BinLocationController::class, 'form']);
+Route::delete('/country/{id}', [BinLocationController::class, 'destroy']);
 
 
 
+Route::get('/binlocation/{war_id?}', [BinLocationController::class, 'index']);
+Route::post('/binlocation/create/{war_id?}', [BinLocationController::class, 'store']);
 
-Route::get('/binlocation/{id?}', [BinLocationController::class, 'index']);
+
+
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 
 route::get('/binlocation/create', [BinLocationController::class, 'create']);

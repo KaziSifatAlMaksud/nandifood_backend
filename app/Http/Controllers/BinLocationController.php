@@ -52,56 +52,123 @@ class BinLocationController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
-            'result' => [
-                'bin_location' => $binlocations
-            ]
+            'result' => $binlocations 
+            
         ]);
     }
 
+    pub
 
 
 
-
-    public function store(Request $request)
+     public function destroy($id)
     {
-        // Dummy data (use this for testing purposes)
-        $binLocation = BinLocation::create([
-            'warehouse_id' => 'W001',
-            'effective_date' => '2024-11-13',
-            'storage_type_id' => 'ST001',
-            'asset_type_id' => 'AT001',
-            'zone_number' => 'Z01',
-            'zone_name' => 'Zone 1',
-            'section_number' => 1,
-            'section_name' => 'Section 1',
-            'aisle_number' => 1,
-            'aisle_name' => 'Aisle 1',
-            'rack_number' => 1,
-            'rack_name' => 'Rack 1',
-            'shelf_number' => 1,
-            'shelf_name' => 'Shelf 1',
-            'bin_number' => 1,
-            'bin_name' => 'Bin 1',
-            'metric_unit' => 'cm',
-            'bin_length' => 50.00,
-            'bin_width' => 30.00,
-            'bin_height' => 20.00,
-            'storage_capacity_slp' => 300.00,
-            'start_date' => now(),
-            'end_date' => now()->addYears(1),
-            'status' => 'active',
-            'created_by' => 'user1',
-            'updated_by' => 'user1',
-            'description' => 'Sample bin location',
-            'file' => 'path/to/file.pdf',
-            'bin_barcode_img' => 'path/to/barcode_image.jpg', // Assuming static path for the dummy image
+        $country = Country::find($id);
+
+        // Check if the country exists
+        if (!$country) {
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Country not found.',
+            ], 404);
+        }
+
+        // Delete the country
+        $country->delete();
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'success' => true,
+            'message' => 'Country deleted successfully.',
+        ], 200);
+    }
+
+
+
+
+
+    public function store(Request $request, $war_id)
+    {
+
+        try {
+        // Validate the request data
+        $validated = $request->validate([
+            'warehouse_id' => 'required|string',
+            'effective_date' => 'required| date',
+            'storage_type_id' => 'required|string',
+            'asset_type_id' => 'required|string',
+            'zone_number' => 'required|string',
+            'zone_name' => 'required|string'
         ]);
 
+        // Begin database transaction
+        DB::beginTransaction();
+        $binlocation = BinLocation::create($validated);
+        DB::commit();
         return response()->json([
-            'message' => 'Dummy Bin Location created successfully!',
-            'bin_location' => $binLocation
-        ], 201); // HTTP 201 Created
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => $binlocation
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Return a custom response with validation errors
+        return response()->json([
+            'status' => 422,
+            'errors' => $e->errors() 
+        ], 422);
+
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of a general exception
+        DB::rollBack();
+
+        // Return a response with the exception message
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage()
+        ], 500);
     }
+
+        // // Dummy data (use this for testing purposes)
+        // $binLocation = BinLocation::create([
+        //     'warehouse_id' => 'W001',
+        //     'effective_date' => '2024-11-13',
+        //     'storage_type_id' => 'ST001',
+        //     'asset_type_id' => 'AT001',
+        //     'zone_number' => 'Z01',
+        //     'zone_name' => 'Zone 1',
+        //     'section_number' => 1,
+        //     'section_name' => 'Section 1',
+        //     'aisle_number' => 1,
+        //     'aisle_name' => 'Aisle 1',
+        //     'rack_number' => 1,
+        //     'rack_name' => 'Rack 1',
+        //     'shelf_number' => 1,
+        //     'shelf_name' => 'Shelf 1',
+        //     'bin_number' => 1,
+        //     'bin_name' => 'Bin 1',
+        //     'metric_unit' => 'cm',
+        //     'bin_length' => 50.00,
+        //     'bin_width' => 30.00,
+        //     'bin_height' => 20.00,
+        //     'storage_capacity_slp' => 300.00,
+        //     'start_date' => now(),
+        //     'end_date' => now()->addYears(1),
+        //     'status' => 'active',
+        //     'created_by' => 'user1',
+        //     'updated_by' => 'user1',
+        //     'description' => 'Sample bin location',
+        //     'file' => 'path/to/file.pdf',
+        //     'bin_barcode_img' => 'path/to/barcode_image.jpg', // Assuming static path for the dummy image
+        // ]);
+
+    //     return response()->json([
+    //         'message' => 'Dummy Bin Location created successfully!',
+    //         'bin_location' => $binLocation
+    //     ], 201); // HTTP 201 Created
+    // }
 
 
 
