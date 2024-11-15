@@ -24,4 +24,15 @@ class Warehouse extends Model
     // {
     //     return $this->hasMany(BinLocation::class); 
     // }
+
+       public function binLocations()
+    {
+        return $this->hasMany(BinLocation::class);
+    }
+
+      public function getWarehouseFullNameAttribute()
+    {
+        // Assuming you have 'name' and 'location' attributes in your warehouse table
+        return $this->id . ' ' . $this->warehouse_name;
+    }
 }

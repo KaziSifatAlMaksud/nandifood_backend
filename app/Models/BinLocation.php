@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
+
+use Illuminate\Support\Facades\DB;
 
 class BinLocation extends Model
 {
@@ -12,8 +15,9 @@ class BinLocation extends Model
     // Specify the table associated with the model
     protected $table = 'bin_location';  // Optional, only needed if your table name is not the plural form of the model
 
+
     // The primary key for the model (optional if using default 'id')
-    protected $primaryKey = 'id'; // Assuming 'id' is the primary key, if not change it to the correct field
+    protected $primaryKey = 'id'; 
 
     // Disable the timestamps if your table doesn't have 'created_at' and 'updated_at' columns
     public $timestamps = true;  // Set to false if your table does not have timestamps
@@ -64,4 +68,42 @@ class BinLocation extends Model
         'storage_capacity_slp' => 'decimal:2',
         // Add any other date or decimal casts as needed
     ];
+
+
+
+     public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id'); // Make sure the foreign key is correct
+    }
+
+
+   
+      /**
+     * Calculate total volume for all bins in a warehouse.
+     *
+     * @param int $warehouseId
+     * @return float
+     */
+
+    public static function calculateTotalVolumeForWarehouse($warehouseId)
+    {
+        return self::where('warehouse_id', $warehouseId)
+            ->get()
+            ->reduce(function ($total, $bin) {
+                $volume = ( $bin->bin_length * $bin->bin_width * $bin->bin_height);
+                return $total + $volume;
+            }, 0);
+    }
+ 
+    //   public static function calculateTotalVolumeForWarehouse($warehouseId)
+    // {
+    //     return self::where('warehouse_id', $warehouseId)
+    //         ->get()
+    //         ->reduce(function ($total, $bin) {
+    //             $volume = ( $bin->bin_length * $bin->bin_width * $bin->bin_height);
+    //             return $total + $volume;
+    //         }, 0);
+    // }
+
+
 }

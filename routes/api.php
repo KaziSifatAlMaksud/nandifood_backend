@@ -11,11 +11,17 @@ Route::get('/user', function (Request $request) {
 
 
 
-Route::get('/welcom', function () {
-    return 'welcome';
-});
-
-Route::get('/warehouse', [WarehouseController::class, 'index']);
+// Route::get('/welcom', function () {
+//     return 'welcome';
+// });
 
 Route::post('/binlocation', [BinLocationController::class, 'store']);
 
+
+route::resource('/warehouse', WarehouseController::class);
+
+
+// route::get('/binlocation', [BinLocationController::class, 'index']);
+Route::get('/binlocation/{id?}', [BinLocationController::class, 'index']);
+
+route::get('/binlocation/create', [BinLocationController::class, 'create']);
