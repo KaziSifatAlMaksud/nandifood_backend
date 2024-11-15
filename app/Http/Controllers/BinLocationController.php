@@ -104,31 +104,49 @@ class BinLocationController extends Controller
     }
 
 
+
     public function form(Request $request)
 {
-    // Validate the request data
-    $validated = $request->validate([
-        'continent' => 'required|string|max:255',
-        'continental_region' => 'required|string|max:255',
-        'country' => 'required|string|max:255',
-        'country_calling_code' => 'required|string|max:255',
-        'state' => 'required|string|max:255',
-        'city' => 'required|string|max:255',
-    ]);
-
-    DB::beginTransaction();
+    // Attempt to validate the request data
     try {
-        // Save the validated data to the database
-        $country = Country::create($validated);
+        // Validate the request data
+        $validated = $request->validate([
+            'continent' => 'required|string|max:255',
+            'continental_region' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
+            'country_calling_code' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+        ]);
 
+        // Begin database transaction
+        DB::beginTransaction();
+        $country = Country::create($validated);
         DB::commit();
+
+        // Return a success response
         return response()->json([
-            'success' => true,
-            'data' => $country, // Return the stored country data
-        ], 200);
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => $country
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Return a custom response with validation errors
+        return response()->json([
+            'status' => 422,
+            'errors' => $e->errors() 
+        ], 422);
+
     } catch (\Exception $e) {
+        // Rollback the transaction in case of a general exception
         DB::rollBack();
-        return response()->json(['error' => $e->getMessage()], 500);
+
+        // Return a response with the exception message
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage()
+        ], 500);
     }
 }
 
