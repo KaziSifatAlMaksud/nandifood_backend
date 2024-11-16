@@ -6,6 +6,7 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\BinLocationController; 
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\UomController;
 
 
 
@@ -27,6 +28,7 @@ route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_e
 Route::get('warehouse/excel/export', [WarehouseController::class, 'export']);
 
 
+route::get('/uom',[UomController::class, 'index']);
 
 
 
