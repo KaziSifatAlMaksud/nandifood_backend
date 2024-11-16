@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\BinLocation;
 use App\Exports\WarehouseExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 
 
 class WarehouseController extends Controller
@@ -141,8 +142,9 @@ class WarehouseController extends Controller
 
     public function export() 
     {
-        
-        return Excel::download(new WarehouseExport, 'warehouseList.xlsx');
+        $slugDate = Str::slug(date('Y-m-d')); 
+        $fileName = "{$slugDate}_warehouseList.xlsx";
+        return Excel::download(new WarehouseExport, $fileName);
     }
 
     //import excel file

@@ -17,7 +17,7 @@ class PdfController extends Controller
         $data = ['title' => 'NandiFood Industries',        
             'date' => date('m/d/Y'),
             'result' => $warehouses
-            ];
+            ]; 
         $slugDate = Str::slug(date('Y-m-d')); 
         $fileName = "{$slugDate}_warehouse_List.pdf";
 
