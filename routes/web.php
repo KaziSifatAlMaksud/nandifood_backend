@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PdfController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -15,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 //         return view('dashboard');
 //     })->name('dashboard');
 // });
+
+
+route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);

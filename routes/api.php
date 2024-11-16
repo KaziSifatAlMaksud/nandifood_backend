@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\BinLocationController; 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PdfController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -19,6 +21,7 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/binlocation', [BinLocationController::class, 'store']);
 
+route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
 
 route::resource('/warehouse', WarehouseController::class);
 
