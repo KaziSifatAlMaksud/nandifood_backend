@@ -107,7 +107,20 @@ return [
             explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
+
+
+
+    // 'providers' => [
+    //     // Other service providers
+    //     Laravel\Fortify\FortifyServiceProvider::class,
+    //     Maatwebsite\Excel\ExcelServiceProvider::class,
+    // ],
     
+    'aliases' => [
+        // Other aliases
+        'File' => Illuminate\Support\Facades\File::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -127,16 +140,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],  
     
-    'providers' => [
-    /*
-     * Package Service Providers...
-     */
-    Maatwebsite\Excel\ExcelServiceProvider::class,
-    ],
 
-    'aliases' => [
-        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-    ],
+
 
 
 

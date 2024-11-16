@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Models\BinLocation;
+use App\Exports\WarehouseExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class WarehouseController extends Controller
 {
@@ -134,4 +137,28 @@ class WarehouseController extends Controller
             'message' => 'Warehouse deleted successfully'
         ]);
     }
+
+
+    public function export() 
+    {
+        
+        return Excel::download(new WarehouseExport, 'warehouseList.xlsx');
+    }
+
+    //import excel file
+    // public function warehouse_excel(Request $request)
+    // {
+    //     $request->validate([
+    //         'import_file' => 'required|mimes:xlsx,xls',
+    //     ]);
+
+    //     $path = $request->file('file')->getRealPath();
+    //     $data = \Excel::import(new WarehouseImport, $path);
+
+    //     return response()->json([
+    //         'status' => '200',
+    //         'message' => 'Warehouse imported successfully',
+    //         'data' => $data
+    //     ]);
+    // }
 }

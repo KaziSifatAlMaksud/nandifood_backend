@@ -18,15 +18,18 @@ Route::get('/user', function (Request $request) {
 // Route::get('/welcom', function () {
 //     return 'welcome';
 // });
+//warehouse route 
+route::resource('/warehouse', WarehouseController::class);
+//download PDF route
+route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
+route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_excel']);
+
+Route::get('warehouse/excel/export', [WarehouseController::class, 'export']);
+
+
+
 
 Route::post('/binlocation', [BinLocationController::class, 'store']);
-
-route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
-
-route::resource('/warehouse', WarehouseController::class);
-
-
-
 
 Route::post('/lavel/create', [BinLocationController::class, 'form']);
 Route::delete('/country/{id}', [BinLocationController::class, 'destroy']);
