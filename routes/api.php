@@ -29,6 +29,8 @@ Route::get('warehouse/excel/export', [WarehouseController::class, 'export']);
 
 
 
+
+
 Route::post('/binlocation', [BinLocationController::class, 'store']);
 
 Route::post('/lavel/create', [BinLocationController::class, 'form']);
