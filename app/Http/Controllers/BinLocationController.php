@@ -83,27 +83,50 @@ class BinLocationController extends Controller
     }
 
 
-
-
-
-    public function store(Request $request, $war_id)
-    {
-
-        try {
+        public function store(Request $request)
+{
+    // Attempt to validate the request data
+    try {
         // Validate the request data
         $validated = $request->validate([
-            'warehouse_id' => 'required|string',
-            'effective_date' => 'required| date',
-            'storage_type_id' => 'required|string',
-            'asset_type_id' => 'required|string',
-            'zone_number' => 'required|string',
-            'zone_name' => 'required|string'
+            'warehouse_id' => 'required|string|max:8',
+            'effective_date' => 'required|date',
+            'storage_type_id' => 'required|string|max:8',
+            'asset_type_id' => 'required|string|max:8',
+            'zone_number' => 'required|string|max:8',
+            'zone_name' => 'required|string|max:255',
+            'section_number' => 'nullable|integer', // Only integer, no need for 'number'
+            'aisle_number' => 'nullable|integer', // Use integer for numbers
+            'rack_number' => 'nullable|integer', // Use integer for numbers
+            'shelf_number' => 'nullable|integer', // Use integer for numbers
+            'bin_number' => 'nullable|integer', // Use integer for numbers
+            'metric_unit' => 'required|string|max:255',
+            'bin_length' => 'required|string|max:255',
+            'bin_width' => 'required|string|max:255',
+            'bin_height' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255', // Optional, so make it nullable
+            'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
+            'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
         ]);
-
+        
         // Begin database transaction
         DB::beginTransaction();
+        if ($request->hasFile('file')) {
+            // Store the file in the 'public' disk and get the file path
+            $filePath = $request->file('file')->store('uploads/files', 'public');
+            $validated['file'] = $filePath;         }
+
+        // Handle file upload for 'bin_barcode_img' field
+        if ($request->hasFile('bin_barcode_img')) {
+            $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
+            $validated['bin_barcode_img'] = $barcodeImagePath;
+        }
+
         $binlocation = BinLocation::create($validated);
         DB::commit();
+
+        // Return a success response
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
@@ -128,6 +151,10 @@ class BinLocationController extends Controller
         ], 500);
     }
 }
+
+
+
+
 
 
     public function form(Request $request)

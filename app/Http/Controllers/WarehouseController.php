@@ -45,6 +45,8 @@ class WarehouseController extends Controller
         ]);
     }
 
+    
+
     // Fetch a single warehouse by ID
     public function show($id)
     {
@@ -60,34 +62,60 @@ class WarehouseController extends Controller
     }
 
     // Store a new warehouse record
-    // public function store(Request $request)
-    // {
-    //     // Validate the incoming request
-    //    $data = validator::make($request->all(), [
-    //         'name' => 'required|string|max:255',
-    //         'location' => 'required|string|max:255',
-    //     ]);
+    public function store(Request $request)
+    {
+        try {
+            // Validate the incoming request
+            $validated = $request->validate([
+            'warehouse_name' => 'required|string|max:255',
+            'address1' => 'required|string|max:255',
+            'country' => 'required|string|max:25',
+            'state' => 'required|string|max:25',
+            'city' => 'required|string|max:25',
+            'zip_code' => 'required|string|max:20',
+            'email' => 'required|email|max:255', // Increased max length for email
+            'phone' => 'nullable|string|max:255', // Regex for phone number validation
+            'address2' => 'nullable|string|max:255',
+            'warehouse_contact' => 'nullable|string|max:255',
+            'emergency_phone' => 'nullable|string|max:255',
+            'eff_date' => 'nullable|date', // Validate if it's a valid date
+            'loc_work_week' => 'nullable|integer', // Integer for work week
+            'work_week_days' => 'nullable|string|max:50', // Max length for days
+            'warehouse_manager' => 'nullable|string|max:255',
+            'warehouse_supervisor' => 'nullable|string|max:255',
+            'bus_hours_open' => 'nullable|string|max:10', // Assuming time format like '08:00'
+            'bus_hours_close' => 'nullable|string|max:10', // Assuming time format like '17:00'
+            'status' => 'nullable|string|max:50', // Status should be string with max length 50
+        ]);
+            DB::beginTransaction();
+               $warehouse = BinLocation::create($validated);
+            DB::commit();
 
-    //     if($data = Warehouse::where('warehouse_name', $request->name)->first()){
-    //         return response()->json([
-    //             'status' => '400',
-    //             'message' => 'Warehouse already exists',
-    //         ], 400);
-    //     }
-    //     // Create the new warehouse
-    //     $warehouse = Warehouse::create([
-    //         'name' => $request->name,
-    //         'location' => $request->location,
-    //         // Add other fields here
-    //     ]);
+            // Return a success response
+            return response()->json([
+                'status' => 200,
+                'message' => 'Warehouse created successfully',
+                'result' => $warehouse,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return a custom response with validation errors
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of a general exception
+            DB::rollBack();
 
-    //     // Return the newly created warehouse
-    //     return response()->json([
-    //         'status' => '201',
-    //         'message' => 'Warehouse created successfully',
-    //         'warehouse' => $warehouse
-    //     ], 201);
-    // }
+            // Return a response with the exception message
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+ 
 
     // Update an existing warehouse record
     public function update(Request $request, $id)
@@ -119,6 +147,10 @@ class WarehouseController extends Controller
             'warehouse' => $warehouse
         ]);
     }
+
+
+
+    
 
     // Delete a warehouse record
     public function destroy($id)
