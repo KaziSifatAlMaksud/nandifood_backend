@@ -47,15 +47,67 @@ class UomController extends Controller
 
         return $uom;
     });
-
-
-
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
             'result' => $uoms
         ]);
     }
+
+
+        // Store a new warehouse record
+     public function store(Request $request)
+{
+    // Attempt to validate the request data
+    try {
+        // Validate the request data
+        $validated = $request->validate([
+            'uom_type_id' => 'required|string|max:8',             
+            'description' => 'required|string',                  
+            'weight' => 'required|numeric',                      
+            'bulk_code' => 'required|string|max:8',             
+            'unit' => 'required|string|max:8',                   
+            'inventory_uom' => 'required|string|max:255',       
+            'production_uom' => 'nullable|string',              
+            'purchase_uom' => 'nullable|string',               
+            'uom_length' => 'nullable|numeric',                   
+            'uom_width' => 'nullable|numeric',                   
+            'uom_height' => 'nullable|numeric',                  
+        ]);
+
+        
+        // Begin database transaction
+        DB::beginTransaction();
+    
+        $uom_list = Uom::create($validated);
+        DB::commit();
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => $uom_list
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Return a custom response with validation errors
+        return response()->json([
+            'status' => 422,
+            'errors' => $e->errors() 
+        ], 422);
+
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of a general exception
+        DB::rollBack();
+
+        // Return a response with the exception message
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 
   
 }

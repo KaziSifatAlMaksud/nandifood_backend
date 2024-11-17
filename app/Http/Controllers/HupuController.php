@@ -121,9 +121,60 @@ class HupuController extends Controller
         });      
         return response()->json([
             'status' => 200,
-            'message' => 'Ok',
+            'message' => 'Unit of Measurement List',
             'result' => $pu_lists
         ]);
 
+    }
+
+
+     public function store(Request $request)
+    {
+        try {
+            // Validate the incoming request
+        $validated = $request->validate([
+        'hu_pu_code' => 'required|string',                   // Validates a required string
+        'hu_pu_type' => 'required|integer',                   // Validates a required integer
+        'flex' => 'nullable|string',                           // Validates an optional string
+        'pu_hu_name' => 'required|integer',                   // Validates a required integer
+        'description' => 'required|string',                   // Validates a required string
+        'unit' => 'required|integer',                         // Validates a required integer
+        'length' => 'required|float',                         // Validates a required float
+        'weight' => 'required|float',                         // Validates a required float
+        'height' => 'required|float',                         // Validates a required float
+        'hu_empty_weight' => 'nullable|float',                // Validates an optional float
+        'hu_minimum_weight' => 'nullable|float',              // Validates an optional float
+        'hu_loaded_weight' => 'nullable|float',               // Validates an optional float
+        'hu_maximum_weight' => 'nullable|float',              // Validates an optional float
+    ]);
+
+
+
+            DB::beginTransaction();
+               $hupu_list = Hupu::create($validated);
+            DB::commit();
+
+            // Return a success response
+            return response()->json([
+                'status' => 200,
+                'message' => 'created successfully',
+                'result' => $hupu_list,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return a custom response with validation errors
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of a general exception
+            DB::rollBack();
+
+            // Return a response with the exception message
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

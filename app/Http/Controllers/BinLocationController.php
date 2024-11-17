@@ -109,7 +109,7 @@ class BinLocationController extends Controller
             'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
             'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
         ]);
-        
+
         // Begin database transaction
         DB::beginTransaction();
         if ($request->hasFile('file')) {
@@ -129,7 +129,7 @@ class BinLocationController extends Controller
         // Return a success response
         return response()->json([
             'status' => 200,
-            'message' => 'Ok',
+            'message' => 'Bin location created successfully',
             'result' => $binlocation
         ]);
 

@@ -12,10 +12,9 @@ class Hupu extends Model
     protected $fillable = [
         'hu_pu_code',
         'hu_pu_type',
-        'description',
         'flex',
         'pu_hu_name',
-        'description',
+        'description',                
         'unit',
         'length',
         'weight',
@@ -28,7 +27,7 @@ class Hupu extends Model
 
     public function uomType()
     {
-        return $this->belongsTo(Uom_type::class, 'pu_hu_name', 'id'); // Assumes uom_type_id is the foreign key
+        return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
     }
 
 public static function fullName($id)
