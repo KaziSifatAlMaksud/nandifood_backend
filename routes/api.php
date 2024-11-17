@@ -29,8 +29,6 @@ route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_e
 Route::get('warehouse/excel/export', [WarehouseController::class, 'export']);
 
 
-Route::post('/binlocation', [BinLocationController::class, 'store']);
-
 Route::post('/lavel/create', [BinLocationController::class, 'form']);
 
 
@@ -59,7 +57,7 @@ route::get('/hu',[HupuController::class, 'hu_list']);
 route::post('/hu/create',[HupuController::class, 'store']);
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
-route::post('/hu/create',[HupuController::class, 'store']);
+route::post('/pu/create',[HupuController::class, 'store_pu']);
 
 
 

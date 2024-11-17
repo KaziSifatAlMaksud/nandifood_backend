@@ -108,8 +108,6 @@ class HupuController extends Controller
             $pu_list->full_name = $result['full_name'];
             $pu_list->volumem3 = $result['volumem3'];
             $pu_list->volumeft3 = $result['volumeft3'];
-
-            // Add values for both inches and centimeters based on unit
             $pu_list->length_in = $length_in ?? $result['length_in'];  // Default to result if not set
             $pu_list->width_in = $width_in ?? $result['width_in'];
             $pu_list->height_in = $height_in ?? $result['height_in'];
@@ -131,46 +129,77 @@ class HupuController extends Controller
      public function store(Request $request)
     {
         try {
-            // Validate the incoming request
         $validated = $request->validate([
-        'hu_pu_code' => 'required|string',                   // Validates a required string
-        'hu_pu_type' => 'required|integer',                   // Validates a required integer
-        'flex' => 'nullable|string',                           // Validates an optional string
-        'pu_hu_name' => 'required|integer',                   // Validates a required integer
-        'description' => 'required|string',                   // Validates a required string
-        'unit' => 'required|integer',                         // Validates a required integer
-        'length' => 'required|float',                         // Validates a required float
-        'weight' => 'required|float',                         // Validates a required float
-        'height' => 'required|float',                         // Validates a required float
-        'hu_empty_weight' => 'nullable|float',                // Validates an optional float
-        'hu_minimum_weight' => 'nullable|float',              // Validates an optional float
-        'hu_loaded_weight' => 'nullable|float',               // Validates an optional float
-        'hu_maximum_weight' => 'nullable|float',              // Validates an optional float
+        'hu_pu_code' => 'required|string',                
+        'hu_pu_type' => 'required|integer',                
+        'flex' => 'nullable|string',                        
+        'pu_hu_name' => 'required|integer',                
+        'description' => 'required|string',               
+        'unit' => 'required|integer',                    
+        'length' => 'required|float',                   
+        'weight' => 'required|float',                        
+        'height' => 'required|float',                       
+        'hu_empty_weight' => 'nullable|float',              
+        'hu_minimum_weight' => 'nullable|float',            
+        'hu_loaded_weight' => 'nullable|float',             
+        'hu_maximum_weight' => 'nullable|float',          
     ]);
-
-
 
             DB::beginTransaction();
                $hupu_list = Hupu::create($validated);
             DB::commit();
-
-            // Return a success response
             return response()->json([
                 'status' => 200,
                 'message' => 'created successfully',
                 'result' => $hupu_list,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Return a custom response with validation errors
             return response()->json([
                 'status' => 422,
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            // Rollback the transaction in case of a general exception
             DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+     public function store_pu(Request $request)
+    {
+        try {
+        $validated = $request->validate([
+        'hu_pu_code' => 'required|string',                
+        'hu_pu_type' => 'required|integer',                
+        'flex' => 'nullable|string',                        
+        'pu_hu_name' => 'required|integer',                
+        'description' => 'required|string',               
+        'unit' => 'required|integer',                    
+        'length' => 'required|float',                   
+        'weight' => 'required|float',                        
+        'height' => 'required|float',                       
+        'hu_empty_weight' => 'nullable|float',              
+        'hu_minimum_weight' => 'nullable|float',            
+        'hu_loaded_weight' => 'nullable|float',             
+        'hu_maximum_weight' => 'nullable|float',          
+    ]);
 
-            // Return a response with the exception message
+            DB::beginTransaction();
+               $hupu_list = Hupu::create($validated);
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'created successfully',
+                'result' => $hupu_list,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'status' => 500,
                 'error' => $e->getMessage(),

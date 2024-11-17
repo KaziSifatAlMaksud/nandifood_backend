@@ -134,17 +134,13 @@ class BinLocationController extends Controller
         ]);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
-        // Return a custom response with validation errors
         return response()->json([
             'status' => 422,
             'errors' => $e->errors() 
         ], 422);
 
     } catch (\Exception $e) {
-        // Rollback the transaction in case of a general exception
         DB::rollBack();
-
-        // Return a response with the exception message
         return response()->json([
             'status' => 500,
             'error' => $e->getMessage()
