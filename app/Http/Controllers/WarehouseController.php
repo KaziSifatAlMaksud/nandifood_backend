@@ -9,6 +9,7 @@ use App\Exports\WarehouseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\WarehouseAttachment;
 
 
 class WarehouseController extends Controller
@@ -48,7 +49,16 @@ class WarehouseController extends Controller
         ]);
     }
 
-    
+
+    public function warehouse_compliance()
+    {
+          $warehouseattachment = WarehouseAttachment::all();
+            return response()->json([
+            'status' => '200',
+            'message' => 'Ok',
+            'result'=>$warehouseattachment,
+        ]);
+    }    
 
     // Fetch a single warehouse by ID
     public function show($id)
@@ -117,9 +127,70 @@ class WarehouseController extends Controller
         }
     }
     
+    public function warehouse_attachment_store(Request $request)
+    {
+        try {
+                $validated = $request->validate([
+                'type' => 'required|integer', 
+                'warehouse_id' => 'required|string|max:11',
+                'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:204800',
+                'created_by' => 'nullable|string|max:11', 
+                'updated_by' => 'nullable|string|max:11',
+                'date_uploaded' => 'nullable|date', 
+                'description' => 'nullable|string|max:255',
 
+            ]);
+      
+            DB::beginTransaction();
+              // Check if the request has a file
+            if ($request->hasFile('file')) {
+                // Store the file in the 'public' disk and get the file path
+                $filePath = $request->file('file')->store('uploads/attachment', 'public');
+                $validated['file'] = $filePath;
+            }
+            $warehouse = WarehouseAttachment::create($validated);
+             DB::commit();
+            // Return a success response
+            return response()->json([
+                'status' => 200,
+                'message' => 'Warehouse created successfully',
+                'result' => $warehouse,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Return a custom response with validation errors
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of a general exception
+            DB::rollBack();
+
+            // Return a response with the exception message
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
  
+    public function warehouse_attachment_destroy($id)
+    {
+        $warehouse = WarehouseAttachment::find($id);
 
+        if (!$warehouse) {
+            return response()->json(['message' => 'Warehouse not found'], 404);
+        }
+
+        // Delete the warehouse
+        $warehouse->delete();
+
+        // Return a success message
+        return response()->json([
+            'status' => '200',
+            'message' => 'Warehouse deleted successfully'
+        ]);
+    }
     // Update an existing warehouse record
     public function update(Request $request, $id)
     {

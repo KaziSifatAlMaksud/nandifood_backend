@@ -23,7 +23,14 @@ Route::get('/user', function (Request $request) {
 //warehouse route 
 route::resource('/warehouse', WarehouseController::class);
 
+//warehouse information
+Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
+route::get('/country',[WarehouseController::class, 'country']);
 
+//warehouse attachment route
+route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
+route::post('/warehouse_attachment/create', [WarehouseController::class, 'warehouse_attachment_store']);
+route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 'warehouse_attachment_destroy'])->name('warehouse-attachment.destroy');
 
 //download PDF route
 // route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
@@ -37,18 +44,17 @@ Route::post('/lavel/create', [BinLocationController::class, 'form']);
 // Route::delete('/country/{id}', [BinLocationController::class, 'destroy']);
 
 
-Route::post('/binlocation/create', [BinLocationController::class, 'store']);
 
+route::get('/binlocation/create', [BinLocationController::class, 'create']);
+Route::post('/binlocation/create', [BinLocationController::class, 'store']);
 Route::get('/binlocation/{war_id?}', [BinLocationController::class, 'index']);
-//Route::post('/binlocation/create/{war_id?}', [BinLocationController::class, 'store1']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');
 
 
 
 
-Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 
-route::get('/binlocation/create', [BinLocationController::class, 'create']);
+
 
 
 // Unit Of Manage  List 
@@ -64,8 +70,7 @@ route::get('/pu',[HupuController::class, 'pu_list']);
 // route::post('/pu/create',[HupuController::class, 'store_pu']);
 
 
-//country information
-route::get('/country',[WarehouseController::class, 'country']);
+
 
 
 
