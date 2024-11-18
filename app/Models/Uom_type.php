@@ -15,9 +15,9 @@ class Uom_type extends Model
         {
               return $this->hasMany(Uom::class, 'uom_type_id', 'id');
         }
-        public function hupu()
-        {
-              return $this->hasMany(Hupu::class, 'id', 'pu_hu_name');
-        }
+      //   public function hupu()
+      //   {
+      //         return $this->hasMany(Hupu::class, 'id', 'pu_hu_name');
+      //   }
 
 }

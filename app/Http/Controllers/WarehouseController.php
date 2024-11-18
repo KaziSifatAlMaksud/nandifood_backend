@@ -8,6 +8,7 @@ use App\Models\BinLocation;
 use App\Exports\WarehouseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 
 class WarehouseController extends Controller
@@ -32,7 +33,9 @@ class WarehouseController extends Controller
         ])->get();
 
         $warehouses = $warehouses->map(function ($warehouse) {
-                $warehouse->volume = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
+                $totals  = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
+                 $warehouse->volume_m3 = $totals['total_volume'];
+                $warehouse->total_storage_capacity = $totals['total_storage_capacity'];
                 return $warehouse;
         });
 
@@ -65,7 +68,6 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validate the incoming request
             $validated = $request->validate([
             'warehouse_name' => 'required|string|max:255',
             'address1' => 'required|string|max:255',
@@ -73,22 +75,22 @@ class WarehouseController extends Controller
             'state' => 'required|string|max:25',
             'city' => 'required|string|max:25',
             'zip_code' => 'required|string|max:20',
-            'email' => 'required|email|max:255', // Increased max length for email
-            'phone' => 'nullable|string|max:255', // Regex for phone number validation
+            'email' => 'required|email|max:255', 
+            'phone' => 'nullable|string|max:255', 
             'address2' => 'nullable|string|max:255',
             'warehouse_contact' => 'nullable|string|max:255',
             'emergency_phone' => 'nullable|string|max:255',
-            'eff_date' => 'nullable|date', // Validate if it's a valid date
-            'loc_work_week' => 'nullable|integer', // Integer for work week
-            'work_week_days' => 'nullable|string|max:50', // Max length for days
+            'eff_date' => 'nullable|date', 
+            'loc_work_week' => 'nullable|integer', 
+            'work_week_days' => 'nullable|string|max:50', 
             'warehouse_manager' => 'nullable|string|max:255',
             'warehouse_supervisor' => 'nullable|string|max:255',
-            'bus_hours_open' => 'nullable|string|max:10', // Assuming time format like '08:00'
-            'bus_hours_close' => 'nullable|string|max:10', // Assuming time format like '17:00'
-            'status' => 'nullable|string|max:50', // Status should be string with max length 50
+            'bus_hours_open' => 'nullable|string|max:10', 
+            'bus_hours_close' => 'nullable|string|max:10',
+            'status' => 'nullable|string|max:50',
         ]);
             DB::beginTransaction();
-               $warehouse = BinLocation::create($validated);
+               $warehouse = Warehouse::create($validated);
             DB::commit();
 
             // Return a success response
@@ -114,6 +116,7 @@ class WarehouseController extends Controller
             ], 500);
         }
     }
+    
 
  
 

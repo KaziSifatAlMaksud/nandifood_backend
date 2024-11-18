@@ -6,6 +6,10 @@ use App\Models\BinLocation;
 use Illuminate\Http\Request;
 use App\Models\Country;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\BinLocationController;
+use App\Http\Controllers\Controller;
+
+
 
 use App\Models\Warehouse;
 
@@ -58,29 +62,6 @@ class BinLocationController extends Controller
     }
 
 
-     public function destroy($id)
-    {
-        $country = Country::find($id);
-
-        // Check if the country exists
-        if (!$country) {
-            return response()->json([
-                'status' => 404,
-                'success' => false,
-                'message' => 'Country not found.',
-            ], 404);
-        }
-
-        // Delete the country
-        $country->delete();
-
-        // Return a success response
-        return response()->json([
-            'status' => 200,
-            'success' => true,
-            'message' => 'Country deleted successfully.',
-        ], 200);
-    }
 
 
         public function store(Request $request)
@@ -149,54 +130,72 @@ class BinLocationController extends Controller
 }
 
 
+     public function destroy($id)
+    {
+         $binLocation = BinLocation::find($id);
 
-
-
-
-    public function form(Request $request)
-{
-    // Attempt to validate the request data
-    try {
-        // Validate the request data
-        $validated = $request->validate([
-            'continent' => 'required|string|max:255',
-            'continental_region' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'country_calling_code' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-        ]);
-
-        // Begin database transaction
-        DB::beginTransaction();
-        $country = Country::create($validated);
-        DB::commit();
+        // Check if the country exists
+        if (!$binLocation) {
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Bin location not found.',
+            ], 404);
+        }
+            $binLocation->delete();
 
         // Return a success response
-        return response()->json([
-            'status' => 200,
-            'message' => 'Ok',
-            'result' => $country
-        ]);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // Return a custom response with validation errors
-        return response()->json([
-            'status' => 422,
-            'errors' => $e->errors() 
-        ], 422);
-
-    } catch (\Exception $e) {
-        // Rollback the transaction in case of a general exception
-        DB::rollBack();
-
-        // Return a response with the exception message
-        return response()->json([
-            'status' => 500,
-            'error' => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'status' => '200',
+                'message' => 'Bin location deleted successfully'
+            ], 200);
     }
-}
+
+
+        public function form(Request $request)
+        {
+            // Attempt to validate the request data
+            try {
+                // Validate the request data
+                $validated = $request->validate([
+                    'continent' => 'required|string|max:255',
+                    'continental_region' => 'required|string|max:255',
+                    'country' => 'required|string|max:255',
+                    'country_calling_code' => 'required|string|max:255',
+                    'state' => 'required|string|max:255',
+                    'city' => 'required|string|max:255',
+                ]);
+
+                // Begin database transaction
+                DB::beginTransaction();
+                $country = Country::create($validated);
+                DB::commit();
+
+                // Return a success response
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Ok',
+                    'result' => $country
+                ]);
+
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                // Return a custom response with validation errors
+                return response()->json([
+                    'status' => 422,
+                    'errors' => $e->errors() 
+                ], 422);
+
+            } catch (\Exception $e) {
+                // Rollback the transaction in case of a general exception
+                DB::rollBack();
+
+                // Return a response with the exception message
+                return response()->json([
+                    'status' => 500,
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+        }
 
 
 

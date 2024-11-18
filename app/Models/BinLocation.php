@@ -85,15 +85,31 @@ class BinLocation extends Model
      * @return float
      */
 
-    public static function calculateTotalVolumeForWarehouse($warehouseId)
-    {
-        return self::where('warehouse_id', $warehouseId)
-            ->get()
-            ->reduce(function ($total, $bin) {
-                $volume = ( $bin->bin_length * $bin->bin_width * $bin->bin_height);
-                return $total + $volume;
-            }, 0);
-    }
+ public static function calculateTotalVolumeForWarehouse($warehouseId)
+{
+    return self::where('warehouse_id', $warehouseId)
+        ->get()
+        ->reduce(function ($totals, $bin) {
+            // Calculate volume based on metric_unit
+            if ($bin->metric_unit == '0') {
+                $volume_m3 = ($bin->bin_length * $bin->bin_width * $bin->bin_height) / 1000000;
+            } elseif ($bin->metric_unit == '1') {
+                $bin_length_cm = $bin->bin_length * 2.54;
+                $bin_width_cm = $bin->bin_width * 2.54;
+                $bin_height_cm = $bin->bin_height * 2.54;
+                $volume_m3 = ($bin_length_cm * $bin_width_cm * $bin_height_cm) / 1000000;
+            } else {
+                $volume_m3 = 0;
+            }
+
+            // Sum up the volume and storage capacity (assuming 'storage_capacity_slp' is in the same unit)
+            return [
+                'total_volume' => $totals['total_volume'] + $volume_m3,
+                'total_storage_capacity_slp' => $totals['total_storage_capacity'] + $bin->storage_capacity_slp
+            ];
+        }, ['total_volume' => 0, 'total_storage_capacity' => 0]);
+}
+
  
     //   public static function calculateTotalVolumeForWarehouse($warehouseId)
     // {

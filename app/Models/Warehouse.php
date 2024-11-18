@@ -11,7 +11,7 @@ class Warehouse extends Model
 
     // Define the table name if it's different from the plural of the model name
     protected $table = 'warehouse';
-    public $incrementing = false;
+    // public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [

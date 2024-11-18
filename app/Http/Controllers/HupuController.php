@@ -126,7 +126,7 @@ class HupuController extends Controller
     }
 
 
-     public function store(Request $request)
+     public function store_pu(Request $request)
     {
         try {
         $validated = $request->validate([
@@ -143,7 +143,7 @@ class HupuController extends Controller
         'hu_minimum_weight' => 'nullable|float',            
         'hu_loaded_weight' => 'nullable|float',             
         'hu_maximum_weight' => 'nullable|float',          
-    ]);
+        ]);
 
             DB::beginTransaction();
                $hupu_list = Hupu::create($validated);
@@ -166,24 +166,26 @@ class HupuController extends Controller
             ], 500);
         }
     }
-     public function store_pu(Request $request)
+
+      public function store(Request $request)
     {
         try {
-        $validated = $request->validate([
-        'hu_pu_code' => 'required|string',                
-        'hu_pu_type' => 'required|integer',                
-        'flex' => 'nullable|string',                        
-        'pu_hu_name' => 'required|integer',                
-        'description' => 'required|string',               
-        'unit' => 'required|integer',                    
-        'length' => 'required|float',                   
-        'weight' => 'required|float',                        
-        'height' => 'required|float',                       
-        'hu_empty_weight' => 'nullable|float',              
-        'hu_minimum_weight' => 'nullable|float',            
-        'hu_loaded_weight' => 'nullable|float',             
-        'hu_maximum_weight' => 'nullable|float',          
-    ]);
+            $validated = $request->validate([
+                'hu_pu_code' => 'required|string',                
+                'hu_pu_type' => 'required|integer',                
+                'flex' => 'nullable|string',                        
+                'pu_hu_name' => 'required|integer',                
+                'description' => 'required|string',               
+                'unit' => 'required|integer',                    
+                'length' => 'required|numeric',                   
+                'weight' => 'required|numeric',                        
+                'height' => 'required|numeric',                       
+                'hu_empty_weight' => 'nullable|numeric',              
+                'hu_minimum_weight' => 'nullable|numeric',            
+                'hu_loaded_weight' => 'nullable|numeric',             
+                'hu_maximum_weight' => 'nullable|numeric',          
+            ]);
+
 
             DB::beginTransaction();
                $hupu_list = Hupu::create($validated);

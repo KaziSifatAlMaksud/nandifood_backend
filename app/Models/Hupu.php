@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Hupu extends Model
 {
+       use HasFactory;
      protected $table = 'hupu';
-    // protected $primaryKey = 'uom_id';
+    // protected $primaryKey = 'id';
 
     protected $fillable = [
+        'id',
         'hu_pu_code',
         'hu_pu_type',
         'flex',
@@ -22,13 +24,13 @@ class Hupu extends Model
         'hu_empty_weight',
         'hu_minimum_weight',
         'hu_loaded_weight',
-        'hu_maximum_weight'
+        'hu_maximum_weight',
     ];
 
-    public function uomType()
-    {
-        return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
-    }
+    // public function uomType()
+    // {
+    //     return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
+    // }
 
 public static function fullName($id)
 {
