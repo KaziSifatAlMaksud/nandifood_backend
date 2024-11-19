@@ -58,13 +58,17 @@ Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destro
 
 
 // Unit Of Manage  List 
-route::get('/uom',[UomController::class, 'index']);
+Route::get('/uom',[UomController::class, 'index']);
 Route::post('/uom/create', [UomController::class, 'store']);
+Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.destroy');
+
 
 
 // handaling Unit List 
 route::get('/hu',[HupuController::class, 'hu_list']);
 route::post('/hu/create',[HupuController::class, 'store']);
+
+
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
 // route::post('/pu/create',[HupuController::class, 'store_pu']);

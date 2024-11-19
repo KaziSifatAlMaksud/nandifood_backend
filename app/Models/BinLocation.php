@@ -105,9 +105,9 @@ class BinLocation extends Model
             // Sum up the volume and storage capacity (assuming 'storage_capacity_slp' is in the same unit)
             return [
                 'total_volume' => $totals['total_volume'] + $volume_m3,
-                'total_storage_capacity_slp' => $totals['total_storage_capacity'] + $bin->storage_capacity_slp
+                'total_storage_capacity_slp' => $totals['total_storage_capacity_slp'] + $bin->storage_capacity_slp
             ];
-        }, ['total_volume' => 0, 'total_storage_capacity' => 0]);
+        }, ['total_volume' => 0, 'total_storage_capacity_slp' => 0]);
 }
 
  

@@ -35,8 +35,8 @@ class WarehouseController extends Controller
 
         $warehouses = $warehouses->map(function ($warehouse) {
                 $totals  = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
-                 $warehouse->volume_m3 = $totals['total_volume'];
-                $warehouse->total_storage_capacity = $totals['total_storage_capacity'];
+                $warehouse->volume_m3 = $totals['total_volume'];
+                $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
                 return $warehouse;
         });
 

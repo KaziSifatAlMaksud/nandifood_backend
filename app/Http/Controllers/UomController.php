@@ -108,6 +108,23 @@ class UomController extends Controller
     }
 }
 
+    public function destroy($id)
+    {
+        try {
+            $uom = Uom::findOrFail($id);
+            $uom->delete();
+            return response()->json([
+                'status' => '200',
+                'message' => 'Uom deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
   
 }
