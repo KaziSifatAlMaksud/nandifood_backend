@@ -15,39 +15,91 @@ use App\Models\WarehouseAttachment;
 class WarehouseController extends Controller
 {
     // Fetch all warehouse records
-    public function index()
-    {
-        $warehouses = Warehouse::select([
-            'id',
-            'warehouse_name',
-            'country',
-            'state',
-            'city',
-            'status',
-            'zip_code',
-            'address1',
-            'address2',
-            'email',
-            'phone',
-            'warehouse_contact',
-            'warehouse_capacity_in_kg',
-        ])->get();
+    // public function index()
+    // {
+    //     $warehouses = Warehouse::select([
+    //         'id',
+    //         'warehouse_name',
+    //         'country',
+    //         'state',
+    //         'city',
+    //         'status',
+    //         'zip_code',
+    //         'address1',
+    //         'address2',
+    //         'email',
+    //         'phone',
+    //         'warehouse_contact',
+    //         'warehouse_capacity_in_kg',
+    //     ])->get();
 
-        $warehouses = $warehouses->map(function ($warehouse) {
-                $totals  = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
-                $warehouse->volume_m3 = $totals['total_volume'];
-                $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
-                return $warehouse;
-        });
+    //     $warehouses = $warehouses->map(function ($warehouse) {
+    //             $totals  = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
+    //             $warehouse->volume_m3 = $totals['total_volume'];
+    //             $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
+    //             return $warehouse;
+    //     });
 
-        return response()->json([
-            'status' => '200',
-            'message' => 'Ok',
-            'result'=>[
-                'warehouses' =>  $warehouses
-            ]
-        ]);
+
+    //     return response()->json([
+    //         'status' => '200',
+    //         'message' => 'Ok',
+    //         'result'=>[
+    //             'warehouses' =>  $warehouses
+    //         ]
+    //     ]);
+    // }
+
+ public function index(Request $request)
+{
+    // Select only required columns to optimize query performance
+    $query = Warehouse::select([
+        'id',
+        'warehouse_name',
+        'country',
+        'state',
+        'city',
+        'status',
+        'zip_code',
+        'address1',
+        'address2',
+        'email',
+        'phone',
+        'warehouse_contact',
+        'warehouse_capacity_in_kg',
+    ]);
+
+    // Handle search functionality
+    $search = $request->input('search'); // Space-separated values
+    if ($search) {
+        $terms = explode(' ', $search); // Split by spaces
+        foreach ($terms as $term) {
+            $query->where('warehouse_name', 'LIKE', "%{$term}%"); // Adjust column as needed
+        }
     }
+
+    // Handle pagination
+    $limit = $request->input('limit', 10); // Default limit to 10
+    $warehousesPaginated = $query->paginate($limit); // Get paginated result
+
+    // Apply additional logic to each warehouse while keeping pagination
+    $warehouses = $warehousesPaginated->getCollection()->map(function ($warehouse) {
+        $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
+        $warehouse->volume_m3 = $totals['total_volume'];
+        $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
+        return $warehouse;
+    });
+
+    // Update the paginated collection
+    $warehousesPaginated->setCollection($warehouses);
+
+    // Return response with pagination
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => $warehousesPaginated, // Contains data + pagination metadata
+    ]);
+}
 
 
     public function warehouse_compliance()
