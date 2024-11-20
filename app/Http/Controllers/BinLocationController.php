@@ -15,7 +15,7 @@ use App\Models\Warehouse;
 
 class BinLocationController extends Controller
 {
-    public function index($id = null)
+    public function index(Request $request)
     {
         // Start the query on BinLocation
         $query = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
@@ -39,26 +39,35 @@ class BinLocationController extends Controller
                 'bin_location.file',
                 'bin_location.bin_barcode_img'
             ]);
-
-        // If an id is provided, filter by it
-        if ($id) {
-            $binlocations = $query->where('bin_location.warehouse_id', $id)->first(); // Fetch a single bin location
-            if (!$binlocations) {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Bin location not found',
-                ], 404);
+            // Handle search functionality
+            $search = $request->input('search');
+            if ($search) {
+                $terms = explode(' ', $search);
+                $query->where(function ($subQuery) use ($terms) {
+                    foreach ($terms as $term) {
+                        $subQuery->orWhere('bin_location.description', 'LIKE', "%{$term}%")
+                            ->orWhere('bin_location.bin_number', 'LIKE', "%{$term}%")
+                            ->orWhere('warehouse.warehouse_name', 'LIKE', "%{$term}%"); // Added warehouse name search
+                    }
+                });
             }
-        } else {
-            $binlocations = $query->get(); // Fetch all bin locations
-        }
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Ok',
-            'result' => $binlocations 
-            
-        ]);
+            // Check for warehouse_id filter
+            $warehouseId = $request->input('warehouse_id');
+            if ($warehouseId) {
+                $query->where('bin_location.warehouse_id', $warehouseId);
+            }
+
+            // Apply pagination with a default limit
+            $limit = $request->input('limit', 10); // Default limit to 10
+            $binlocations = $query->paginate($limit);
+
+            // Return the paginated response
+            return response()->json([
+                'status' => 200,
+                'message' => 'Ok',
+                'result' => $binlocations,
+            ]);
     }
 
 

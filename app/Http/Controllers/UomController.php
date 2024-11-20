@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class UomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
     $uoms = Uom::select([
         'uom_id',
@@ -22,6 +22,32 @@ class UomController extends Controller
         'purchase_uom',
         'sales_uom'
     ])->get();
+
+    // Initialize the query for searching and filtering
+    $query = Uom::query();
+
+     // Handle search input (space-separated values)
+    $search = $request->input('search');
+    if ($search) {
+        $terms = explode(' ', $search); // Split the input into search terms
+        foreach ($terms as $term) {
+            $query->where('description', 'LIKE', "%{$term}%")
+                  ->orWhere('uom_id', 'LIKE', "%{$term}%"); // Adjust the columns as needed
+        }
+    }
+
+   
+    // Filter by warehouse_id if provided
+    // $warehouseId = $request->input('warehouse_id');
+    // if ($warehouseId) {
+    //     $query->where('bin_location.warehouse_id', $warehouseId);
+    // }
+
+
+    // Apply pagination with a default limit
+    $limit = $request->input('limit', 10); // Default limit set to 5
+    $uomPaginated = $query->paginate($limit);
+
 
     $uoms = $uoms->map(function ($uom) {
         if ($uom->unit == 0) {      
@@ -47,10 +73,12 @@ class UomController extends Controller
 
         return $uom;
     });
+    //   $uomPaginated->setCollection($uoms);
+
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
-            'result' => $uoms
+            'result' => $uomPaginated
         ]);
     }
 

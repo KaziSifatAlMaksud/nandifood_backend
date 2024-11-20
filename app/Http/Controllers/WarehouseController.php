@@ -79,7 +79,7 @@ class WarehouseController extends Controller
     }
 
     // Handle pagination
-    $limit = $request->input('limit', 10); // Default limit to 10
+    $limit = $request->input('limit', 5); // Default limit to 10
     $warehousesPaginated = $query->paginate($limit); // Get paginated result
 
     // Apply additional logic to each warehouse while keeping pagination
