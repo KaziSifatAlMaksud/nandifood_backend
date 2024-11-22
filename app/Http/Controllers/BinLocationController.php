@@ -16,6 +16,7 @@ use App\Models\Warehouse;
 
 class BinLocationController extends Controller
 {
+<<<<<<< HEAD
 public function index(Request $request)
 {
     // Start the query on BinLocation
@@ -53,6 +54,61 @@ public function index(Request $request)
             'message' => 'Filtered by warehouse ID',
             'result' => $binLocation
         ]);
+=======
+    public function index(Request $request)
+    {
+        // Start the query on BinLocation
+        $query = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
+            ->select([
+                'bin_location.id',
+                'bin_location.warehouse_id',
+                // Assuming you want to use warehouse name and location for full name
+                DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
+                DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
+                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
+                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
+                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
+                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
+                'bin_location.bin_number',
+                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location"),
+                'bin_location.bin_length',
+                'bin_location.bin_width',
+                'bin_location.bin_height',
+                'bin_location.status',
+                'bin_location.description',
+                'bin_location.file',
+                'bin_location.bin_barcode_img'
+            ]);
+            // Handle search functionality
+            $search = $request->input('search');
+            if ($search) {
+                $terms = explode(' ', $search);
+                $query->where(function ($subQuery) use ($terms) {
+                    foreach ($terms as $term) {
+                        $subQuery->orWhere('bin_location.description', 'LIKE', "%{$term}%")
+                            ->orWhere('bin_location.bin_number', 'LIKE', "%{$term}%")
+                            ->orWhere('warehouse.warehouse_name', 'LIKE', "%{$term}%"); // Added warehouse name search
+                    }
+                });
+            }
+
+            // Check for warehouse_id filter
+            $warehouseId = $request->input('warehouse_id');
+            if ($warehouseId) {
+                $query->where('bin_location.warehouse_id', $warehouseId);
+            }
+
+            // Apply pagination with a default limit
+            $limit = $request->input('limit', 10); // Default limit to 10
+            $binlocations = $query->paginate($limit);
+
+            // Return the paginated response
+            return response()->json([
+                'status' => 200,
+                'message' => 'Ok',
+                'result' => $binlocations,
+            ]);
+>>>>>>> 205504f58f9cd092eff9e2a52e4ac018e313b93f
     }
 
   // Implement search functionality if no ID is provided

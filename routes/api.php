@@ -23,6 +23,7 @@ Route::get('/user', function (Request $request) {
 // });
 //warehouse route 
 route::resource('/warehouse', WarehouseController::class);
+<<<<<<< HEAD
 
 // route::get('/warehouse/pagination', [EmployeeController::class, 'pagination']);
 
@@ -31,10 +32,18 @@ Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 
 route::get('/country',[WarehouseController::class, 'country']);
 
+=======
+>>>>>>> 205504f58f9cd092eff9e2a52e4ac018e313b93f
 //warehouse attachment route
 route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
 route::post('/warehouse_attachment/create', [WarehouseController::class, 'warehouse_attachment_store']);
 route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 'warehouse_attachment_destroy'])->name('warehouse-attachment.destroy');
+
+//warehouse information
+Route::get('/employee', [EmployeeController::class, 'index']);
+route::get('/country',[WarehouseController::class, 'country']);
+
+
 
 //download PDF route
 route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
@@ -42,10 +51,14 @@ route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_e
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 
+<<<<<<< HEAD
 // Route::post('/lavel/create', [BinLocationController::class, 'form']);
 
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
+=======
+
+>>>>>>> 205504f58f9cd092eff9e2a52e4ac018e313b93f
 route::get('/binlocation/create', [BinLocationController::class, 'create']);
 Route::post('/binlocation/create', [BinLocationController::class, 'store']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');

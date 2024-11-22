@@ -8,51 +8,53 @@ use App\Models\Employee;
 
 class EmployeeController extends Controller
 {
-   public function index($id = null)
-{
 
-    try {
-        if ($id) {
-            // Query employees by warehouse_id if $id is provided
-            $employees = Employee::where('default_warehouse', $id)->get();
-
-            // Check if there are no employees found
-            if ($employees->isEmpty()) {
-                return response()->json([
-                    'status' => '404',
-                    'message' => 'No employees found for this warehouse.',
-                    'result' => []
-                ]);
+    public function index(Request $request, $id = null)
+    {
+        try {
+            // Initialize the query
+            $query = Employee::query();
+    
+            // Filter by warehouse_id if $id is provided
+            if ($id) {
+                $query->where('default_warehouse', $id);
             }
-
+    
+            // Handle search input (search by name or employee_id)
+            $search = $request->input('search');
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('employee_id', 'LIKE', "%{$search}%");
+                });
+            }
+    
+            // Apply pagination with a default limit
+            $limit = $request->input('limit', 10); // Default limit set to 10
+            $employeesPaginated = $query->paginate($limit);
+    
+            // Return the paginated response with links
             return response()->json([
                 'status' => '200',
-                'message' => 'Employees found for warehouse.',
+                'message' => $id ? 'Employees found for warehouse.' : 'All employees retrieved.',
                 'result' => [
-                    'employees' => $employees
+                    'employees' => $employeesPaginated->items(), // Current page items
+                    'total' => $employeesPaginated->total(),    // Total number of items
+                    'per_page' => $employeesPaginated->perPage(), // Items per page
+                    'current_page' => $employeesPaginated->currentPage(), // Current page number
+                    'last_page' => $employeesPaginated->lastPage(), // Last page number
+                    'links' => $employeesPaginated->toArray()['links'], // Pagination links
                 ]
             ]);
-        } else {
-            // Fetch all employees if no warehouse_id is provided
-            $employees = Employee::all();
-
+        } catch (\Exception $e) {
+            // Catch any exceptions and return an error response
             return response()->json([
-                'status' => '200',
-                'message' => 'All employees retrieved.',
-                'result' => [
-                    'employees' => $employees
-                ]
+                'status' => '500',
+                'message' => 'An error occurred: ' . $e->getMessage(),
+                'result' => []
             ]);
         }
-    } catch (\Exception $e) {
-        // Catch any exceptions and return an error response
-        return response()->json([
-            'status' => '500',
-            'message' => 'An error occurred: ' . $e->getMessage(),
-            'result' => []
-        ]);
     }
-}
-
+    
 
 }
