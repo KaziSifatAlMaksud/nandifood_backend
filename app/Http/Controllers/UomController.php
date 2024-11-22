@@ -75,7 +75,6 @@ class UomController extends Controller
 
         return $uom;
     });
-<<<<<<< HEAD
 
      // Search logic
     $search = $request->input('search');
@@ -114,14 +113,6 @@ class UomController extends Controller
             'status' => 200,
             'message' => 'Ok',
             'result' => $paginated
-=======
-    //   $uomPaginated->setCollection($uoms);
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'Ok',
-            'result' => $uomPaginated
->>>>>>> 205504f58f9cd092eff9e2a52e4ac018e313b93f
         ]);
     }
 
