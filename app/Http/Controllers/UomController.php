@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Uom; 
 use App\Models\Hupu;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class UomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
     $uoms = Uom::select([
         'uom_id',
@@ -47,10 +49,44 @@ class UomController extends Controller
 
         return $uom;
     });
+
+     // Search logic
+    $search = $request->input('search');
+    if ($search) {
+        $terms = explode(' ', $search); // Split by spaces
+        $uoms = $uoms->filter(function ($uom) use ($terms) {
+            foreach ($terms as $term) {
+                if (
+                    stripos($uom->description, $term) !== false || 
+                    stripos($uom->bulk_code, $term) !== false
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+       
+       // Pagination logic
+        $currentPage = Paginator::resolveCurrentPage(); // Get current page
+        $limit = (int) $request->input('limit', 5); // Default limit to 5
+        $paginatedItems = $uoms->slice(($currentPage - 1) * $limit, $limit)->values(); // Slice the collection
+
+        // Create a LengthAwarePaginator
+        $paginated = new LengthAwarePaginator(
+            $paginatedItems, // Items for the current page
+            $uoms->count(), // Total items
+            $limit, // Items per page
+            $currentPage, // Current page number
+            [
+                'path' => Paginator::resolveCurrentPath(), // Set pagination path
+                'query' => $request->query() // Preserve query parameters
+            ]
+        );
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
-            'result' => $uoms
+            'result' => $paginated
         ]);
     }
 

@@ -8,64 +8,80 @@ use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\BinLocationController;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 
 use App\Models\Warehouse;
 
 class BinLocationController extends Controller
 {
-    public function index($id = null)
-    {
-        // Start the query on BinLocation
-        $query = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
-            ->select([
-                'bin_location.id',
-                'bin_location.warehouse_id',
-                // Assuming you want to use warehouse name and location for full name
-                DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
-                DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
-                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
-                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
-                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
-                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
-                'bin_location.bin_number',
-                DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location"),
-                'bin_location.bin_length',
-                'bin_location.bin_width',
-                'bin_location.bin_height',
-                'bin_location.status',
-                'bin_location.description',
-                'bin_location.file',
-                'bin_location.bin_barcode_img'
-            ]);
+public function index(Request $request)
+{
+    // Start the query on BinLocation
+    $query = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
+        ->select([
+            'bin_location.id',
+            'bin_location.warehouse_id',
+            DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
+            DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
+            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
+            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
+            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
+            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
+            'bin_location.bin_number',
+            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location"),
+            'bin_location.bin_length',
+            'bin_location.bin_width',
+            'bin_location.bin_height',
+            'bin_location.status',
+            'bin_location.description',
+            'bin_location.file',
+            'bin_location.bin_barcode_img'
+        ]);
 
-        // If an id is provided, filter by it
-        if ($id) {
-            $binlocations = $query->where('bin_location.warehouse_id', $id)->first(); // Fetch a single bin location
-            if (!$binlocations) {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Bin location not found',
-                ], 404);
-            }
-        } else {
-            $binlocations = $query->get(); // Fetch all bin locations
-        }
+    // Check if an ID is provided
+    $id = $request->input('id');
+    $limit = (int) $request->input('limit', 5);
+    if ($id) {
+        // Filter by ID and retrieve the data
+        $binLocation = $query->where('bin_location.warehouse_id', $id)->paginate($limit);
 
+        // Return the filtered result
         return response()->json([
             'status' => 200,
-            'message' => 'Ok',
-            'result' => $binlocations 
-            
+            'message' => 'Filtered by warehouse ID',
+            'result' => $binLocation
         ]);
     }
 
+  // Implement search functionality if no ID is provided
+    $search = $request->input('search'); // Accept space-separated search terms
+    if ($search) {
+        $terms = explode(' ', $search); // Split the search string into terms
+        $query = $query->where(function ($query) use ($terms) {
+            foreach ($terms as $term) {
+                $query->orWhere('warehouse.warehouse_name', 'LIKE', '%' . $term . '%')
+                      ->orWhere('bin_location.description', 'LIKE', '%' . $term . '%');
+            }
+        });
+    }
+
+    // Pagination logic
+     $binLocation = $query->paginate($limit);
+
+    // Return paginated results if no ID is provided
+    return response()->json([
+        'status' => 200,
+        'message' => 'Success',
+        'result' => $binLocation
+    ]);
+}
 
 
 
-        public function store(Request $request)
-{
+    public function store(Request $request)
+    {
     // Attempt to validate the request data
     try {
         // Validate the request data

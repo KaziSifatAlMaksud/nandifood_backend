@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Hupu;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 class HupuController extends Controller
 {
-   public function hu_list()
+   public function hu_list(Request $request)
     {
         $hu_lists = Hupu::select([
             'id',
@@ -60,15 +61,45 @@ class HupuController extends Controller
             return $hu_list;
         });
 
+        $search = $request->input('search'); // Space-separated values
+        if ($search) {
+            $terms = explode(' ', $search); // Split by spaces
+            $hu_lists = $hu_lists->filter(function ($hu_list) use ($terms) {
+                foreach ($terms as $term) {
+                    if (stripos($hu_list->pu_hu_name, $term) !== false || 
+                        stripos($hu_list->description, $term) !== false) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+        // Pagination logic
+        $currentPage = Paginator::resolveCurrentPage(); // Get current page
+        $limit = (int) $request->input('limit', 5); // Default limit to 5
+        $paginatedItems = $hu_lists->slice(($currentPage - 1) * $limit, $limit)->values(); // Slice the collection
+
+        // Create a LengthAwarePaginator
+        $paginated = new LengthAwarePaginator(
+            $paginatedItems, // Items for the current page
+            $hu_lists->count(), // Total items
+            $limit, // Items per page
+            $currentPage, // Current page number
+            [
+                'path' => Paginator::resolveCurrentPath(), // Set pagination path
+                'query' => $request->query() // Preserve query parameters
+            ]
+        );
+
         return response()->json([
             'status' => 200,
-            'message' => 'Ok',
-            'result' => $hu_lists
+            'message' => 'HU list Ok..',
+            'result' => $paginated
         ]);
     }
 
 
-     public function pu_list()
+     public function pu_list(Request $request)
     {
          $pu_lists = Hupu::select([
             'id',
@@ -116,11 +147,42 @@ class HupuController extends Controller
             $pu_list->height_cm = $height_cm ?? $result['height_cm'];
 
             return $pu_list;
-        });      
+        });     
+        
+        $search = $request->input('search'); // Space-separated values
+    if ($search) {
+        $terms = explode(' ', $search); // Split by spaces
+        $pu_lists = $pu_lists->filter(function ($pu_list) use ($terms) {
+            foreach ($terms as $term) {
+                if (stripos($pu_list->pu_hu_name, $term) !== false || 
+                    stripos($pu_list->description, $term) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+         // Pagination logic
+        $currentPage = Paginator::resolveCurrentPage(); // Get current page
+        $limit = (int) $request->input('limit', 5); // Default limit to 5
+        $paginatedItems = $pu_lists->slice(($currentPage - 1) * $limit, $limit)->values(); // Slice the collection
+
+        // Create a LengthAwarePaginator
+        $paginated = new LengthAwarePaginator(
+            $paginatedItems, // Items for the current page
+            $pu_lists->count(), // Total items
+            $limit, // Items per page
+            $currentPage, // Current page number
+            [
+                'path' => Paginator::resolveCurrentPath(), // Set pagination path
+                'query' => $request->query() // Preserve query parameters
+            ]
+        );
+
         return response()->json([
             'status' => 200,
-            'message' => 'Unit of Measurement List',
-            'result' => $pu_lists
+            'message' => 'PU List Ok.',
+            'result' => $paginated
         ]);
 
     }

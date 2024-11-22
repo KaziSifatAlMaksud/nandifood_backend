@@ -24,10 +24,11 @@ Route::get('/user', function (Request $request) {
 //warehouse route 
 route::resource('/warehouse', WarehouseController::class);
 
-route::get('/warehouse/pagination', [EmployeeController::class, 'pagination']);
+// route::get('/warehouse/pagination', [EmployeeController::class, 'pagination']);
 
 //warehouse information
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
+
 route::get('/country',[WarehouseController::class, 'country']);
 
 //warehouse attachment route
@@ -44,10 +45,9 @@ Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 // Route::post('/lavel/create', [BinLocationController::class, 'form']);
 
 
-
+Route::get('/binlocation', [BinLocationController::class, 'index']);
 route::get('/binlocation/create', [BinLocationController::class, 'create']);
 Route::post('/binlocation/create', [BinLocationController::class, 'store']);
-Route::get('/binlocation/{war_id?}', [BinLocationController::class, 'index']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');
 
 
