@@ -73,7 +73,7 @@ public function index(Request $request)
     // Return paginated results if no ID is provided
     return response()->json([
         'status' => 200,
-        'message' => 'Success',
+        'message' => 'Ok.',
         'result' => $binLocation
     ]);
 }

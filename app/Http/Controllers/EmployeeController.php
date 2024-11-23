@@ -16,9 +16,7 @@ class EmployeeController extends Controller
             $query = Employee::query();
     
             // Filter by warehouse_id if $id is provided
-            if ($id) {
-                $query->where('default_warehouse', $id);
-            }
+            $id = $request->input('id');
     
             // Handle search input (search by name or employee_id)
             $search = $request->input('search');
@@ -34,17 +32,22 @@ class EmployeeController extends Controller
             $employeesPaginated = $query->paginate($limit);
     
             // Return the paginated response with links
-            return response()->json([
-                'status' => '200',
-                'message' => $id ? 'Employees found for warehouse.' : 'All employees retrieved.',
-                'result' => [
-                    'employees' => $employeesPaginated->items(), // Current page items
-                    'total' => $employeesPaginated->total(),    // Total number of items
-                    'per_page' => $employeesPaginated->perPage(), // Items per page
-                    'current_page' => $employeesPaginated->currentPage(), // Current page number
-                    'last_page' => $employeesPaginated->lastPage(), // Last page number
-                    'links' => $employeesPaginated->toArray()['links'], // Pagination links
-                ]
+            //  return response()->json([
+            // 'status' => 200,
+            // 'message' => $id ? 'Filtered by warehouse ID' : 'Success',
+            // 'result' => [
+            //     'data' => $binLocationPaginated->items(), // Current page items
+            //     'total' => $binLocationPaginated->total(), // Total number of items
+            //     'per_page' => $binLocationPaginated->perPage(), // Items per page
+            //     'current_page' => $binLocationPaginated->currentPage(), // Current page number
+            //     'last_page' => $binLocationPaginated->lastPage(), // Last page number
+            //     'links' => $binLocationPaginated->toArray()['links'], // Pagination links
+            //     ]
+            // ]);
+              return response()->json([
+                'status' => 200,
+                'message' => 'OK.',
+                'result' => $employeesPaginated
             ]);
         } catch (\Exception $e) {
             // Catch any exceptions and return an error response
