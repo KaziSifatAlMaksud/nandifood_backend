@@ -43,7 +43,7 @@ route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_e
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
-route::get('/binlocation/create', [BinLocationController::class, 'create']);
+// route::get('/binlocation/create', [BinLocationController::class, 'create']);
 Route::post('/binlocation/create', [BinLocationController::class, 'store']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');
 

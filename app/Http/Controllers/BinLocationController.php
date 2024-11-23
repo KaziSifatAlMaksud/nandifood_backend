@@ -100,7 +100,7 @@ public function index(Request $request)
             'bin_length' => 'required|string|max:255',
             'bin_width' => 'required|string|max:255',
             'bin_height' => 'required|string|max:255',
-            'status' => 'required|string|max:255',
+            'status' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:255', // Optional, so make it nullable
             'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
             'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
