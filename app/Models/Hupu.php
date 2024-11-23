@@ -27,10 +27,10 @@ class Hupu extends Model
         'hu_maximum_weight',
     ];
 
-    // public function uomType()
-    // {
-    //     return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
-    // }
+    public function uomType()
+    {
+        return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
+    }
 
 public static function fullName($id)
 {

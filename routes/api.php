@@ -57,12 +57,13 @@ Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.
 
 // handaling Unit List 
 Route::get('/hu',[HupuController::class, 'hu_list']);
-Route::post('/hu_pu/create',[HupuController::class, 'store']);
+Route::POST('hu_pu/create',[HupuController::class, 'store']);
 Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('hu_pu.destroy');
 
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
+route::get('/',[HupuController::class, 'pu_list']);
 
 
 

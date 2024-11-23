@@ -82,7 +82,6 @@ public function index(Request $request)
 
     public function store(Request $request)
     {
-    // Attempt to validate the request data
     try {
         // Validate the request data
         $validated = $request->validate([

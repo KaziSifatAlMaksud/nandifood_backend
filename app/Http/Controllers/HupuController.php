@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Hupu;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 class HupuController extends Controller
 {
    public function hu_list(Request $request)
@@ -188,7 +189,7 @@ class HupuController extends Controller
     }
 
 
-     public function store_pu(Request $request)
+     public function store(Request $request)
     {
         try {
         $validated = $request->validate([
@@ -198,13 +199,13 @@ class HupuController extends Controller
         'pu_hu_name' => 'required|integer',                
         'description' => 'required|string',               
         'unit' => 'required|integer',                    
-        'length' => 'required|float',                   
-        'weight' => 'required|float',                        
-        'height' => 'required|float',                       
-        'hu_empty_weight' => 'nullable|float',              
-        'hu_minimum_weight' => 'nullable|float',            
-        'hu_loaded_weight' => 'nullable|float',             
-        'hu_maximum_weight' => 'nullable|float',          
+        'length' => 'required|numeric',                   
+        'weight' => 'required|numeric',                        
+        'height' => 'required|numeric',                       
+        'hu_empty_weight' => 'nullable|numeric',              
+        'hu_minimum_weight' => 'nullable|numeric',            
+        'hu_loaded_weight' => 'nullable|numeric',             
+        'hu_maximum_weight' => 'nullable|numeric',          
         ]);
 
             DB::beginTransaction();
@@ -229,45 +230,45 @@ class HupuController extends Controller
         }
     }
 
-      public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'hu_pu_code' => 'required|string',                
-                'hu_pu_type' => 'required|integer',                
-                'flex' => 'nullable|string',                        
-                'pu_hu_name' => 'required|integer',                
-                'description' => 'required|string',               
-                'unit' => 'required|integer',                    
-                'length' => 'required|numeric',                   
-                'weight' => 'required|numeric',                        
-                'height' => 'required|numeric',                       
-                'hu_empty_weight' => 'nullable|numeric',              
-                'hu_minimum_weight' => 'nullable|numeric',            
-                'hu_loaded_weight' => 'nullable|numeric',             
-                'hu_maximum_weight' => 'nullable|numeric',          
-            ]);
+    //   public function storeadsfasd(Request $request)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'hu_pu_code' => 'required|string',                
+    //             'hu_pu_type' => 'required|integer',                
+    //             'flex' => 'nullable|string',                        
+    //             'pu_hu_name' => 'required|integer',                
+    //             'description' => 'required|string',               
+    //             'unit' => 'required|integer',                    
+    //             'length' => 'required|numeric',                   
+    //             'weight' => 'required|numeric',                        
+    //             'height' => 'required|numeric',                       
+    //             'hu_empty_weight' => 'nullable|numeric',              
+    //             'hu_minimum_weight' => 'nullable|numeric',            
+    //             'hu_loaded_weight' => 'nullable|numeric',             
+    //             'hu_maximum_weight' => 'nullable|numeric',          
+    //         ]);
 
 
-            DB::beginTransaction();
-               $hupu_list = Hupu::create($validated);
-            DB::commit();
-            return response()->json([
-                'status' => 200,
-                'message' => 'created successfully',
-                'result' => $hupu_list,
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         DB::beginTransaction();
+    //            $hupu_list = Hupu::create($validated);
+    //         DB::commit();
+    //         return response()->json([
+    //             'status' => 200,
+    //             'message' => 'created successfully',
+    //             'result' => $hupu_list,
+    //         ]);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'status' => 422,
+    //             'errors' => $e->errors(),
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'status' => 500,
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 }
