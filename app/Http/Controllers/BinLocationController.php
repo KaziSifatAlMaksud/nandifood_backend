@@ -84,27 +84,27 @@ public function index(Request $request)
     {
     try {
         // Validate the request data
-        $validated = $request->validate([
-            'warehouse_id' => 'required|string|max:8',
-            'effective_date' => 'required|date',
-            'storage_type_id' => 'required|string|max:8',
-            'asset_type_id' => 'required|string|max:8',
-            'zone_number' => 'required|string|max:8',
-            'zone_name' => 'required|string|max:255',
-            'section_number' => 'nullable|integer', // Only integer, no need for 'number'
-            'aisle_number' => 'nullable|integer', // Use integer for numbers
-            'rack_number' => 'nullable|integer', // Use integer for numbers
-            'shelf_number' => 'nullable|integer', // Use integer for numbers
-            'bin_number' => 'nullable|integer', // Use integer for numbers
-            'metric_unit' => 'required|string|max:255',
-            'bin_length' => 'required|string|max:255',
-            'bin_width' => 'required|string|max:255',
-            'bin_height' => 'required|string|max:255',
-            'status' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:255', // Optional, so make it nullable
-            'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
-            'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
-        ]);
+        // $validated = $request->validate([
+        //     'warehouse_id' => 'required|string|max:8',
+        //     'effective_date' => 'required|date',
+        //     'storage_type_id' => 'required|string|max:8',
+        //     'asset_type_id' => 'required|string|max:8',
+        //     'zone_number' => 'required|string|max:8',
+        //     'zone_name' => 'required|string|max:255',
+        //     'section_number' => 'nullable|integer',
+        //     'aisle_number' => 'nullable|integer', // Use integer for numbers
+        //     'rack_number' => 'nullable|integer', // Use integer for numbers
+        //     'shelf_number' => 'nullable|integer', // Use integer for numbers
+        //     'bin_number' => 'nullable|integer', // Use integer for numbers
+        //     'metric_unit' => 'required|string|max:255',
+        //     'bin_length' => 'required|string|max:255',
+        //     'bin_width' => 'required|string|max:255',
+        //     'bin_height' => 'required|string|max:255',
+        //     'status' => 'nullable|string|max:255',
+        //     'description' => 'nullable|string|max:255', // Optional, so make it nullable
+        //     'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
+        //     'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
+        // ]);
 
         // Begin database transaction
         DB::beginTransaction();
@@ -118,8 +118,8 @@ public function index(Request $request)
             $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
             $validated['bin_barcode_img'] = $barcodeImagePath;
         }
-
-        $binlocation = BinLocation::create($validated);
+        $binlocation = BinLocation::create($request->all());
+        // $binlocation = BinLocation::create($validated);
         DB::commit();
 
         // Return a success response

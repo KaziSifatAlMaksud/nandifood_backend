@@ -130,29 +130,30 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
-            'warehouse_name' => 'required|string|max:255',
-            'address1' => 'required|string|max:255',
-            'country' => 'required|string|max:25',
-            'state' => 'required|string|max:25',
-            'city' => 'required|string|max:25',
-            'zip_code' => 'required|string|max:20',
-            'email' => 'required|email|max:255', 
-            'phone' => 'nullable|string|max:255', 
-            'address2' => 'nullable|string|max:255',
-            'warehouse_contact' => 'nullable|string|max:255',
-            'emergency_phone' => 'nullable|string|max:255',
-            'eff_date' => 'nullable|date', 
-            'loc_work_week' => 'nullable|integer', 
-            'work_week_days' => 'nullable|string|max:50', 
-            'warehouse_manager' => 'nullable|string|max:255',
-            'warehouse_supervisor' => 'nullable|string|max:255',
-            'bus_hours_open' => 'nullable|string|max:10', 
-            'bus_hours_close' => 'nullable|string|max:10',
-            'status' => 'nullable|string|max:50',
-        ]);
+        //     $validated = $request->validate([
+        //     'warehouse_name' => 'required|string|max:255',
+        //     'address1' => 'required|string|max:255',
+        //     'country' => 'required|string|max:25',
+        //     'state' => 'required|string|max:25',
+        //     'city' => 'required|string|max:25',
+        //     'zip_code' => 'required|string|max:20',
+        //     'email' => 'required|email|max:255', 
+        //     'phone' => 'nullable|string|max:255', 
+        //     'address2' => 'nullable|string|max:255',
+        //     'warehouse_contact' => 'nullable|string|max:255',
+        //     'emergency_phone' => 'nullable|string|max:255',
+        //     'eff_date' => 'nullable|date', 
+        //     'loc_work_week' => 'nullable|integer', 
+        //     'work_week_days' => 'nullable|string|max:50', 
+        //     'warehouse_manager' => 'nullable|string|max:255',
+        //     'warehouse_supervisor' => 'nullable|string|max:255',
+        //     'bus_hours_open' => 'nullable|string|max:10', 
+        //     'bus_hours_close' => 'nullable|string|max:10',
+        //     'status' => 'nullable|string|max:50',
+        // ]);
             DB::beginTransaction();
-               $warehouse = Warehouse::create($validated);
+            //    $warehouse = Warehouse::create($validated);
+                $warehouse = Warehouse::create($request->all());
             DB::commit();
 
             // Return a success response

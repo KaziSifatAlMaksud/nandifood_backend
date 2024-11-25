@@ -123,25 +123,25 @@ class UomController extends Controller
     // Attempt to validate the request data
     try {
         // Validate the request data
-        $validated = $request->validate([
-            'uom_type_id' => 'required|string|max:8',             
-            'description' => 'required|string',                  
-            'weight' => 'required|numeric',                      
-            'bulk_code' => 'required|string|max:8',             
-            'unit' => 'required|string|max:8',                   
-            'inventory_uom' => 'required|string|max:255',       
-            'production_uom' => 'nullable|string',              
-            'purchase_uom' => 'nullable|string',               
-            'uom_length' => 'nullable|numeric',                   
-            'uom_width' => 'nullable|numeric',                   
-            'uom_height' => 'nullable|numeric',                  
-        ]);
+        // $validated = $request->validate([
+        //     'uom_type_id' => 'required|numeric',             
+        //     'description' => 'required|string',                  
+        //     'weight' => 'required|numeric',                      
+        //     'bulk_code' => 'required|string|max:8',             
+        //     'unit' => 'required|string|max:8',                   
+        //     'inventory_uom' => 'required|string|max:255',       
+        //     'production_uom' => 'nullable|string',              
+        //     'purchase_uom' => 'nullable|string',               
+        //     'uom_length' => 'nullable|numeric',                   
+        //     'uom_width' => 'nullable|numeric',                   
+        //     'uom_height' => 'nullable|numeric',                  
+        // ]);
 
         
         // Begin database transaction
         DB::beginTransaction();
     
-        $uom_list = Uom::create($validated);
+        $uom_list = Uom::create($request->all());
         DB::commit();
 
         // Return a success response
