@@ -50,12 +50,18 @@ Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 Route::get('/binlocation', [BinLocationController::class, 'index']);
 // route::get('/binlocation/create', [BinLocationController::class, 'create']);
 Route::post('/binlocation/create', [BinLocationController::class, 'store']);
+Route::get('/binlocation/{id}', [BinLocationController::class, 'show']);
+Route::get('/binlocation/{id}/edit', [BinLocationController::class, 'edit']);
+Route::put('/binlocation/{id}', [BinLocationController::class, 'update']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');
 
 
 // Unit Of Manage  List 
 Route::get('/uom',[UomController::class, 'index']);
 Route::post('/uom/create', [UomController::class, 'store']);
+Route::get('/uom/{id}', [UomController::class, 'show']);
+Route::get('/uom/{id}/edit', [UomController::class, 'edit']);
+Route::put('/uom/{id}', [UomController::class, 'update']);
 Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.destroy');
 
 
@@ -63,6 +69,7 @@ Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.
 // handaling Unit List 
 Route::get('/hu',[HupuController::class, 'hu_list']);
 Route::POST('hu_pu/create',[HupuController::class, 'store']);
+Route::Get('hu_pu/{id}',[HupuController::class, 'show']);
 Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('hu_pu.destroy');
 
 

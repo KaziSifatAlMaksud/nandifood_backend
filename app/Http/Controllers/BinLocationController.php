@@ -78,7 +78,41 @@ public function index(Request $request)
     ]);
 }
 
+public function show($id){
+    $binLocation = BinLocation::find($id);
 
+    // Check if the bin location exists
+    if (!$binLocation) {
+        return response()->json([
+            'status' => 404,
+            'success' => false,
+            'message' => 'Bin location not found.',
+        ], 404);
+    }
+    return response()->json([
+        'status' => 200,
+        'message' => 'Ok',
+        'result' => $binLocation
+    ]);
+}
+
+public function update(Request $request, $id){
+        $binlocation = BinLocation::find($id);
+        if ($binlocation) {
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Bin location not found.',
+            ], 404);
+                
+        }
+        $binlocation->update($request->all());
+        return response()->json([
+            'status' => 200,
+            'message' => 'Bin location updated successfully',
+            'result' => $binlocation
+        ]);
+}
 
     public function store(Request $request)
     {

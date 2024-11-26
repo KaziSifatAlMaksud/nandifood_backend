@@ -188,6 +188,24 @@ class HupuController extends Controller
 
     }
 
+     public function show($id)
+    {
+        try {
+            $hupu = Hupu::findOrFail($id);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Ok',
+                'result' => [
+                    'data' => $hupu, 
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
      public function store(Request $request)
     {

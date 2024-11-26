@@ -170,6 +170,47 @@ class UomController extends Controller
     }
 }
 
+    // Show a single warehouse record
+    public function show($id)
+    {
+        try {
+            $uom = Uom::findOrFail($id);
+         return response()->json([
+                    'status' => 200,
+                    'message' => 'Ok',
+                      'result' => [
+                    'data' => $uom, 
+                ],
+                ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+  public function update(Request $request, $id)
+{
+    $uom = Uom::find($id);
+
+    if (!$uom) {
+        return response()->json([
+            'status' => '404',
+            'message' => 'Error: UOM not found!',
+        ], 404);
+    }
+    $uom->update($request->all());
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok.',
+        'result' => [
+            'data' => $uom,
+        ],
+    ]);
+}
+
     public function destroy($id)
     {
         try {
