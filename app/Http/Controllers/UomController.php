@@ -190,6 +190,25 @@ class UomController extends Controller
             ], 500);
         }
     }
+   public function edit($id)
+    {
+        try {
+            $uom = Uom::findOrFail($id);
+         return response()->json([
+                    'status' => 200,
+                    'message' => 'Ok',
+                      'result' => [
+                    'data' => $uom, 
+                ],
+                ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
   public function update(Request $request, $id)
 {
