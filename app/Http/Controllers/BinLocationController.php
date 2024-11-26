@@ -118,26 +118,30 @@ public function edit($id){
 
 }
 
-
-public function update(Request $request, $id){
-        $binlocation = BinLocation::find($id);
-        if ($binlocation) {
-            return response()->json([
-                'status' => 404,
-                'success' => false,
-                'message' => 'Bin location not found.',
-            ], 404);
-                
-        }
-        $binlocation->update($request->all());
+public function update(Request $request, $id)
+{
+    $binlocation = BinLocation::find($id);
+    if (!$binlocation) {
         return response()->json([
-            'status' => 200,
-            'message' => 'Bin location updated successfully',
-            'result' => [
-               "data" => $binlocation
-    ],
-        ]);
+            'status' => 404,
+            'success' => false,
+            'message' => 'Bin location not found.',
+        ], 404);
+    }
+    // Update the BinLocation with the validated data
+    $binlocation->update($request->all());
+
+    // Return a successful response
+    return response()->json([
+        'status' => 200,
+        'message' => 'Update Ok.!',
+        'result' => [
+            'data' => $binlocation,
+        ],
+    ], 200);
 }
+
+
 
     public function store(Request $request)
     {

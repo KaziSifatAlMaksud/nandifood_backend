@@ -207,6 +207,43 @@ class HupuController extends Controller
         }
     }
 
+       public function edit($id)
+    {
+        try {
+            $hupu = Hupu::findOrFail($id);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Ok',
+                'result' => [
+                    'data' => $hupu, 
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+   public function update(Request $request, $id)
+{
+    $hupu = Hupu::find($id);
+
+    if (!$hupu) {
+        return response()->json([
+            'status' => '404',
+            'message' => 'Error: UOM not found!',
+        ], 404);
+    }
+    $hupu->update($request->all());
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok.',
+        'result' => [
+            'data' => $hupu,
+        ],
+    ]);
+}
      public function store(Request $request)
     {
         try {

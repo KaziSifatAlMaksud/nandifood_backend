@@ -217,8 +217,7 @@ class UomController extends Controller
 
   public function update(Request $request, $id)
 {
-    $uom = Uom::find($id);
-
+        $uom = Uom::findOrFail($id);
     if (!$uom) {
         return response()->json([
             'status' => '404',

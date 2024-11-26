@@ -70,6 +70,8 @@ Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.
 Route::get('/hu',[HupuController::class, 'hu_list']);
 Route::POST('hu_pu/create',[HupuController::class, 'store']);
 Route::Get('hu_pu/{id}',[HupuController::class, 'show']);
+Route::Get('hu_pu/{id}/edit',[HupuController::class, 'edit']);
+Route::put('hu_pu/{id}', [HupuController::class, 'update']);
 Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('hu_pu.destroy');
 
 

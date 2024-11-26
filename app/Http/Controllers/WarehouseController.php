@@ -245,29 +245,19 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::find($id);
 
         if (!$warehouse) {
-            return response()->json(['message' => 'Warehouse not found'], 404);
-        }
-
-        // Validate the incoming request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            // Add other validation rules here as per your requirements
-        ]);
-
-        // Update the warehouse record
-        $warehouse->update([
-            'name' => $request->name,
-            'location' => $request->location,
-            // Update other fields here
-        ]);
-
-        // Return the updated warehouse
         return response()->json([
-            'status' => '200',
-            'message' => 'Warehouse updated successfully',
-            'warehouse' => $warehouse
-        ]);
+            'status' => '404',
+            'message' => 'Error: UOM not found!',
+        ], 404);
+    }
+    $warehouse->update($request->all());
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok.',
+        'result' => [
+            'data' => $warehouse,
+        ],
+    ]);
     }
 
 
@@ -291,6 +281,24 @@ class WarehouseController extends Controller
             'status' => '200',
             'message' => 'Warehouse deleted successfully'
         ]);
+    }
+
+    public function edit($id){
+        try {
+            $warehouse = Warehouse::findOrFail($id);
+            return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' =>$warehouse   
+            ],
+        ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
