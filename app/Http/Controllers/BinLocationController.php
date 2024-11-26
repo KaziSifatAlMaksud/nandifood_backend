@@ -96,6 +96,27 @@ public function show($id){
     ]);
 }
 
+public function edit($id){
+    $binLocation = BinLocation::find($id);
+
+    // Check if the bin location exists
+    if (!$binLocation) {
+        return response()->json([
+            'status' => 404,
+            'success' => false,
+            'message' => 'Bin location not found.',
+        ], 404);
+    }
+    return response()->json([
+        'status' => 200,
+        'message' => 'Ok',
+       'result' => [
+                    'data' => $binLocation, 
+        ],
+    ]);
+}
+
+
 public function update(Request $request, $id){
         $binlocation = BinLocation::find($id);
         if ($binlocation) {
@@ -110,7 +131,9 @@ public function update(Request $request, $id){
         return response()->json([
             'status' => 200,
             'message' => 'Bin location updated successfully',
-            'result' => $binlocation
+            'result' => [
+               "data" => $binlocation
+    ],
         ]);
 }
 
