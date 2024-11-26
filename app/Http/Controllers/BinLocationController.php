@@ -107,13 +107,15 @@ public function edit($id){
             'message' => 'Bin location not found.',
         ], 404);
     }
-    return response()->json([
-        'status' => 200,
-        'message' => 'Ok',
-       'result' => [
-                    'data' => $binLocation, 
-        ],
-    ]);
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binLocation,  // Assuming $binLocation is an object or array
+                'data_uom_id' => $id,    // Corrected key format, using _ instead of .
+            ],
+        ]);
+
 }
 
 
