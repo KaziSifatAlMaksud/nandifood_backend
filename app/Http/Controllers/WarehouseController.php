@@ -10,46 +10,13 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\WarehouseAttachment;
+use App\Models\BinStatus;
+use App\Models\BinStorageType;
+use App\Models\Uom_type;
 
 
 class WarehouseController extends Controller
 {
-    // Fetch all warehouse records
-    // public function index()
-    // {
-    //     $warehouses = Warehouse::select([
-    //         'id',
-    //         'warehouse_name',
-    //         'country',
-    //         'state',
-    //         'city',
-    //         'status',
-    //         'zip_code',
-    //         'address1',
-    //         'address2',
-    //         'email',
-    //         'phone',
-    //         'warehouse_contact',
-    //         'warehouse_capacity_in_kg',
-    //     ])->get();
-
-    //     $warehouses = $warehouses->map(function ($warehouse) {
-    //             $totals  = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
-    //             $warehouse->volume_m3 = $totals['total_volume'];
-    //             $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
-    //             return $warehouse;
-    //     });
-
-
-    //     return response()->json([
-    //         'status' => '200',
-    //         'message' => 'Ok',
-    //         'result'=>[
-    //             'warehouses' =>  $warehouses
-    //         ]
-    //     ]);
-    // }
-
  public function index(Request $request)
 {
     // Select only required columns to optimize query performance
@@ -68,36 +35,26 @@ class WarehouseController extends Controller
         'warehouse_contact',
         'warehouse_capacity_in_kg',
     ]);
-
-    // Handle search functionality
-    $search = $request->input('search'); // Space-separated values
+    $search = $request->input('search');
     if ($search) {
-        $terms = explode(' ', $search); // Split by spaces
+        $terms = explode(' ', $search);
         foreach ($terms as $term) {
-            $query->where('warehouse_name', 'LIKE', "%{$term}%"); // Adjust column as needed
+            $query->where('warehouse_name', 'LIKE', "%{$term}%");
         }
     }
-
-    // Handle pagination
-    $limit = $request->input('limit', 5); // Default limit to 10
-    $warehousesPaginated = $query->paginate($limit); // Get paginated result
-
-    // Apply additional logic to each warehouse while keeping pagination
+    $limit = $request->input('limit', 5);
+    $warehousesPaginated = $query->paginate($limit);
     $warehouses = $warehousesPaginated->getCollection()->map(function ($warehouse) {
         $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
         $warehouse->volume_m3 = $totals['total_volume'];
         $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
         return $warehouse;
     });
-
-    // Update the paginated collection
     $warehousesPaginated->setCollection($warehouses);
-
-    // Return response with pagination
     return response()->json([
         'status' => '200',
         'message' => 'Ok',
-        'result' => $warehousesPaginated, // Contains data + pagination metadata
+        'result' => $warehousesPaginated,
     ]);
 }
 
@@ -111,20 +68,58 @@ class WarehouseController extends Controller
             'result'=>$warehouseattachment,
         ]);
     }    
+  
+// public function show($id)
+// {
+//     // Find the warehouse by ID with related models
+//     $warehouse = Warehouse::with('binLocations') // Add other relationships as needed
+//         ->find($id);
 
-    // Fetch a single warehouse by ID
+//     // Check if the warehouse exists
+//     if ($warehouse) {
+//         // Calculate the totals if necessary
+//         $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
+//         $warehouse->volume_m3 = $totals['total_volume'];
+//         $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
+
+//         // Return the response in the desired format with all information
+//         return response()->json([
+//             'status' => '200',
+//             'message' => 'Ok',
+//             'result' => [
+//                 'data' => $warehouse, // The warehouse with all loaded relationships
+//             ],
+//         ]);
+//     } else {
+//         // If the warehouse is not found, return an error message
+//         return response()->json([
+//             'status' => '404',
+//             'message' => 'Error: Warehouse not found!',
+//         ]);
+//     }
+// }
+
+
     public function show($id)
     {
-        $warehouse = Warehouse::find($id);
-
+        // Find the warehouse by ID with its related binLocations
+        $warehouse = Warehouse::with('binLocations')->find($id);
         if ($warehouse) {
-            return response()->json($warehouse);
+            return response()->json([
+                'status' => '200',
+                'message' => 'Ok',
+                'result' => [
+                    'data' => $warehouse, 
+                ],
+            ]);
         } else {
-            return response()->json(['status' => '404',
-            'message' => 'Error..!!',
-           ]);
+            return response()->json([
+                'status' => '404',
+                'message' => 'Error: Warehouse not found!',
+            ]);
         }
     }
+
 
     // Store a new warehouse record
     public function store(Request $request)
@@ -305,6 +300,23 @@ class WarehouseController extends Controller
         $fileName = "{$slugDate}_warehouseList.xlsx";
         return Excel::download(new WarehouseExport, $fileName);
     }
+
+
+    public function bin_storage_type(){
+    $bin_status = BinStorageType::all();
+        return response()->json($bin_status);
+    }
+
+    public function bin_status(){
+        $bin_storage_type = BinStatus::all();
+        return response()->json($bin_storage_type);
+    }
+
+    public function uom_type(){
+        $uom_type = Uom_type::all();
+        return response()->json($uom_type);
+    }
+
 
     //import excel file
     // public function warehouse_excel(Request $request)

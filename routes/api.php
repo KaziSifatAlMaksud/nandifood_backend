@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 
 
 
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -35,7 +36,11 @@ route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 
 Route::get('/employee', [EmployeeController::class, 'index']);
 route::get('/country',[WarehouseController::class, 'country']);
 
+// addtional information
 
+Route::get('/bin_status', [WarehouseController::class, 'bin_status']);
+route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type']);
+route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 
 //download PDF route
 route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
