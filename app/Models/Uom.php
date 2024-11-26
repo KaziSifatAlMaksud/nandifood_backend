@@ -9,7 +9,7 @@ class Uom extends Model
     // Specify the table name if it doesn't match the default naming convention
     protected $table = 'uom';
     protected $primaryKey = 'uom_id';
-
+    protected $keyType = 'string';
     protected $fillable = [
         'uom_id',
         'uom_type_id',

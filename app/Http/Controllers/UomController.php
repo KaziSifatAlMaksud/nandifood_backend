@@ -194,13 +194,18 @@ class UomController extends Controller
     {
         try {
             $uom = Uom::findOrFail($id);
-         return response()->json([
-                    'status' => 200,
-                    'message' => 'Ok',
-                      'result' => [
-                    'data' => $uom, 
-                ],
-                ]);
+    
+            return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' =>$uom
+                
+            ],
+        ]);
+
+
+                
 
         } catch (\Exception $e) {
             return response()->json([

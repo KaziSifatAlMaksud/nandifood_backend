@@ -111,8 +111,8 @@ public function edit($id){
             'status' => 200,
             'message' => 'Ok',
             'result' => [
-                'data' => $binLocation,  // Assuming $binLocation is an object or array
-                'data_uom_id' => $id,    // Corrected key format, using _ instead of .
+                'data' => $binLocation
+               
             ],
         ]);
 
