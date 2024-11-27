@@ -89,12 +89,15 @@ public static function fullName($uom_id)
         return null; // Return null if UOM type not found
     }
 
+
+
     // Generate names
     $short_name = $uom->uom_id . '(' . $uom_type->uom_name . ')';
     $full_name = $uom->uom_id . ' ' . $uom_type->uom_name . ' (' . $uom->description . ')';
 
     // Return the result as an array
     return [
+        'uom_type_name' => $uom_type->uom_name,
         'short_name' => $short_name,
         'full_name' => $full_name,
         'volumem3' => $volumem3,

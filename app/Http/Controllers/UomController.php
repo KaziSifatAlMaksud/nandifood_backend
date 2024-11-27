@@ -62,6 +62,7 @@ class UomController extends Controller
             $height_in = $uom->uom_height;
         }
         $result = Uom::fullName($uom->uom_id);
+        $uom->uom_type_name = $result['uom_type_name'];
         $uom->short_name = $result['short_name']; 
         $uom->full_name = $result['full_name']; 
         $uom->volumem3 = $result['volumem3']; 
@@ -171,25 +172,66 @@ class UomController extends Controller
 }
 
     // Show a single warehouse record
-    public function show($id)
-    {
-        try {
-            $uom = Uom::findOrFail($id);
-         return response()->json([
-                    'status' => 200,
-                    'message' => 'Ok',
-                      'result' => [
-                    'data' => $uom, 
-                ],
-                ]);
+public function show($id)
+{
+    try {
+        // Find the Uom by ID
+        $uom = Uom::findOrFail($id);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage()
-            ], 500);
+        // Initialize conversion variables (for metric and imperial units)
+        $length_cm = $width_cm = $height_cm = null;
+        $length_in = $width_in = $height_in = null;
+
+        // Check if the unit is metric (0) or imperial (non-0)
+        if ($uom->unit == 0) {      
+            // Metric system (centimeters)
+            $length_cm = $uom->uom_length;  
+            $width_cm = $uom->uom_width;  
+            $height_cm = $uom->uom_height; 
+        } else { 
+            // Imperial system (inches)
+            $length_in = $uom->uom_length;
+            $width_in = $uom->uom_width; 
+            $height_in = $uom->uom_height;
         }
+
+        // Assuming `Uom::fullName($uom->uom_id)` returns an array with additional data
+        $result = Uom::fullName($uom->uom_id);
+
+        // Assign the result data to the Uom object
+         $uom->uom_type_name = $result['uom_type_name'];
+        $uom->short_name = $result['short_name']; 
+        $uom->full_name = $result['full_name']; 
+        $uom->volumem3 = $result['volumem3']; 
+        $uom->volumeft3 = $result['volumeft3'];
+        $uom->length_in = $result['length_in'];
+        $uom->width_in = $result['width_in'];
+        $uom->height_in = $result['height_in'];
+        $uom->length_cm = $result['length_cm']; 
+        $uom->width_cm = $result['width_cm'];   
+        $uom->height_cm = $result['height_cm'];
+
+        // Return the modified Uom object in the response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $uom, // Return the modified Uom object
+            ],
+        ]);
+
+    } catch (\Exception $e) {
+        // Return error response if something goes wrong
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
+
+
    public function edit($id)
     {
         try {
