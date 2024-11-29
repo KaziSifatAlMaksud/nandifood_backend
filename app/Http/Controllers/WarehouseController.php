@@ -13,6 +13,7 @@ use App\Models\WarehouseAttachment;
 use App\Models\BinStatus;
 use App\Models\BinStorageType;
 use App\Models\Uom_type;
+use App\Models\Country;
 
 
 class WarehouseController extends Controller
@@ -58,6 +59,16 @@ class WarehouseController extends Controller
     ]);
 }
 
+public function country(){
+    $country = Country::all();
+     return response()->json([
+                'status' => '200',
+                'message' => 'Ok',
+                'result' => [
+                    'data' => $country, 
+                ],
+            ]);
+}
 
     public function warehouse_compliance()
     {

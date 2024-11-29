@@ -25,7 +25,7 @@ route::resource('/warehouse', WarehouseController::class);
 
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 
-route::get('/country',[WarehouseController::class, 'country']);
+// route::get('/country',[WarehouseController::class, 'country']);
 
 //warehouse attachment route
 route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
