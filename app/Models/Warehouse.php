@@ -15,7 +15,7 @@ class Warehouse extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id','warehouse_name','global_default_warehouse', 'country_default_warehouse', 'country', 'state','city', 'zip_code', 'address1', 'address2', 'city', 'email','phone', 'warehouse_contact', 'warehouse_capacity_in_lb', 'warehouse_capacity_in_kg', 'status', 'created_by' ,'created_at', 'updated_at', 'updated_by','emergency_phone', 'warehouse_manager','warehouse_supervisor','eff_date','loc_work_week','work_week_days','bus_hours_open','bus_hours_close','entity'
+        'id','warehouse_name','global_default_warehouse', 'country_default_warehouse', 'country', 'state','city', 'zip_code', 'address1', 'address2', 'city', 'email','phone', 'warehouse_contact', 'warehouse_capacity_in_lb', 'warehouse_capacity_in_kg', 'status', 'created_by' ,'created_at', 'updated_at', 'updated_by','emergency_phone', 'warehouse_manager','warehouse_supervisor','eff_date','loc_work_week','work_week_days','bus_hours_open','bus_hours_close','entity','wh_image'
     ];
 
 

@@ -81,7 +81,7 @@ public function warehouse_compliance(Request $request)
 
     // Loop through each attachment and generate file URL
     $warehouseattachments->getCollection()->transform(function ($attachment) {
-        // Check if the file exists before generating the URL
+
         if ($attachment->file) {
             $attachment->file = Storage::url($attachment->file);
         } else {
@@ -131,80 +131,128 @@ public function warehouse_compliance(Request $request)
 // }
 
 
-    public function show($id)
-    {
-        // Find the warehouse by ID with its related binLocations
-        $warehouse = Warehouse::with('binLocations')->find($id);
-        if ($warehouse) {
-            return response()->json([
-                'status' => '200',
-                'message' => 'Ok',
-                'result' => [
-                    'data' => $warehouse, 
-                ],
-            ]);
-        } else {
-            return response()->json([
-                'status' => '404',
-                'message' => 'Error: Warehouse not found!',
-            ]);
-        }
+public function show($id)
+{
+    // Retrieve the warehouse by its ID
+    $warehouse = Warehouse::find($id);
+
+    if ($warehouse) {
+        // If the warehouse has an image, generate its URL
+        $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
+
+        return response()->json([
+            'status' => '200',
+            'message' => 'Success',
+            'result' => [
+                'data' => $warehouse,
+            ],
+        ]);
+    } else {
+        return response()->json([
+            'status' => '404',
+            'message' => 'Error: Warehouse not found!',
+        ]);
     }
+}
+
+
 
 
     // Store a new warehouse record
-    public function store(Request $request)
-    {
-        try {
-        //     $validated = $request->validate([
-        //     'warehouse_name' => 'required|string|max:255',
-        //     'address1' => 'required|string|max:255',
-        //     'country' => 'required|string|max:25',
-        //     'state' => 'required|string|max:25',
-        //     'city' => 'required|string|max:25',
-        //     'zip_code' => 'required|string|max:20',
-        //     'email' => 'required|email|max:255', 
-        //     'phone' => 'nullable|string|max:255', 
-        //     'address2' => 'nullable|string|max:255',
-        //     'warehouse_contact' => 'nullable|string|max:255',
-        //     'emergency_phone' => 'nullable|string|max:255',
-        //     'eff_date' => 'nullable|date', 
-        //     'loc_work_week' => 'nullable|integer', 
-        //     'work_week_days' => 'nullable|string|max:50', 
-        //     'warehouse_manager' => 'nullable|string|max:255',
-        //     'warehouse_supervisor' => 'nullable|string|max:255',
-        //     'bus_hours_open' => 'nullable|string|max:10', 
-        //     'bus_hours_close' => 'nullable|string|max:10',
-        //     'status' => 'nullable|string|max:50',
-        // ]);
-            DB::beginTransaction();
-            //    $warehouse = Warehouse::create($validated);
-                $warehouse = Warehouse::create($request->all());
-            DB::commit();
+public function store(Request $request)
+{
+    try {
+        // Validate the request (including the file upload)
+        $validated = $request->validate([
+            'warehouse_name' => 'required|string|max:255',
+            'address1' => 'required|string|max:255',
+            'country' => 'required|string|max:25',
+            'state' => 'required|string|max:25',
+            'city' => 'required|string|max:25',
+            'zip_code' => 'required|string|max:20',
+            'email' => 'required|email|max:255', 
+            'phone' => 'nullable|string|max:255', 
+            'address2' => 'nullable|string|max:255',
+            'warehouse_contact' => 'nullable|string|max:255',
+            'emergency_phone' => 'nullable|string|max:255',
+            'eff_date' => 'nullable|date', 
+            'loc_work_week' => 'nullable|integer', 
+            'work_week_days' => 'nullable|string|max:50', 
+            'warehouse_manager' => 'nullable|string|max:255',
+            'warehouse_supervisor' => 'nullable|string|max:255',
+            'bus_hours_open' => 'nullable|string|max:10', 
+            'bus_hours_close' => 'nullable|string|max:10',
+            'status' => 'nullable|string|max:50',
+            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Validate the image file
+        ]);
 
-            // Return a success response
-            return response()->json([
-                'status' => 200,
-                'message' => 'Warehouse created successfully',
-                'result' => $warehouse,
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Return a custom response with validation errors
-            return response()->json([
-                'status' => 422,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            // Rollback the transaction in case of a general exception
-            DB::rollBack();
+        DB::beginTransaction();
 
-            // Return a response with the exception message
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage(),
-            ], 500);
+        $filePath = null;
+        if ($request->hasFile('wh_image')) {
+            // Validate the file and store it
+            $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
         }
+        $warehouseData = $validated;
+        if ($filePath) {
+            $warehouseData['wh_image'] = $filePath;
+        }
+
+        $warehouse = Warehouse::create($warehouseData);
+
+        DB::commit();
+
+        // Return a success response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Warehouse created successfully',
+            'result' => $warehouse,
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Return a custom response with validation errors
+        return response()->json([
+            'status' => 422,
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of a general exception
+        DB::rollBack();
+
+        // Return a response with the exception message
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+    
+public function update(Request $request, $id)
+{
+    $warehouse = Warehouse::find($id);
+
+    if (!$warehouse) {
+        return response()->json([
+            'status' => '404',
+            'message' => 'Error: Warehouse not found!',
+        ], 404);
+    }
+    if ($request->hasFile('wh_image')) {
+        $request->validate([
+            'wh_image' => 'mimes:jpg,jpeg,png,pdf|max:200048', // Example validation
+        ]);
+        $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
+        $warehouse->wh_image = $filePath;
+    }
+    $warehouse->update($request->except('wh_image')); 
+    return response()->json([
+        'status' => '200',
+        'message' => 'Warehouse updated successfully.',
+        'result' => [
+            'data' => $warehouse,
+        ],
+    ]);
+}
 
 
     
@@ -278,26 +326,6 @@ public function warehouse_compliance(Request $request)
             'message' => 'Warehouse deleted successfully'
         ]);
     }
-    // Update an existing warehouse record
-    public function update(Request $request, $id)
-    {
-        $warehouse = Warehouse::find($id);
-
-        if (!$warehouse) {
-        return response()->json([
-            'status' => '404',
-            'message' => 'Error: UOM not found!',
-        ], 404);
-    }
-    $warehouse->update($request->all());
-    return response()->json([
-        'status' => '200',
-        'message' => 'Ok.',
-        'result' => [
-            'data' => $warehouse,
-        ],
-    ]);
-    }
 
 
 
@@ -322,23 +350,31 @@ public function warehouse_compliance(Request $request)
         ]);
     }
 
-    public function edit($id){
-        try {
-            $warehouse = Warehouse::findOrFail($id);
-            return response()->json([
-            'status' => 200,
-            'message' => 'Ok',
+
+    public function edit($id)
+{
+    // Retrieve the warehouse by its ID
+    $warehouse = Warehouse::findOrFail($id);
+
+    if ($warehouse) {
+        // If the warehouse has an image, generate its URL
+        $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
+
+        return response()->json([
+            'status' => '200',
+            'message' => 'Success',
             'result' => [
-                'data' =>$warehouse   
+                'data' => $warehouse,
             ],
         ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    } else {
+        return response()->json([
+            'status' => '404',
+            'message' => 'Error: Warehouse not found!',
+        ]);
     }
+}
+
 
 
     public function export() 
