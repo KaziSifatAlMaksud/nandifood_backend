@@ -164,13 +164,13 @@ public function store(Request $request)
     try {
         // Validate the request (including the file upload)
         $validated = $request->validate([
-            'warehouse_name' => 'required|string|max:255',
-            'address1' => 'required|string|max:255',
-            'country' => 'required|string|max:25',
-            'state' => 'required|string|max:25',
-            'city' => 'required|string|max:25',
-            'zip_code' => 'required|string|max:20',
-            'email' => 'required|email|max:255', 
+            'warehouse_name' => 'nullable|string|max:255',
+            'address1' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:25',
+            'state' => 'nullable|string|max:25',
+            'city' => 'nullable|string|max:25',
+            'zip_code' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255', 
             'phone' => 'nullable|string|max:255', 
             'address2' => 'nullable|string|max:255',
             'warehouse_contact' => 'nullable|string|max:255',
