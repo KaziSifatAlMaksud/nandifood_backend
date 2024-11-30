@@ -10,6 +10,8 @@ use App\Http\Controllers\BinLocationController;
 use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Storage;
+
 
 
 use App\Models\Warehouse;
@@ -43,38 +45,53 @@ public function index(Request $request)
     // Check if an ID is provided
     $id = $request->input('id');
     $limit = (int) $request->input('limit', 5);
+
     if ($id) {
         // Filter by ID and retrieve the data
-        $binLocation = $query->where('bin_location.warehouse_id', $id)->paginate($limit);
+        $binLocations = $query->where('bin_location.warehouse_id', $id)->paginate($limit);
+
+        // Transform the collection
+        $binLocations->getCollection()->transform(function ($binLocation) {
+            $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
+            $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+            return $binLocation;
+        });
 
         // Return the filtered result
         return response()->json([
             'status' => 200,
             'message' => 'Filtered by warehouse ID',
-            'result' => $binLocation
+            'result' => $binLocations
         ]);
     }
 
-  // Implement search functionality if no ID is provided
-    $search = $request->input('search'); // Accept space-separated search terms
+    // Implement search functionality if no ID is provided
+    $search = $request->input('search');
     if ($search) {
         $terms = explode(' ', $search); // Split the search string into terms
-        $query = $query->where(function ($query) use ($terms) {
+        $query->where(function ($subQuery) use ($terms) {
             foreach ($terms as $term) {
-                $query->orWhere('warehouse.warehouse_name', 'LIKE', '%' . $term . '%')
-                      ->orWhere('bin_location.description', 'LIKE', '%' . $term . '%');
+                $subQuery->orWhere('warehouse.warehouse_name', 'LIKE', '%' . $term . '%')
+                    ->orWhere('bin_location.description', 'LIKE', '%' . $term . '%');
             }
         });
     }
 
     // Pagination logic
-     $binLocation = $query->paginate($limit);
+    $binLocations = $query->paginate($limit);
+
+    // Transform the result to add file and barcode image URLs
+    $binLocations->getCollection()->transform(function ($binLocation) {
+        $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
+        $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+        return $binLocation;
+    });
 
     // Return paginated results if no ID is provided
     return response()->json([
         'status' => 200,
         'message' => 'Ok.',
-        'result' => $binLocation
+        'result' => $binLocations
     ]);
 }
 
