@@ -133,27 +133,28 @@ public function warehouse_compliance(Request $request)
 
 public function show($id)
 {
-    // Retrieve the warehouse by its ID
-    $warehouse = Warehouse::find($id);
+    // Retrieve the warehouse by its ID, including related data
+    $warehouse = Warehouse::with('binLocations','warehouse_attachment')->find($id);
 
     if ($warehouse) {
-        // If the warehouse has an image, generate its URL
+        // Generate the URL for the warehouse image, if it exists
         $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
 
         return response()->json([
-            'status' => '200',
-            'message' => 'Success',
+            'status' => 200,
+            'message' => 'Warehouse retrieved successfully.',
             'result' => [
                 'data' => $warehouse,
             ],
         ]);
     } else {
         return response()->json([
-            'status' => '404',
-            'message' => 'Error: Warehouse not found!',
+            'status' => 404,
+            'message' => 'Error: Warehouse not found.',
         ]);
     }
 }
+
 
 
 

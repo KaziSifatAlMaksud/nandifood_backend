@@ -12,18 +12,23 @@ class Employee extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'string'; 
     protected $fillable = [
-        'employee_name',
+        'first_name',
         'country_id',
         'position_id',
         'default_warehouse',
+        'middle_name',
+        'last_name',
+        'email',
+        'off_phone',
+        'phone',
+        'status'
     ];
-
-    // Optionally, disable timestamps if you don't want 'created_at' and 'updated_at' columns
-    public $timestamps = true; 
+    public $timestamps = false; 
 
 
-    public function warehouse(){
-        return $this->belongsTo(Warehouse::class, 'default_warehouse'); // Make sure the foreign key is correct
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'default_warehouse','id');
     }
 
 }

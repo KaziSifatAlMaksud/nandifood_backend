@@ -28,6 +28,11 @@ class Warehouse extends Model
     {
         return $this->hasMany(Employee::class);
     }
+           public function warehouse_attachment()
+    {
+        return $this->hasMany(WarehouseAttachment::class);
+    }
+    
 
       public function getWarehouseFullNameAttribute()
     {

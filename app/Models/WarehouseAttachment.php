@@ -20,4 +20,9 @@ class WarehouseAttachment extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+    }
 }
