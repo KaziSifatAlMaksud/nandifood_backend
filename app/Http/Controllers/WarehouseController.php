@@ -134,7 +134,7 @@ public function warehouse_compliance(Request $request)
 public function show($id)
 {
     // Retrieve the warehouse by its ID, including related data
-    $warehouse = Warehouse::with('binLocations','warehouse_attachment')->find($id);
+    $warehouse = Warehouse::with('binLocations','employee','warehouse_attachment')->find($id);
 
     if ($warehouse) {
         // Generate the URL for the warehouse image, if it exists

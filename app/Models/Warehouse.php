@@ -24,10 +24,11 @@ class Warehouse extends Model
     {
         return $this->hasMany(BinLocation::class);
     }
-        public function employee()
+    public function employee()
     {
         return $this->hasMany(Employee::class);
     }
+
            public function warehouse_attachment()
     {
         return $this->hasMany(WarehouseAttachment::class);
@@ -36,7 +37,6 @@ class Warehouse extends Model
 
       public function getWarehouseFullNameAttribute()
     {
-        // Assuming you have 'name' and 'location' attributes in your warehouse table
         return $this->id . ' ' . $this->warehouse_name;
     }
 }
