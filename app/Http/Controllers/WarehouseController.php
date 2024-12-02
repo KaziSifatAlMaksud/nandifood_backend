@@ -59,16 +59,17 @@ class WarehouseController extends Controller
     ]);
 }
 
-public function country(){
-    $country = Country::all();
-     return response()->json([
-                'status' => '200',
-                'message' => 'Ok',
-                'result' => [
-                    'data' => $country, 
-                ],
-            ]);
+public function country()
+{
+    // Fetch distinct countries from the 'country' table
+    $distinctCountries = Country::all();
+        return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => $distinctCountries,
+    ]);
 }
+
 
 
 public function warehouse_compliance(Request $request)
