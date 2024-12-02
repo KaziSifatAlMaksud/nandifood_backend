@@ -26,7 +26,7 @@ class Employee extends Model
     // public $timestamps = false; 
 
 
-    public function warehouse_employee()
+    public function employee()
     {
         return $this->belongsTo(Warehouse::class);
     }

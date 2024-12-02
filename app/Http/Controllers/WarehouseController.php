@@ -14,6 +14,7 @@ use App\Models\BinStatus;
 use App\Models\BinStorageType;
 use App\Models\Uom_type;
 use App\Models\Country;
+use App\Models\Employee;
   use Illuminate\Support\Facades\Storage;
 
 class WarehouseController extends Controller
@@ -135,7 +136,7 @@ public function warehouse_compliance(Request $request)
 public function show($id)
 {
     // Retrieve the warehouse by its ID, including related data
-    $warehouse = Warehouse::with('binLocations','employee','warehouse_attachment')->find($id);
+    $warehouse = Warehouse::with('binLocations','warehouse_attachment','employee')->find($id);
 
     if ($warehouse) {
         // Generate the URL for the warehouse image, if it exists

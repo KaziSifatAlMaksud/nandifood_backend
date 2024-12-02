@@ -17,7 +17,7 @@ class Uom extends Model
         'weight',
         'bulk_code',
         'unit',
-        'invertory_uom',
+        'inventory_uom',
         'production_uom',
         'purchase_uom',
         'sales_uom',
@@ -27,6 +27,7 @@ class Uom extends Model
         'status',
         'created_at',
         'updated_at',
+        'eff_date'
     ];
     public function uomType()
     {
