@@ -314,8 +314,6 @@ public function update(Request $request, $id)
             } catch (\Exception $e) {
                 // Rollback the transaction in case of a general exception
                 DB::rollBack();
-
-                // Return a response with the exception message
                 return response()->json([
                     'status' => 500,
                     'error' => $e->getMessage()
