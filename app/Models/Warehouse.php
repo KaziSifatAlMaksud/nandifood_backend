@@ -33,8 +33,6 @@ class Warehouse extends Model
     {
         return $this->hasMany(WarehouseAttachment::class);
     }
-    
-
       public function getWarehouseFullNameAttribute()
     {
         return $this->id . ' ' . $this->warehouse_name;
