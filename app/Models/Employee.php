@@ -15,7 +15,7 @@ class Employee extends Model
         'first_name',
         'country_id',
         'position_id',
-        'default_warehouse',
+        'warehouse_id',
         'middle_name',
         'last_name',
         'email',
@@ -23,12 +23,14 @@ class Employee extends Model
         'phone',
         'status'
     ];
-    public $timestamps = false; 
+    // public $timestamps = false; 
 
 
-    public function warehouse()
+    public function warehouse_employee()
     {
-        return $this->belongsTo(Warehouse::class, 'default_warehouse','id');
+        return $this->belongsTo(Warehouse::class);
     }
+    
+    
 
 }
