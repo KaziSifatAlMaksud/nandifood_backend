@@ -269,6 +269,7 @@ public function update(Request $request, $id)
         $validated = $request->validate([
             // 'type' => 'required|integer', 
             'warehouse_id' => 'required|string|max:11',
+            'type' => 'required|integer',
             'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000',
             'created_by' => 'nullable|string|max:11', 
             'updated_by' => 'nullable|string|max:11',
