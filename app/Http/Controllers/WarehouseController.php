@@ -232,10 +232,9 @@ public function store(Request $request)
     }
 }
 
-    
-public function update(Request $request, $id)
+   public function update(Request $request, $warehouseId)
 {
-    $warehouse = Warehouse::find($id);
+    $warehouse = Warehouse::find($warehouseId);
 
     if (!$warehouse) {
         return response()->json([
@@ -243,14 +242,23 @@ public function update(Request $request, $id)
             'message' => 'Error: Warehouse not found!',
         ], 404);
     }
+
+    // Validate file upload if present
     if ($request->hasFile('wh_image')) {
         $request->validate([
             'wh_image' => 'mimes:jpg,jpeg,png,pdf|max:200048', // Example validation
         ]);
-        $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
-        $warehouse->wh_image = $filePath;
+        
+        // Store the uploaded file and get the file path
+        $imagePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
+        
+        // Update the warehouse image field
+        $warehouse->wh_image = $imagePath;
     }
-    $warehouse->update($request->except('wh_image')); 
+
+    // Update other warehouse details (except 'wh_image' which is handled separately)
+    $warehouse->update($request->except('wh_image'));
+
     return response()->json([
         'status' => '200',
         'message' => 'Warehouse updated successfully.',
@@ -259,7 +267,7 @@ public function update(Request $request, $id)
         ],
     ]);
 }
-
+ 
 
     
     public function warehouse_attachment_store(Request $request)
