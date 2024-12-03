@@ -147,7 +147,59 @@ public function index(Request $request)
 public function show($id)
 {
     // Retrieve the BinLocation by ID
-    $binLocation = BinLocation::findOrFail($id);
+    $binLocation = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
+    ->select([
+        'bin_location.id',
+        'bin_location.warehouse_id',
+        'bin_location.effective_date',
+        'bin_location.storage_type_id',
+        'bin_location.asset_type_id',
+        'bin_location.zone_number',
+        'bin_location.zone_name',
+        'bin_location.section_number',
+        'bin_location.section_name',
+        'bin_location.aisle_number',
+        'bin_location.aisle_name',
+        'bin_location.rack_number',
+        'bin_location.rack_name',
+        'bin_location.shelf_number',
+        'bin_location.shelf_name',
+        'bin_location.bin_number',
+        'bin_location.bin_name',
+        'bin_location.metric_unit',
+        'bin_location.bin_length',
+        'bin_location.bin_width',
+        'bin_location.bin_height',
+        'bin_location.storage_capacity_slp',
+        'bin_location.start_date',
+        'bin_location.end_date',
+        'bin_location.status',
+        'bin_location.created_at',
+        'bin_location.created_by',
+        'bin_location.updated_at',
+        'bin_location.updated_by',
+        'bin_location.description',
+        'bin_location.file',
+        'bin_location.bin_barcode_img',
+        'bin_location.bin_image',
+        'bin_location.bin_weight_kg',
+        
+        // Warehouse-related and formatted values
+        DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
+        DB::raw("CONCAT( bin_location.zone_number) AS section_number"),
+        DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number) AS full_section_number"),
+        DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
+        DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
+        DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
+        DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location")
+    ])
+    ->where('bin_location.id', $id)
+    ->firstOrFail(); // Retrieve the first result or fail if not found
+
+
+   
+        $totals = BinLocation::calculateTotalVolume($id);
+        $binLocation->volume_m3 = $totals;
 
     // Check if the bin location exists
     if (!$binLocation) {

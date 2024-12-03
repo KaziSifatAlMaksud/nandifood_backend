@@ -55,7 +55,8 @@ class BinLocation extends Model
         'description',
         'file',
         'bin_barcode_img',
-        'bin_image'
+        'bin_image',
+        'bin_weight_kg'
     ];
 
     // Optionally, define the data types of attributes (for casting)
@@ -110,6 +111,29 @@ class BinLocation extends Model
             ];
         }, ['total_volume' => 0, 'total_storage_capacity_slp' => 0]);
 }
+
+
+
+public static function calculateTotalVolume($id)
+{
+    // Use `find` for a single bin, as `id` is unique
+    $bin = self::find($id);
+
+    if (!$bin) {
+        // Handle case where no bin is found
+        return 0;
+    }
+
+    // Ensure bin dimensions are valid numbers
+    $length = $bin->bin_length ?? 0;
+    $width = $bin->bin_width ?? 0;
+    $height = $bin->bin_height ?? 0;
+
+    // Calculate and return volume in cubic meters
+    return ($length * $width * $height) / 1000000;
+}
+
+
 
  
     //   public static function calculateTotalVolumeForWarehouse($warehouseId)

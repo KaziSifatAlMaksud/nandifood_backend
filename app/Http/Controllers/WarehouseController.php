@@ -136,17 +136,33 @@ public function warehouse_compliance(Request $request)
 public function show($id)
 {
     // Retrieve the warehouse by its ID, including related data
-    $warehouse = Warehouse::with('binLocations','warehouse_attachment','employee')->find($id);
+    $warehouse = Warehouse::with(['binLocations', 'warehouse_attachment', 'employee'])->find($id);
 
     if ($warehouse) {
         // Generate the URL for the warehouse image, if it exists
         $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
 
+        // Process binLocations to concatenate the fields and add 'full_bin_location'
+        $binLocations = $warehouse->binLocations->map(function ($binLocation) {
+            // Ensure all binLocation fields are available before concatenation
+            $binLocation->full_bin_location =  $binLocation->zone_number ."-". 
+                                              $binLocation->section_number ."-". 
+                                              $binLocation->aisle_number ."-".
+                                              $binLocation->rack_number ."-".
+                                              $binLocation->shelf_number ."-".
+                                              $binLocation->bin_number;
+            $totals = BinLocation::calculateTotalVolume($binLocation->id);
+            $binLocation->volume_m3 = $totals;
+            return $binLocation;
+        });
+
+        // Return the data, including binLocations with the full_bin_location
         return response()->json([
             'status' => 200,
             'message' => 'Warehouse retrieved successfully.',
             'result' => [
                 'data' => $warehouse,
+                'binLocations' => $binLocations,  // Include processed binLocations
             ],
         ]);
     } else {
@@ -156,6 +172,8 @@ public function show($id)
         ]);
     }
 }
+
+
 
 
 
