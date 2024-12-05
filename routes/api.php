@@ -36,6 +36,14 @@ route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 
 Route::get('/employee', [EmployeeController::class, 'index']);
 route::get('/country',[WarehouseController::class, 'country']);
 
+
+route::get('/country_name',[WarehouseController::class, 'getCountries']);
+Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
+Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
+
+Route::get('/warhouse/employee/{warehouse_id}', [WarehouseController::class, 'getEmployee']);
+Route::get('/warhouse/attachment/{warehouse_id}', [WarehouseController::class, 'getAttachment']);
+Route::get('/warhouse/bin_location/{warehouse_id}', [WarehouseController::class, 'getBinLocation']);
 // addtional information
 
 Route::get('/bin_status', [WarehouseController::class, 'bin_status']);

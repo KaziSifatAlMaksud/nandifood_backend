@@ -70,6 +70,120 @@ public function country()
         'result' => $distinctCountries,
     ]);
 }
+    public function getCountries()
+    {
+        // Fetch all countries and group them by country name
+        $distinctCountries = Country::all(['id', 'country'])
+                                    ->groupBy('country')
+                                    ->map(function ($country) {
+                                     
+                                        return $country->first();
+                                    });
+
+            return response()->json([
+                'status' => '200',
+                'message' => 'Ok',
+                'result' => [
+                    'data' => $distinctCountries
+                ]
+            ]);
+
+    }
+
+    public function getStates($countryName)
+    {
+        // Fetch distinct states for the specified country
+     $distinctStates = Country::where('country', $countryName)
+        ->selectRaw('MIN(id) as id, state')
+        ->groupBy('state')
+        ->get();
+
+
+        // Check if there are any states
+        if ($distinctStates->isEmpty()) {
+            return response()->json([
+                'status' => '404',
+                'message' => 'No states found for the specified country.',
+            ]);
+        }
+
+        return response()->json([
+            'status' => '200',
+            'message' => 'Ok',
+            'result' => [
+                'data' => $distinctStates
+            ]
+        ]);
+    }
+
+
+
+public function getCities($stateName)
+{
+      $distinctCities = Country::where('state', $stateName)
+        ->selectRaw('MIN(id) as id, city')
+        ->groupBy('city')
+        ->get();
+
+    // Check if cities were found
+    if ($distinctCities->isEmpty()) {
+        return response()->json([
+            'status' => '404',
+            'message' => 'No cities found for the specified state.',
+        ]);
+    }
+
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+                    'data' =>$distinctCities
+        ]
+    ]);
+}
+
+
+public function getEmployee($warehouse_id)
+{    // Fetch the employees associated with the warehouse
+    $employees = Employee::where('warehouse_id', $warehouse_id)->get();
+
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'data' => $employees,
+        ],
+    ]);
+}
+
+public function getAttachment($warehouse_id)
+{    // Fetch the employees associated with the warehouse
+    $attachment = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
+
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'data' => $attachment,
+        ],
+    ]);
+}
+
+public function getBinLocation($warehouse_id)
+{    // Fetch the employees associated with the warehouse
+    $binLocation = BinLocation::where('warehouse_id', $warehouse_id)->get();
+
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'data' => $binLocation,
+        ],
+    ]);
+}
+
+
+
 
 
 
