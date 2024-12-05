@@ -250,17 +250,33 @@ public function warehouse_compliance(Request $request)
 public function show($id)
 {
     // Retrieve the warehouse by its ID, including related data
-    $warehouse = Warehouse::with('binLocations','warehouse_attachment','employee')->find($id);
+    $warehouse = Warehouse::with(['binLocations', 'warehouse_attachment', 'employee'])->find($id);
 
     if ($warehouse) {
         // Generate the URL for the warehouse image, if it exists
         $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
 
+        // Process binLocations to concatenate the fields and add 'full_bin_location'
+        $binLocations = $warehouse->binLocations->map(function ($binLocation) {
+            // Ensure all binLocation fields are available before concatenation
+            $binLocation->full_bin_location =  $binLocation->zone_number ."-". 
+                                              $binLocation->section_number ."-". 
+                                              $binLocation->aisle_number ."-".
+                                              $binLocation->rack_number ."-".
+                                              $binLocation->shelf_number ."-".
+                                              $binLocation->bin_number;
+            $totals = BinLocation::calculateTotalVolume($binLocation->id);
+            $binLocation->volume_m3 = $totals;
+            return $binLocation;
+        });
+
+        // Return the data, including binLocations with the full_bin_location
         return response()->json([
             'status' => 200,
             'message' => 'Warehouse retrieved successfully.',
             'result' => [
                 'data' => $warehouse,
+                'binLocations' => $binLocations,  // Include processed binLocations
             ],
         ]);
     } else {
@@ -270,6 +286,8 @@ public function show($id)
         ]);
     }
 }
+
+
 
 
 
@@ -346,10 +364,12 @@ public function store(Request $request)
     }
 }
 
-   public function update(Request $request, $warehouseId)
+public function update(Request $request, $warehouseId)
 {
+    // Find warehouse by ID
     $warehouse = Warehouse::find($warehouseId);
 
+    // Check if the warehouse exists
     if (!$warehouse) {
         return response()->json([
             'status' => '404',
@@ -357,30 +377,54 @@ public function store(Request $request)
         ], 404);
     }
 
-    // Validate file upload if present
+    // Validate the incoming request
+    $request->validate([
+        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048000', // Validate image
+        // Add validation for other fields if needed
+    ]);
+
+    // Initialize the image path variable
+    $imagePath = $warehouse->wh_image; // Keep the old image path if no new image is uploaded
+
+    // Check if the 'wh_image' file is present in the request
     if ($request->hasFile('wh_image')) {
-        $request->validate([
-            'wh_image' => 'mimes:jpg,jpeg,png,pdf|max:200048', // Example validation
-        ]);
-        
-        // Store the uploaded file and get the file path
-        $imagePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
-        
-        // Update the warehouse image field
-        $warehouse->wh_image = $imagePath;
+        $file = $request->file('wh_image');
+
+        // Validate if the file is a valid image
+        if ($file->isValid()) {
+            // Delete the old image if it exists
+            if ($warehouse->wh_image) {
+                // Remove the old image from storage
+                Storage::disk('public')->delete($warehouse->wh_image);
+            }
+
+            // Store the new image and get the path
+            $imagePath = $file->store('uploads/warehouse_image', 'public');
+        } else {
+            return response()->json([
+                'status' => '400',
+                'message' => 'Error: File upload is not valid!',
+            ], 400);
+        }
     }
 
-    // Update other warehouse details (except 'wh_image' which is handled separately)
-    $warehouse->update($request->except('wh_image'));
+    // Update all warehouse fields from the request, including the image path
+    $warehouse->fill($request->all());
+    $warehouse->wh_image = $imagePath; // Ensure the correct image path is saved
 
+    // Save the updated warehouse
+    $warehouse->save();
+
+    // Return success response with the updated warehouse data
     return response()->json([
         'status' => '200',
         'message' => 'Warehouse updated successfully.',
         'result' => [
-            'data' => $warehouse,
+            'data' => $warehouse, // Return the updated warehouse data
         ],
     ]);
 }
+
  
 
     
@@ -391,6 +435,7 @@ public function store(Request $request)
         $validated = $request->validate([
             // 'type' => 'required|integer', 
             'warehouse_id' => 'required|string|max:11',
+            'type' => 'required|integer',
             'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000',
             'created_by' => 'nullable|string|max:11', 
             'updated_by' => 'nullable|string|max:11',
