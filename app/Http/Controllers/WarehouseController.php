@@ -73,7 +73,7 @@ public function country()
 
 public function getCountries()
 {
-    $distinctCountries = Country::selectRaw('MIN(id) as id, country')
+    $distinctCountries = Country::selectRaw('MIN(id) as id, country as name')
         ->groupBy('country')
         ->get();
 
@@ -90,10 +90,11 @@ public function getCountries()
     public function getStates($countryName)
     {
         // Fetch distinct states for the specified country
-     $distinctStates = Country::where('country', $countryName)
-        ->selectRaw('MIN(id) as id, state')
+    $distinctStates = Country::where('country', $countryName)
+        ->selectRaw('MIN(id) as id, state as name')
         ->groupBy('state')
         ->get();
+
 
 
         // Check if there are any states
@@ -118,7 +119,7 @@ public function getCountries()
 public function getCities($stateName)
 {
       $distinctCities = Country::where('state', $stateName)
-        ->selectRaw('MIN(id) as id, city')
+        ->selectRaw('MIN(id) as id, city as name')
         ->groupBy('city')
         ->get();
 
