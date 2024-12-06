@@ -70,25 +70,22 @@ public function country()
         'result' => $distinctCountries,
     ]);
 }
-    public function getCountries()
-    {
-        // Fetch all countries and group them by country name
-        $distinctCountries = Country::all(['id', 'country'])
-                                    ->groupBy('country')
-                                    ->map(function ($country) {
-                                     
-                                        return $country->first();
-                                    });
 
-            return response()->json([
-                'status' => '200',
-                'message' => 'Ok',
-                'result' => [
-                    'data' => $distinctCountries
-                ]
-            ]);
+public function getCountries()
+{
+    $distinctCountries = Country::selectRaw('MIN(id) as id, country')
+        ->groupBy('country')
+        ->get();
 
-    }
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'data' => $distinctCountries
+        ]
+    ]);
+}
+
 
     public function getStates($countryName)
     {
