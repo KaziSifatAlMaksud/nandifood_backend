@@ -179,9 +179,9 @@ public function show($id)
         'bin_location.updated_at',
         'bin_location.updated_by',
         'bin_location.description',
-        'bin_location.file',
-        'bin_location.bin_barcode_img',
-        'bin_location.bin_image',
+        'bin_location.file as file',
+        'bin_location.bin_barcode_img as bin_barcode_img',
+        'bin_location.bin_image as bin_image',
         'bin_location.bin_weight_kg',
         
         // Warehouse-related and formatted values
@@ -196,7 +196,10 @@ public function show($id)
     ->where('bin_location.id', $id)
     ->firstOrFail(); // Retrieve the first result or fail if not found
 
-
+   // Prepare the file URLs
+    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
+    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
    
         $totals = BinLocation::calculateTotalVolume($id);
         $binLocation->volume_m3 = $totals;
@@ -209,11 +212,6 @@ public function show($id)
             'message' => 'Bin location not found.',
         ], 404);
     }
-
-    // Prepare the file URLs
-    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
-    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
-    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
 
     // Return the bin location with the updated file URLs
     return response()->json([
@@ -260,6 +258,70 @@ public function edit($id)
 
 public function update(Request $request, $id)
 {
+    DB::beginTransaction(); // Start the transaction
+
+    try {
+        // Find the BinLocation by ID
+        $binlocation = BinLocation::find($id);
+        if (!$binlocation) {
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Bin location not found.',
+            ], 404);
+        }
+
+        // Prepare the data to be updated
+        $data = $request->all();
+
+        // Handle file upload for 'file' field (general file)
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('uploads/files', 'public');
+            $data['file'] = $filePath;
+        }
+
+        // Handle file upload for 'bin_image' field (image file)
+        if ($request->hasFile('bin_image')) {
+            $binImagePath = $request->file('bin_image')->store('uploads/bin_images', 'public');
+            $data['bin_image'] = $binImagePath;
+        }
+
+        // Handle file upload for 'bin_barcode_img' field (barcode image)
+        if ($request->hasFile('bin_barcode_img')) {
+            $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
+            $data['bin_barcode_img'] = $barcodeImagePath;
+        }
+
+        // Update the BinLocation with the validated data
+        $binlocation->update($data);
+
+        // Commit the transaction if everything is successful
+        DB::commit();
+
+        // Return a successful response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Update successful.',
+            'result' => [
+                'data' => $binlocation,
+            ],
+        ], 200);
+    } catch (\Exception $e) {
+        // If an exception occurs, rollback the transaction
+        DB::rollback();
+
+        return response()->json([
+            'status' => 500,
+            'success' => false,
+            'message' => 'An error occurred during the update process.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+/*
+public function update(Request $request, $id)
+{
     $binlocation = BinLocation::find($id);
     if (!$binlocation) {
         return response()->json([
@@ -279,7 +341,7 @@ public function update(Request $request, $id)
             'data' => $binlocation,
         ],
     ], 200);
-}
+} */
 
 
 
