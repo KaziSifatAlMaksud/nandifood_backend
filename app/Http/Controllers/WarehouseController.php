@@ -288,6 +288,18 @@ public function show($id)
 
 
 
+public function warehouse_name(){
+    $warehouses = Warehouse::select('id', 'warehouse_name as name')->get();
+
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'data' => $warehouses
+        ]
+    ]);
+}
+
 
 
 

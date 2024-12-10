@@ -23,6 +23,8 @@ Route::get('/user', function (Request $request) {
 //warehouse route 
 route::resource('/warehouse', WarehouseController::class);
 
+route::get('/war_name', [WarehouseController::class,'warehouse_name']);
+
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 
 // route::get('/country',[WarehouseController::class, 'country']);
