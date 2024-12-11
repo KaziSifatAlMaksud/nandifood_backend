@@ -299,11 +299,10 @@ public function warehouse_name(){
     ]);
 }
 
-
 public function store(Request $request)
 {
     try {
-        // Validate the request (including the file upload)
+        // Validate the request
         $validated = $request->validate([
             'entity' => 'nullable|string|max:255',
             'warehouse_name' => 'nullable|string|max:255',
@@ -330,23 +329,34 @@ public function store(Request $request)
             'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048',
         ]);
 
-        DB::beginTransaction();
+        DB::beginTransaction();  // Start transaction
 
+        // Initialize filePath variable
         $filePath = null;
-        if ($request->hasFile('wh_image')) {
-            // Store file on DigitalOcean Space
-            $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'spaces');
 
-            // $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'do');
+        // Check if the request has a file
+        if ($request->hasFile('wh_image')) {
+            $file = $request->file('wh_image');
+            $fileName = time() . '_' . $file->getClientOriginalName(); 
+            $path = "uploads/warehouse_image/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+
+            if ($uploaded) {
+                $filePath = $path;  
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'error' => 'Failed to upload file to DigitalOcean Spaces',
+                ], 500);
+            }
         }
         $warehouseData = $validated;
         if ($filePath) {
             $warehouseData['wh_image'] = $filePath;
         }
-
         $warehouse = Warehouse::create($warehouseData);
 
-        DB::commit();
+        DB::commit();  // Commit transaction
 
         // Return a success response
         return response()->json([
@@ -354,14 +364,15 @@ public function store(Request $request)
             'message' => 'Warehouse created successfully',
             'result' => $warehouse,
         ]);
+
     } catch (\Illuminate\Validation\ValidationException $e) {
-        // Return a custom response with validation errors
+        // Handle validation errors
         return response()->json([
             'status' => 422,
             'errors' => $e->errors(),
         ], 422);
     } catch (\Exception $e) {
-        // Rollback the transaction in case of a general exception
+        // Rollback the transaction in case of any error
         DB::rollBack();
 
         // Return a response with the exception message
@@ -371,6 +382,7 @@ public function store(Request $request)
         ], 500);
     }
 }
+
 
 
     // Store a new warehouse record
