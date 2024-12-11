@@ -288,22 +288,7 @@ public function show($id)
 
 
 
-public function warehouse_name(){
-    $warehouses = Warehouse::select('id', 'warehouse_name as name')->get();
 
-    return response()->json([
-        'status' => '200',
-        'message' => 'Ok',
-        'result' => [
-            'data' => $warehouses
-        ]
-    ]);
-}
-
-
-
-
-    // Store a new warehouse record
 public function store(Request $request)
 {
     try {
@@ -311,35 +296,37 @@ public function store(Request $request)
         $validated = $request->validate([
             'entity' => 'nullable|string|max:255',
             'warehouse_name' => 'nullable|string|max:255',
-            'global_default_warehouse'  => 'nullable|string|max:10',
+            'global_default_warehouse' => 'nullable|string|max:10',
             'warehouse_capacity_in_kg' => 'nullable|string|max:10',
             'address1' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:25',
             'state' => 'nullable|string|max:25',
             'city' => 'nullable|string|max:25',
             'zip_code' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255', 
-            'phone' => 'nullable|string|max:255', 
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:255',
             'address2' => 'nullable|string|max:255',
             'warehouse_contact' => 'nullable|string|max:255',
             'emergency_phone' => 'nullable|string|max:255',
-            'eff_date' => 'nullable|string', 
-            'loc_work_week' => 'nullable|string', 
-            'work_week_days' => 'nullable|string|max:50', 
+            'eff_date' => 'nullable|string',
+            'loc_work_week' => 'nullable|string',
+            'work_week_days' => 'nullable|string|max:50',
             'warehouse_manager' => 'nullable|string|max:255',
             'warehouse_supervisor' => 'nullable|string|max:255',
-            'bus_hours_open' => 'nullable|string|max:10', 
+            'bus_hours_open' => 'nullable|string|max:10',
             'bus_hours_close' => 'nullable|string|max:10',
             'status' => 'nullable|string|max:50',
-            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048'
+            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048',
         ]);
 
         DB::beginTransaction();
 
         $filePath = null;
         if ($request->hasFile('wh_image')) {
-            // Validate the file and store it
-            $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
+            // Store file on DigitalOcean Space
+            $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'spaces');
+
+            // $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'do');
         }
         $warehouseData = $validated;
         if ($filePath) {
@@ -373,6 +360,73 @@ public function store(Request $request)
         ], 500);
     }
 }
+
+
+    // Store a new warehouse record
+// public function store(Request $request)
+// {
+//     try {
+//         // Validate the request (including the file upload)
+//         $validated = $request->validate([
+//             'entity' => 'nullable|string|max:255',
+//             'warehouse_name' => 'nullable|string|max:255',
+//             'global_default_warehouse'  => 'nullable|string|max:10',
+//             'warehouse_capacity_in_kg' => 'nullable|string|max:10',
+//             'address1' => 'nullable|string|max:255',
+//             'country' => 'nullable|string|max:25',
+//             'state' => 'nullable|string|max:25',
+//             'city' => 'nullable|string|max:25',
+//             'zip_code' => 'nullable|string|max:20',
+//             'email' => 'nullable|email|max:255', 
+//             'phone' => 'nullable|string|max:255', 
+//             'address2' => 'nullable|string|max:255',
+//             'warehouse_contact' => 'nullable|string|max:255',
+//             'emergency_phone' => 'nullable|string|max:255',
+//             'eff_date' => 'nullable|string', 
+//             'loc_work_week' => 'nullable|string', 
+//             'work_week_days' => 'nullable|string|max:50', 
+//             'warehouse_manager' => 'nullable|string|max:255',
+//             'warehouse_supervisor' => 'nullable|string|max:255',
+//             'bus_hours_open' => 'nullable|string|max:10', 
+//             'bus_hours_close' => 'nullable|string|max:10',
+//             'status' => 'nullable|string|max:50',
+//             'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048'
+//         ]);
+
+//         DB::beginTransaction();
+
+//         $filePath = null;
+//         if ($request->hasFile('wh_image')) {
+//             $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
+//         }
+//         $warehouseData = $validated;
+//         if ($filePath) {
+//             $warehouseData['wh_image'] = $filePath;
+//         }
+
+//         $warehouse = Warehouse::create($warehouseData);
+
+//         DB::commit();
+
+//         return response()->json([
+//             'status' => 200,
+//             'message' => 'Warehouse created successfully',
+//             'result' => $warehouse,
+//         ]);
+//     } catch (\Illuminate\Validation\ValidationException $e) {
+//         return response()->json([
+//             'status' => 422,
+//             'errors' => $e->errors(),
+//         ], 422);
+//     } catch (\Exception $e) {
+//         DB::rollBack();
+
+//         return response()->json([
+//             'status' => 500,
+//             'error' => $e->getMessage(),
+//         ], 500);
+//     }
+// }
 
 public function update(Request $request, $warehouseId)
 {
