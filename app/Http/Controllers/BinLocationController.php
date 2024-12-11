@@ -344,75 +344,92 @@ public function update(Request $request, $id)
 } */
 
 
-
-    public function store(Request $request)
-    {
+public function store(Request $request)
+{
     try {
-        // Validate the request data
-        // $validated = $request->validate([
-        //     'warehouse_id' => 'required|string|max:8',
-        //     'effective_date' => 'required|date',
-        //     'storage_type_id' => 'required|string|max:8',
-        //     'asset_type_id' => 'required|string|max:8',
-        //     'zone_number' => 'required|string|max:8',
-        //     'zone_name' => 'required|string|max:255',
-        //     'section_number' => 'nullable|integer',
-        //     'aisle_number' => 'nullable|integer', // Use integer for numbers
-        //     'rack_number' => 'nullable|integer', // Use integer for numbers
-        //     'shelf_number' => 'nullable|integer', // Use integer for numbers
-        //     'bin_number' => 'nullable|integer', // Use integer for numbers
-        //     'metric_unit' => 'required|string|max:255',
-        //     'bin_length' => 'required|string|max:255',
-        //     'bin_width' => 'required|string|max:255',
-        //     'bin_height' => 'required|string|max:255',
-        //     'status' => 'nullable|string|max:255',
-        //     'description' => 'nullable|string|max:255', // Optional, so make it nullable
-        //     'file' => 'nullable|file|mimes:jpg,png,pdf', // Assuming file is an uploaded file
-        //     'bin_barcode_img' => 'nullable|file|mimes:jpg,png,jpeg', // Optional, so make it nullable
-        // ]);
-
         // Begin database transaction
         DB::beginTransaction();
-        $data = $request->all();
-       // Handle file upload for 'file' field (general file)
-       if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('uploads/files', 'public');
-            $data['file'] = $filePath;
+
+        try {
+            $data = $request->all();
+            
+            // Handle file upload for 'file' field (general file)
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName(); 
+                $path = "uploads/warehouse_file/{$fileName}";
+                
+                // Upload the file to DigitalOcean Spaces using 'put' method
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+                
+                // If upload was successful, set the file path
+                if ($uploaded) {
+                    $data['file'] = $path;  // Save the correct file path
+                }
+            }
+
+            // Handle file upload for 'bin_image' field (image file)
+            if ($request->hasFile('bin_image')) {
+                $bin_image = $request->file('bin_image');
+                $bin_imageName = time() . '_' . $bin_image->getClientOriginalName(); 
+                $bin_path = "uploads/warehouse_file/{$bin_imageName}";
+                
+                // Upload the image to DigitalOcean Spaces using 'put' method
+                $uploaded = Storage::disk('spaces')->put($bin_path, file_get_contents($bin_image), ['visibility' => 'public']);
+                
+                // If upload was successful, set the file path
+                if ($uploaded) {
+                    $data['bin_image'] = $bin_path;  // Save the correct bin image path
+                }
+            }
+
+            // Handle file upload for 'bin_barcode_img' field (barcode image)
+            if ($request->hasFile('bin_barcode_img')) {
+                $bin_bar_image = $request->file('bin_barcode_img');
+                $bin_bar_imageName = time() . '_' . $bin_bar_image->getClientOriginalName(); 
+                $bin_bar_path = "uploads/warehouse_file/{$bin_bar_imageName}";
+                
+                // Upload the barcode image to DigitalOcean Spaces using 'put' method
+                $uploaded = Storage::disk('spaces')->put($bin_bar_path, file_get_contents($bin_bar_image), ['visibility' => 'public']);
+                
+                // If upload was successful, set the file path
+                if ($uploaded) {
+                    $data['bin_barcode_img'] = $bin_bar_path;  // Save the correct barcode image path
+                }
+            }
+
+            // Create BinLocation with the uploaded data
+            $binlocation = BinLocation::create($data);
+
+            // Commit the transaction
+            DB::commit();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Bin location created successfully',
+                'result' => $binlocation
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation exception
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            // Handle general exception, rollback transaction
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Handle file upload for 'bin_image' field (image file)
-        if ($request->hasFile('bin_image')) {
-            $binImagePath = $request->file('bin_image')->store('uploads/bin_images', 'public');
-            $data['bin_image'] = $binImagePath;
-        }
-
-        // Handle file upload for 'bin_barcode_img' field (barcode image)
-        if ($request->hasFile('bin_barcode_img')) {
-            $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
-            $data['bin_barcode_img'] = $barcodeImagePath;
-        }
-        $binlocation = BinLocation::create($data);
-        // $binlocation = BinLocation::create($validated);
-        DB::commit();
-
-        // Return a success response
-        return response()->json([
-            'status' => 200,
-            'message' => 'Bin location created successfully',
-            'result' => $binlocation
-        ]);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'status' => 422,
-            'errors' => $e->errors() 
-        ], 422);
-
     } catch (\Exception $e) {
-        DB::rollBack();
+        // Handle outer try-catch for database transaction issues
         return response()->json([
             'status' => 500,
-            'error' => $e->getMessage()
+            'error' => 'Transaction failed: ' . $e->getMessage()
         ], 500);
     }
 }
