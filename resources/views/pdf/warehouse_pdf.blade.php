@@ -28,7 +28,7 @@
             margin-bottom: 10px;
         }
         h1 {
-            font-size: 24px;
+            font-size: 12px;
             color: #333;
         }
         table {
@@ -47,7 +47,7 @@
         .footer {
             text-align: center;
             margin-top: 40px;
-            font-size: 14px;
+            font-size: 10px;
             color: #777;
         }
     </style>
@@ -58,12 +58,12 @@
    <header>
         <!-- Company Logo -->
         <img src="{{ asset('storage/company-logo.png') }}" alt="Company Logo" class="logo">
-        <h1>{{ $title }}</h1>
+        <h3>{{ $title }}</h3>
         {{-- <p>{{ $company_name }} | {{ $company_contact }}</p>  <!-- Uncomment this to show company details --> --}}
     </header>
 
 
-    <h2>Date: {{ $date }}</h2>
+    <h6>Date: {{ $date }}</h6>
 
     <table>
         <thead>

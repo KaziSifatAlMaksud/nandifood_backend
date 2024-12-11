@@ -18,4 +18,17 @@ Route::get('/', function () {
 // });
 
 
+Route::get('/uom-list-view', function () {
+    $uom = \App\Models\Uom::all();
+
+    $data = [
+        'title' => 'Unit of Measure (UOM) List',
+        'date' => date('m/d/Y'),
+        'result' => $uom,
+    ];
+
+    return view('pdf.uom_list', $data);
+});
+
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
+route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
