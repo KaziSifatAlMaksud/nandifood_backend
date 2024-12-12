@@ -7,73 +7,71 @@
     <title>{{ $title }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Times New Roman", sans-serif;
             margin: 0;
             padding: 0;
             background-color: #fff;
             width: 100%;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center all content horizontally */
+        
+        }
+
+        .container {
+            width: 900px; /* Fixed width for the container */
+            padding: 10px;
+            text-align: center; /* Center text inside container */
         }
 
         header {
             text-align: center;
             margin-bottom: 20px;
         }
+
         header img {
             max-width: 150px;
             margin-bottom: 10px;
         }
-        h1, h3 {
+
+        h1{   
+            font-size: 18px;
+            color: #333;
+
+        } h3 {
             font-size: 14px;
             color: #333;
         }
+
         h6 {
             font-size: 10px;
             color: #333;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
             table-layout: auto; /* Ensure the table adjusts to the content */
+            margin: 0 auto; /* Center the table horizontally */
         }
+
         th, td {
             padding: 10px;
             text-align: left;
             border: 1px solid #ddd;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .footer {
             text-align: center;
             margin-top: 40px;
             font-size: 10px;
             color: #777;
-        }
-
-        /* Responsiveness */
-        @media (max-width: 768px) {
-            .container {
-                width: 100%;
-                padding: 10px;
-            }
-            table {
-                font-size: 12px;
-            }
-            th, td {
-                padding: 8px;
-            }
-        }
-
-        /* Handling large tables */
-        @media (max-width: 576px) {
-            table {
-                font-size: 10px;
-                overflow-x: auto;
-                display: block;
-                white-space: nowrap; /* Prevent wrapping of table content */
-            }
         }
     </style>
 </head>
@@ -83,10 +81,10 @@
     <header>
         <!-- Company Logo -->
         <img src="{{ asset('storage/company-logo.png') }}" alt="Company Logo" class="logo">
-        <h3>{{ $title }}</h3>
+        <h1> {{ $title }}</h1>
     </header>
 
-    <h6>Date: {{ $date }}</h6>
+    <h4 align="left">Date: {{ $date }}</h4>
 
     @php
         // Mapping of id to uom_name
