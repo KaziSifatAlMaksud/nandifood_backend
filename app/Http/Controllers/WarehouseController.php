@@ -197,7 +197,7 @@ public function warehouse_compliance(Request $request)
     $warehouseattachments->getCollection()->transform(function ($attachment) {
 
         if ($attachment->file) {
-            $attachment->file = Storage::url($attachment->file);
+            $attachment->file = Storage::disk('spaces')->url($attachment->file);
         } else {
             $attachment->file = null; // If there's no file, set it to null
         }
@@ -252,7 +252,7 @@ public function show($id)
 
     if ($warehouse) {
         // Generate the URL for the warehouse image, if it exists
-        $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
+        $warehouse->wh_image = $warehouse->wh_image ? Storage::disk('spaces')->url($warehouse->wh_image) : null;
 
         // Process binLocations to concatenate the fields and add 'full_bin_location'
         $binLocations = $warehouse->binLocations->map(function ($binLocation) {
@@ -759,7 +759,7 @@ public function warehouse_attachment_store(Request $request)
 
     if ($warehouse) {
         // If the warehouse has an image, generate its URL
-        $warehouse->wh_image = $warehouse->wh_image ? Storage::url($warehouse->wh_image) : null;
+        $warehouse->wh_image = $warehouse->wh_image ? Storage::disk('spaces')->url($warehouse->wh_image) : null;
 
         return response()->json([
             'status' => '200',

@@ -100,8 +100,8 @@ public function index(Request $request)
 
         // Transform the collection
         $binLocations->getCollection()->transform(function ($binLocation) {
-            $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
-            $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+            $binLocation->file_url = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
+            $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
             return $binLocation;
         });
 
@@ -130,11 +130,12 @@ public function index(Request $request)
 
     // Transform the result to add file and barcode image URLs
     $binLocations->getCollection()->transform(function ($binLocation) {
-        $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
-        $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+        $binLocation->file_url = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
+        $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
         return $binLocation;
     });
 
+     $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
     // Return paginated results if no ID is provided
     return response()->json([
         'status' => 200,
@@ -195,11 +196,11 @@ public function show($id)
         ])
         ->where('bin_location.id', $id)
         ->firstOrFail(); // Retrieve the first result or fail if not found
+        // Prepare the file URLs
+        $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
+        $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
+        $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
 
-    // Prepare the file URLs
-    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
-    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
-    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
 
     // Calculate total volume (if needed)
     $totals = BinLocation::calculateTotalVolume($id);
@@ -239,9 +240,9 @@ public function edit($id)
     }
 
     // Prepare the file URLs
-    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
-    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
-    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
+    $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
+    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
+    $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
 
     // Return the bin location with the updated file URLs
     return response()->json([
