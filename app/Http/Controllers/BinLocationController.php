@@ -256,7 +256,6 @@ public function edit($id)
 }
 
 
-
 public function update(Request $request, $id)
 {
     DB::beginTransaction(); // Start the transaction
@@ -277,23 +276,59 @@ public function update(Request $request, $id)
 
         // Handle file upload for 'file' field (general file)
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('uploads/files', 'public');
-            $data['file'] = $filePath;
+            // Delete the old file from DigitalOcean Spaces if it exists
+            if ($binlocation->file && Storage::disk('spaces')->exists($binlocation->file)) {
+                Storage::disk('spaces')->delete($binlocation->file);
+            }
+
+            // Upload new file to DigitalOcean Spaces
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = "uploads/warehouse_file/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['file'] = $filePath;  // Update the file path in the data array
+            }
         }
 
         // Handle file upload for 'bin_image' field (image file)
         if ($request->hasFile('bin_image')) {
-            $binImagePath = $request->file('bin_image')->store('uploads/bin_images', 'public');
-            $data['bin_image'] = $binImagePath;
+            // Delete the old bin image from DigitalOcean Spaces if it exists
+            if ($binlocation->bin_image && Storage::disk('spaces')->exists($binlocation->bin_image)) {
+                Storage::disk('spaces')->delete($binlocation->bin_image);
+            }
+
+            // Upload new bin image to DigitalOcean Spaces
+            $binImage = $request->file('bin_image');
+            $binImageName = time() . '_' . $binImage->getClientOriginalName();
+            $binImagePath = "uploads/warehouse_file/{$binImageName}";
+            $uploaded = Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['bin_image'] = $binImagePath;  // Update the bin image path in the data array
+            }
         }
 
         // Handle file upload for 'bin_barcode_img' field (barcode image)
         if ($request->hasFile('bin_barcode_img')) {
-            $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
-            $data['bin_barcode_img'] = $barcodeImagePath;
+            // Delete the old barcode image from DigitalOcean Spaces if it exists
+            if ($binlocation->bin_barcode_img && Storage::disk('spaces')->exists($binlocation->bin_barcode_img)) {
+                Storage::disk('spaces')->delete($binlocation->bin_barcode_img);
+            }
+
+            // Upload new barcode image to DigitalOcean Spaces
+            $barcodeImage = $request->file('bin_barcode_img');
+            $barcodeImageName = time() . '_' . $barcodeImage->getClientOriginalName();
+            $barcodeImagePath = "uploads/warehouse_file/{$barcodeImageName}";
+            $uploaded = Storage::disk('spaces')->put($barcodeImagePath, file_get_contents($barcodeImage), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['bin_barcode_img'] = $barcodeImagePath;  // Update the barcode image path in the data array
+            }
         }
 
-        // Update the BinLocation with the validated data
+        // Update the BinLocation with the new data
         $binlocation->update($data);
 
         // Commit the transaction if everything is successful
@@ -319,6 +354,7 @@ public function update(Request $request, $id)
         ], 500);
     }
 }
+
 
 /*
 public function update(Request $request, $id)
@@ -369,7 +405,7 @@ public function store(Request $request)
                 }
             }
 
-            // Handle file upload for 'bin_image' field (image file)
+
             if ($request->hasFile('bin_image')) {
                 $bin_image = $request->file('bin_image');
                 $bin_imageName = time() . '_' . $bin_image->getClientOriginalName(); 
@@ -384,7 +420,6 @@ public function store(Request $request)
                 }
             }
 
-            // Handle file upload for 'bin_barcode_img' field (barcode image)
             if ($request->hasFile('bin_barcode_img')) {
                 $bin_bar_image = $request->file('bin_barcode_img');
                 $bin_bar_imageName = time() . '_' . $bin_bar_image->getClientOriginalName(); 
@@ -399,7 +434,6 @@ public function store(Request $request)
                 }
             }
 
-            // Create BinLocation with the uploaded data
             $binlocation = BinLocation::create($data);
 
             // Commit the transaction
