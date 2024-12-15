@@ -130,12 +130,12 @@ public function index(Request $request)
 
     // Transform the result to add file and barcode image URLs
     $binLocations->getCollection()->transform(function ($binLocation) {
+        $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
         $binLocation->file_url = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
         $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
         return $binLocation;
     });
 
-     $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
     // Return paginated results if no ID is provided
     return response()->json([
         'status' => 200,
@@ -180,9 +180,9 @@ public function show($id)
             'bin_location.updated_at',
             'bin_location.updated_by',
             'bin_location.description',
-            'bin_location.file',
-            'bin_location.bin_barcode_img',
             'bin_location.bin_image',
+            'bin_location.file',
+            'bin_location.bin_barcode_img',         
             'bin_location.bin_weight_kg',
 
             // Warehouse-related and formatted values
