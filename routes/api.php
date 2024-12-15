@@ -53,9 +53,15 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 
 //download PDF route
-route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
+// route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
 route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_excel']);
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
+
+//csv file export 
+
+Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
+
+
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
 // route::get('/binlocation/create', [BinLocationController::class, 'create']);

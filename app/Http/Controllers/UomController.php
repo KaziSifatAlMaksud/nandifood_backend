@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Uom; 
 use App\Models\Hupu;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UomExport;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
@@ -169,6 +172,14 @@ class UomController extends Controller
             'error' => $e->getMessage()
         ], 500);
     }
+}
+
+
+public function uom_export() 
+{
+    $slugDate = Str::slug(date('Y-m-d')); 
+    $fileName = "{$slugDate}_uomList.xlsx";
+    return Excel::download(new UomExport, $fileName);
 }
 
     // Show a single warehouse record
