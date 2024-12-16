@@ -358,11 +358,18 @@ public function store(Request $request)
 
         DB::commit();  // Commit transaction
 
-        // Return a success response
+       $newWarehouse = Warehouse::where('warehouse_name', $warehouseData['warehouse_name'])
+            ->where('email', $warehouseData['email'])
+            ->first();
+
+        if (!$newWarehouse) {
+            throw new \Exception('Failed to retrieve the newly created warehouse.');
+        }
+
         return response()->json([
             'status' => 200,
             'message' => 'Warehouse created successfully',
-            'result' => $warehouse,
+            'result' => $newWarehouse,
         ]);
 
     } catch (\Illuminate\Validation\ValidationException $e) {

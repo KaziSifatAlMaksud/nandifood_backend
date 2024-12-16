@@ -276,12 +276,10 @@ public function update(Request $request, $id)
 
         // Handle file upload for 'file' field (general file)
         if ($request->hasFile('file')) {
-            // Delete the old file from DigitalOcean Spaces if it exists
             if ($binlocation->file && Storage::disk('spaces')->exists($binlocation->file)) {
                 Storage::disk('spaces')->delete($binlocation->file);
             }
 
-            // Upload new file to DigitalOcean Spaces
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = "uploads/warehouse_file/{$fileName}";
@@ -291,26 +289,21 @@ public function update(Request $request, $id)
                 $data['file'] = $filePath;  // Update the file path in the data array
             }
         }
-
-        // Handle file upload for 'bin_image' field (image file)
         if ($request->hasFile('bin_image')) {
             // Delete the old bin image from DigitalOcean Spaces if it exists
             if ($binlocation->bin_image && Storage::disk('spaces')->exists($binlocation->bin_image)) {
                 Storage::disk('spaces')->delete($binlocation->bin_image);
             }
-
-            // Upload new bin image to DigitalOcean Spaces
             $binImage = $request->file('bin_image');
             $binImageName = time() . '_' . $binImage->getClientOriginalName();
             $binImagePath = "uploads/warehouse_file/{$binImageName}";
             $uploaded = Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
             
             if ($uploaded) {
-                $data['bin_image'] = $binImagePath;  // Update the bin image path in the data array
+                $data['bin_image'] = $binImagePath;
             }
         }
 
-        // Handle file upload for 'bin_barcode_img' field (barcode image)
         if ($request->hasFile('bin_barcode_img')) {
             // Delete the old barcode image from DigitalOcean Spaces if it exists
             if ($binlocation->bin_barcode_img && Storage::disk('spaces')->exists($binlocation->bin_barcode_img)) {
