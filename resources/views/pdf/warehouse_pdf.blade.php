@@ -57,7 +57,7 @@
 <div class="container">
    <header>
         <!-- Company Logo -->
-        <img src="{{ asset('storage/company-logo.png') }}" alt="Company Logo" class="logo">
+        <img src="{{ asset('$imageSrc') }}" alt="Company Logo" class="logo">
         <h3>{{ $title }}</h3>
         {{-- <p>{{ $company_name }} | {{ $company_contact }}</p>  <!-- Uncomment this to show company details --> --}}
     </header>

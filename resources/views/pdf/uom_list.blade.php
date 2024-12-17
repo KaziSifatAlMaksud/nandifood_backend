@@ -15,14 +15,16 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center all content horizontally */
-        
+            align-items: center; 
+            justify-content: flex-start; 
+            text-align: center;
         }
 
         .container {
-            width: 900px; /* Fixed width for the container */
+            width: 100%; 
+            max-width: 900px;
             padding: 10px;
-            text-align: center; /* Center text inside container */
+            box-sizing: border-box;
         }
 
         header {
@@ -35,36 +37,35 @@
             margin-bottom: 10px;
         }
 
-        h1{   
-            font-size: 18px;
-            color: #333;
-
-        } h3 {
+        h1 {   
             font-size: 14px;
             color: #333;
         }
 
-        h6 {
-            font-size: 10px;
+        h4 {
+            text-align: left;
+            font-size: 12px;
             color: #333;
         }
 
-        table {
+        /* Layout for form number, serial number, and company info */
+        .header-info {
+            display: flex;
+            justify-content: space-between; /* Distribute content across the page */
+            margin-bottom: 20px;
             width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            table-layout: auto; /* Ensure the table adjusts to the content */
-            margin: 0 auto; /* Center the table horizontally */
         }
 
-        th, td {
-            padding: 10px;
+        .left-section {
+            width: 50%; /* Left side takes up 50% of the width */
             text-align: left;
-            border: 1px solid #ddd;
+            font-size: 12px;
         }
 
-        th {
-            background-color: #f2f2f2;
+        .right-section {
+            width: 50%; /* Right side takes up 50% of the width */
+            text-align: right;
+            font-size: 12px;
         }
 
         .footer {
@@ -73,18 +74,54 @@
             font-size: 10px;
             color: #777;
         }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border: 1px solid #000; /* Black border */
+            table-layout: fixed; /* Fixed width for cells */
+            margin: 0 auto; /* Center table horizontally */
+        }
+
+        th, td {
+            text-align: center;
+            font-size: 10px;
+            word-wrap: break-word;
+            border: 1px solid #000; /* Black border for table cells */
+        }
+        
+        th.right-align, td.right-align {
+            text-align: right; /* Right align for specific columns */
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        @page {
+            size: A4; /* Use A4 page size */
+            margin: 20mm; /* Set page margins */
+        }
+
+        /* Ensure the table adapts to page size for smaller content */
+        table, th, td {
+            border: 1px solid #000; /* Set black borders for all elements */
+        }
+
     </style>
 </head>
 <body>
 
 <div class="container">
+
     <header>
         <!-- Company Logo -->
-        <img src="{{ asset('storage/company-logo.png') }}" alt="Company Logo" class="logo">
-        <h1> {{ $title }}</h1>
+        <img src="{{ $imageSrc }}" alt="Company Logo" class="logo">
+        <h1>{{ $title }}</h1>
     </header>
 
-    <h4 align="left">Date: {{ $date }}</h4>
+    <h4>Date: {{ $date }}</h4>
 
     @php
         // Mapping of id to uom_name
@@ -103,47 +140,49 @@
     <table>
         <thead>
             <tr>
-                <th>UOM ID</th>
-                <th>UOM Name</th> 
-                <th>Description</th>
-                <th>Inventory UOM</th>
-                <th>Production UOM</th>
-                <th>Purchase UOM</th>
-                <th>Sales UOM</th>
-                <th>Unit</th>
-                <th>Length</th>
-                <th>Width</th>
-                <th>Height</th>
-                <th>Weight</th>
-                <th>Bulk Code</th>
+                <th class="uom-id">UOM ID</th>
+                <th class="uom-name">UOM Name</th>
+                <th class="description">Description</th>
+                <th class="inventory-uom">Inventory UOM</th>
+                <th class="production-uom">Production UOM</th>
+                <th class="purchase-uom">Purchase UOM</th>
+                <th class="sales-uom">Sales UOM</th>
+                <th class="unit">Unit</th>
+                <th class="right-align">Length</th>
+                <th class="right-align">Width</th>
+                <th class="right-align">Height</th>
+                <th class="right-align">Weight</th>
+                <th class="right-align">Bulk Code</th>
             </tr>
+            
         </thead>
         <tbody>
             @foreach ($result as $uom)
-                <tr>
-                    <td>{{ $uom->uom_id }}</td>
-                    <td>{{ $uomNames[$uom->uom_type_id] ?? 'Unknown' }}</td>
-                    <td>{{ $uom->description }}</td>
-                    <td>{{ $uom->inventory_uom }}</td>
-                    <td>{{ $uom->production_uom }}</td>
-                    <td>{{ $uom->purchase_uom }}</td>
-                    <td>{{ $uom->sales_uom }}</td>
-                    <td>
-                        @if ($uom->unit == 0)
-                            Matrix
-                        @elseif ($uom->unit == 1)
-                            Imparial
-                        @else
-                            Unknown
-                        @endif
-                    </td>
-                    <td>{{ $uom->uom_length }}</td>
-                    <td>{{ $uom->uom_width }}</td>
-                    <td>{{ $uom->uom_height }}</td>
-                    <td>{{ $uom->weight }}</td>
-                    <td>{{ $uom->bulk_code }}</td>
-                </tr>
-            @endforeach
+            
+            <tr>
+                <td class="uom-id">{{ $uom->uom_id }}</td>
+                <td class="uom-name">{{ $uomNames[$uom->uom_type_id] ?? 'Unknown' }}</td>
+                <td class="description">{{ $uom->description }}</td>
+                <td class="inventory-uom">{{ $uom->inventory_uom }}</td>
+                <td class="production-uom">{{ $uom->production_uom }}</td>
+                <td class="purchase-uom">{{ $uom->purchase_uom }}</td>
+                <td class="sales-uom">{{ $uom->sales_uom }}</td>
+                <td class="unit">
+                    @if ($uom->unit == 0)
+                        Matrix
+                    @elseif ($uom->unit == 1)
+                        Imperial
+                    @else
+                        Unknown
+                    @endif
+                </td>
+                <td class="right-align">{{ $uom->uom_length }}</td>
+                <td class="right-align">{{ $uom->uom_width }}</td>
+                <td class="right-align">{{ $uom->uom_height }}</td>
+                <td class="right-align">{{ $uom->weight }}</td>
+                <td class="right-align">{{ $uom->bulk_code }}</td>
+            </tr>
+            @endforeach            
         </tbody>
     </table>
 </div>

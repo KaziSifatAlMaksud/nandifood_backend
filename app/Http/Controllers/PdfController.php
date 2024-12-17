@@ -14,28 +14,37 @@ class PdfController extends Controller
   
     public function warehouse_pdf(){
         $warehouses = Warehouse::all();
+        $imagePath = public_path('storage/company-logo.png'); 
+        $imageData = base64_encode(file_get_contents($imagePath));
+        $imageSrc = 'data:image/png;base64,' . $imageData;
 
-        $data = ['title' => 'NandiFood Industries',        
+        $data = [
+            'title' => 'NandiFood Industries',
             'date' => date('m/d/Y'),
-            'result' => $warehouses
-            ]; 
-        $slugDate = Str::slug(date('Y-m-d')); 
+            'result' => $warehouses,
+            'imageSrc' => $imageSrc 
+        ];
+    
+        $slugDate = Str::slug(date('Y-m-d'));
         $fileName = "{$slugDate}_warehouse_List.pdf";
-
         $pdf = Pdf::loadView('pdf.warehouse_pdf', $data);
         return $pdf->download($fileName);
-        
     }
+    
 
 
     
     public function uom_list_pdf()
     {
         $uom = Uom::all(); // Removed the extra ->get() as all() already retrieves the data.
+        $imagePath = public_path('storage/company-logo.png'); 
+        $imageData = base64_encode(file_get_contents($imagePath));
+        $imageSrc = 'data:image/png;base64,' . $imageData;
     
         $data = [
             'title' => 'Unit of Measure (UOM) List',        
             'date' => date('m/d/Y'),
+            'imageSrc' => $imageSrc ,
             'result' => $uom,
         ]; 
     

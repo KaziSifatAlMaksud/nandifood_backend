@@ -793,6 +793,12 @@ public function warehouse_attachment_store(Request $request)
     }
 
 
+    public function exportCsv()
+    {
+        // Export using the WarehouseExport class, specifying CSV format
+        return Excel::download(new WarehouseExport, 'warehouses_' . date('Y-m-d') . '.csv', \Maatwebsite\Excel\Excel::CSV);
+    }
+
     public function bin_storage_type(){
     $bin_status = BinStorageType::all();
         return response()->json($bin_status);
