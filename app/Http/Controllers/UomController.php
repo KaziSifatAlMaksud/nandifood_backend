@@ -116,9 +116,7 @@ class UomController extends Controller
         // Store a new warehouse record
      public function store(Request $request)
 {
-    // Attempt to validate the request data
     try {        
-        // Begin database transaction
         DB::beginTransaction();
     
         $uom_list = Uom::create($request->all());
@@ -183,7 +181,7 @@ public function show($id)
         }
 
         // Assuming `Uom::fullName($uom->uom_id)` returns an array with additional data
-        $result = Uom::fullName($uom->uom_id);
+        $result = Uom::fullName($uom->id);
 
         // Assign the result data to the Uom object
          $uom->uom_type_name = $result['uom_type_name'];
