@@ -275,8 +275,8 @@ public function show($id)
 {
     try {
         // Find the Uom by ID
-        $uom = Uom::findOrFail($id);
-
+        //$uom = Uom::findOrFail($id);
+        $uom = Uom::with('linkedUoms')->findOrFail($id);
         // Initialize conversion variables (for metric and imperial units)
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
@@ -313,6 +313,9 @@ public function show($id)
         $uom->height_cm = $result['height_cm'];
         $uom->weight_kg = $result['weight_kg'];
         $uom->weight_lb = $result['weight_lb'];
+
+
+
 
         // Return the modified Uom object in the response
         return response()->json([
