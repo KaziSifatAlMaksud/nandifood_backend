@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Uom_linked extends Model
 {
-       use HasFactory;
+        protected $table = 'uom_linked';
 
      protected $fillable = [
         'uom_id',      
@@ -14,12 +14,7 @@ class Uom_linked extends Model
         'conv_to_id',
         'conv_qty',     
         'status'         
-    ];
-
-       public function uom()
-    {
-        return $this->belongsTo(UOM::class); 
-    }
+];
 
 
 }

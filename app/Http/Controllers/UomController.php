@@ -12,6 +12,7 @@ use App\Exports\UomExport;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use App\Models\Uom_linked;
 
 class UomController extends Controller
 {
@@ -192,7 +193,7 @@ public function store(Request $request)
         $uom_width = $request->input('uom_width');
         $uom_height = $request->input('uom_height');
 
-        
+        $link_uom = $request->input('link_uom');
 
         // Step 1: Get the maximum uom_id for the given uom_type_id
         $max_uom_id = Uom::max('id');
@@ -216,8 +217,39 @@ public function store(Request $request)
         $uom->uom_height = $uom_height;
 
         // Save the UOM record to the database
+     
         $uom->save();
+          // Step 4: Save the linked UOM data
+        // if (!empty($link_uom) && is_array($link_uom)) {
+        //     foreach ($link_uom as $link) {
+        //         $uomLink = new Uom_linked(); // Ensure the model name matches your table
+        //         $uomLink->uom_id = $uom->id; // Link it to the newly created UOM ID
+        //         $uomLink->conv_form_id = $link['conv_form_id']; // Ensure field exists
+        //         $uomLink->conv_to_id = $link['conv_to_id']; // Ensure field exists
+        //         $uomLink->conv_qty = $link['conv_qty']; // Ensure field exists
+        //         $uomLink->save();
+        //     }
+        // }
 
+        if (!empty($link_uom) && is_array($link_uom)) {
+            $linkedUoms = [];
+            foreach ($link_uom as $link) {
+                $uomLink = new Uom_linked(); // Ensure the model name matches your table
+                $uomLink->uom_id = $uom->id; // Link it to the newly created UOM ID
+                $uomLink->conv_form_id = $link['conv_form_id']; // Ensure field exists
+                $uomLink->conv_to_id = $link['conv_to_id']; // Ensure field exists
+                $uomLink->conv_qty = $link['conv_qty']; // Ensure field exists
+                $uomLink->save();
+
+                // Add the linked UOM data to the array
+                $linkedUoms[] = $uomLink;
+            }
+
+            // Attach linked UOM data to the $uom variable
+            $uom->linked_uoms = $linkedUoms;
+        }
+
+      
         // Commit the transaction
         DB::commit();
 
