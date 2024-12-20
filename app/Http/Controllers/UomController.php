@@ -18,6 +18,7 @@ class UomController extends Controller
     public function index(Request $request)
     {
     $uoms = Uom::select([
+        'id',
         'uom_id',
         'description',
         'bulk_code',
@@ -40,15 +41,6 @@ class UomController extends Controller
                   ->orWhere('uom_id', 'LIKE', "%{$term}%"); // Adjust the columns as needed
         }
     }
-
-   
-    // Filter by warehouse_id if provided
-    // $warehouseId = $request->input('warehouse_id');
-    // if ($warehouseId) {
-    //     $query->where('bin_location.warehouse_id', $warehouseId);
-    // }
-
-
     // Apply pagination with a default limit
     $limit = $request->input('limit', 10); // Default limit set to 5
     $uomPaginated = $query->paginate($limit);
@@ -64,7 +56,7 @@ class UomController extends Controller
             $width_in = $uom->uom_width; 
             $height_in = $uom->uom_height;
         }
-        $result = Uom::fullName($uom->uom_id);
+        $result = Uom::fullName($uom->id);
         $uom->uom_type_name = $result['uom_type_name'];
         $uom->short_name = $result['short_name']; 
         $uom->full_name = $result['full_name']; 
@@ -125,23 +117,7 @@ class UomController extends Controller
      public function store(Request $request)
 {
     // Attempt to validate the request data
-    try {
-        // Validate the request data
-        // $validated = $request->validate([
-        //     'uom_type_id' => 'required|numeric',             
-        //     'description' => 'required|string',                  
-        //     'weight' => 'required|numeric',                      
-        //     'bulk_code' => 'required|string|max:8',             
-        //     'unit' => 'required|string|max:8',                   
-        //     'inventory_uom' => 'required|string|max:255',       
-        //     'production_uom' => 'nullable|string',              
-        //     'purchase_uom' => 'nullable|string',               
-        //     'uom_length' => 'nullable|numeric',                   
-        //     'uom_width' => 'nullable|numeric',                   
-        //     'uom_height' => 'nullable|numeric',                  
-        // ]);
-
-        
+    try {        
         // Begin database transaction
         DB::beginTransaction();
     
