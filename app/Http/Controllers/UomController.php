@@ -172,29 +172,61 @@ class UomController extends Controller
     }
 
 
-        // Store a new warehouse record
-     public function store(Request $request)
+
+public function store(Request $request)
 {
-    try {        
+    try {
+        // Begin database transaction
         DB::beginTransaction();
-    
-        $uom_list = Uom::create($request->all());
+
+        // Manually retrieve input data
+        $uom_type_id = $request->input('uom_type_id');
+        $description = $request->input('description');
+        $weight = $request->input('weight');
+        $bulk_code = $request->input('bulk_code');
+        $unit = $request->input('unit');
+        $inventory_uom = $request->input('inventory_uom');
+        $production_uom = $request->input('production_uom');
+        $purchase_uom = $request->input('purchase_uom');
+        $uom_length = $request->input('uom_length');
+        $uom_width = $request->input('uom_width');
+        $uom_height = $request->input('uom_height');
+
+        
+
+        // Step 1: Get the maximum uom_id for the given uom_type_id
+        $max_uom_id = Uom::max('id');
+
+        // Step 2: Generate the new uom_id
+        $new_uom_id = 'U' . $uom_type_id . str_pad(($max_uom_id + 1), 3, '0', STR_PAD_LEFT);
+
+        // Step 3: Create a new UOM record
+        $uom = new Uom();
+        $uom->uom_id = $new_uom_id;
+        $uom->uom_type_id = $uom_type_id;
+        $uom->description = $description;
+        $uom->weight = $weight;
+        $uom->bulk_code = $bulk_code;
+        $uom->unit = $unit;
+        $uom->inventory_uom = $inventory_uom;
+        $uom->production_uom = $production_uom;
+        $uom->purchase_uom = $purchase_uom;
+        $uom->uom_length = $uom_length;
+        $uom->uom_width = $uom_width;
+        $uom->uom_height = $uom_height;
+
+        // Save the UOM record to the database
+        $uom->save();
+
+        // Commit the transaction
         DB::commit();
 
-        // Return a success response
+        // Return a success response with the created UOM record
         return response()->json([
             'status' => 200,
-            'message' => 'Ok',
-            'result' => $uom_list
+            'message' => 'UOM Created Successfully',
+            'result' => $uom,
         ]);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // Return a custom response with validation errors
-        return response()->json([
-            'status' => 422,
-            'errors' => $e->errors() 
-        ], 422);
-
     } catch (\Exception $e) {
         // Rollback the transaction in case of a general exception
         DB::rollBack();
@@ -202,10 +234,11 @@ class UomController extends Controller
         // Return a response with the exception message
         return response()->json([
             'status' => 500,
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
         ], 500);
     }
 }
+
 
 
 public function uom_export() 
@@ -305,24 +338,90 @@ public function show($id)
         }
     }
 
-  public function update(Request $request, $id)
-{
-        $uom = Uom::findOrFail($id);
-    if (!$uom) {
-        return response()->json([
-            'status' => '404',
-            'message' => 'Error: UOM not found!',
-        ], 404);
+
+
+    public function update(Request $request, $id)
+    {
+        try {
+            // Begin database transaction
+            DB::beginTransaction();
+
+            // Find the UOM record by ID
+            $uom = Uom::findOrFail($id);
+
+            // Retrieve input data
+            $new_uom_type_id = $request->input('uom_type_id');
+            $description = $request->input('description');
+            $weight = $request->input('weight');
+            $bulk_code = $request->input('bulk_code');
+            $unit = $request->input('unit');
+            $inventory_uom = $request->input('inventory_uom');
+            $production_uom = $request->input('production_uom');
+            $purchase_uom = $request->input('purchase_uom');
+            $uom_length = $request->input('uom_length');
+            $uom_width = $request->input('uom_width');
+            $uom_height = $request->input('uom_height');
+
+            // Check if the `uom_type_id` is being updated
+           if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
+                // Extract the numeric part from the existing uom_id
+                $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
+
+                // Generate the new uom_id using the new uom_type_id and the numeric part
+                $new_uom_id = 'U' . $new_uom_type_id . $numeric_part;
+
+                // Update the uom_id and uom_type_id
+                $uom->uom_id = $new_uom_id;
+                $uom->uom_type_id = $new_uom_type_id;
+            }
+
+
+            // Update other fields
+            $uom->description = $description ?? $uom->description;
+            $uom->weight = $weight ?? $uom->weight;
+            $uom->bulk_code = $bulk_code ?? $uom->bulk_code;
+            $uom->unit = $unit ?? $uom->unit;
+            $uom->inventory_uom = $inventory_uom ?? $uom->inventory_uom;
+            $uom->production_uom = $production_uom ?? $uom->production_uom;
+            $uom->purchase_uom = $purchase_uom ?? $uom->purchase_uom;
+            $uom->uom_length = $uom_length ?? $uom->uom_length;
+            $uom->uom_width = $uom_width ?? $uom->uom_width;
+            $uom->uom_height = $uom_height ?? $uom->uom_height;
+
+            // Save the updated UOM record to the database
+            $uom->save();
+
+            // Commit the transaction
+            DB::commit();
+
+            // Return a success response with the updated UOM record
+            return response()->json([
+                'status' => 200,
+                'message' => 'UOM Updated Successfully',
+                'result' => $uom,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            // Rollback the transaction in case of a not found exception
+            DB::rollBack();
+
+            // Return a response with the not found error
+            return response()->json([
+                'status' => 404,
+                'message' => 'Error: UOM not found!',
+            ], 404);
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of a general exception
+            DB::rollBack();
+
+            // Return a response with the exception message
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while updating the UOM.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-    $uom->update($request->all());
-    return response()->json([
-        'status' => '200',
-        'message' => 'Ok.',
-        'result' => [
-            'data' => $uom,
-        ],
-    ]);
-}
+
 
     public function destroy($id)
     {
