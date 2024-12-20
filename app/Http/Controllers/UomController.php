@@ -220,16 +220,6 @@ public function store(Request $request)
      
         $uom->save();
           // Step 4: Save the linked UOM data
-        // if (!empty($link_uom) && is_array($link_uom)) {
-        //     foreach ($link_uom as $link) {
-        //         $uomLink = new Uom_linked(); // Ensure the model name matches your table
-        //         $uomLink->uom_id = $uom->id; // Link it to the newly created UOM ID
-        //         $uomLink->conv_form_id = $link['conv_form_id']; // Ensure field exists
-        //         $uomLink->conv_to_id = $link['conv_to_id']; // Ensure field exists
-        //         $uomLink->conv_qty = $link['conv_qty']; // Ensure field exists
-        //         $uomLink->save();
-        //     }
-        // }
 
         if (!empty($link_uom) && is_array($link_uom)) {
             $linkedUoms = [];
@@ -371,88 +361,114 @@ public function show($id)
     }
 
 
+public function update(Request $request, $id)
+{
+    try {
+        // Begin database transaction
+        DB::beginTransaction();
 
-    public function update(Request $request, $id)
-    {
-        try {
-            // Begin database transaction
-            DB::beginTransaction();
+        // Find the UOM record by ID and eager load linked UOMs
+        $uom = Uom::with('linkedUoms')->findOrFail($id);
 
-            // Find the UOM record by ID
-            $uom = Uom::findOrFail($id);
+        // Retrieve input data
+        $new_uom_type_id = $request->input('uom_type_id');
+        $description = $request->input('description');
+        $weight = $request->input('weight');
+        $bulk_code = $request->input('bulk_code');
+        $unit = $request->input('unit');
+        $inventory_uom = $request->input('inventory_uom');
+        $production_uom = $request->input('production_uom');
+        $purchase_uom = $request->input('purchase_uom');
+        $uom_length = $request->input('uom_length');
+        $uom_width = $request->input('uom_width');
+        $uom_height = $request->input('uom_height');
+        $link_uom = $request->input('link_uom'); // Added: link_uom input from request
 
-            // Retrieve input data
-            $new_uom_type_id = $request->input('uom_type_id');
-            $description = $request->input('description');
-            $weight = $request->input('weight');
-            $bulk_code = $request->input('bulk_code');
-            $unit = $request->input('unit');
-            $inventory_uom = $request->input('inventory_uom');
-            $production_uom = $request->input('production_uom');
-            $purchase_uom = $request->input('purchase_uom');
-            $uom_length = $request->input('uom_length');
-            $uom_width = $request->input('uom_width');
-            $uom_height = $request->input('uom_height');
+        // Check if the `uom_type_id` is being updated
+        if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
+            // Extract the numeric part from the existing uom_id
+            $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
 
-            // Check if the `uom_type_id` is being updated
-           if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
-                // Extract the numeric part from the existing uom_id
-                $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
+            // Generate the new uom_id using the new uom_type_id and the numeric part
+            $new_uom_id = 'U' . $new_uom_type_id . $numeric_part;
 
-                // Generate the new uom_id using the new uom_type_id and the numeric part
-                $new_uom_id = 'U' . $new_uom_type_id . $numeric_part;
+            // Update the uom_id and uom_type_id
+            $uom->uom_id = $new_uom_id;
+            $uom->uom_type_id = $new_uom_type_id;
+        }
 
-                // Update the uom_id and uom_type_id
-                $uom->uom_id = $new_uom_id;
-                $uom->uom_type_id = $new_uom_type_id;
+        // Update other fields
+        $uom->description = $description ?? $uom->description;
+        $uom->weight = $weight ?? $uom->weight;
+        $uom->bulk_code = $bulk_code ?? $uom->bulk_code;
+        $uom->unit = $unit ?? $uom->unit;
+        $uom->inventory_uom = $inventory_uom ?? $uom->inventory_uom;
+        $uom->production_uom = $production_uom ?? $uom->production_uom;
+        $uom->purchase_uom = $purchase_uom ?? $uom->purchase_uom;
+        $uom->uom_length = $uom_length ?? $uom->uom_length;
+        $uom->uom_width = $uom_width ?? $uom->uom_width;
+        $uom->uom_height = $uom_height ?? $uom->uom_height;
+
+        // Step 1: Delete the old linked UOM records if any
+        Uom_linked::where('uom_id', $uom->id)->delete();
+
+        // Step 2: Insert the new linked UOM records if provided
+        if (!empty($link_uom) && is_array($link_uom)) {
+            $linkedUoms = []; // Array to store the new Uom_linked instances
+            foreach ($link_uom as $link) {
+                // Validate the required fields
+                if (isset($link['conv_form_id'], $link['conv_to_id'], $link['conv_qty'])) {
+                    $linkedUoms[] = new Uom_linked([
+                        'uom_id' => $uom->id, // Link it to the updated UOM ID
+                        'conv_form_id' => $link['conv_form_id'],
+                        'conv_to_id' => $link['conv_to_id'],
+                        'conv_qty' => $link['conv_qty'],
+                    ]);
+                }
             }
 
-
-            // Update other fields
-            $uom->description = $description ?? $uom->description;
-            $uom->weight = $weight ?? $uom->weight;
-            $uom->bulk_code = $bulk_code ?? $uom->bulk_code;
-            $uom->unit = $unit ?? $uom->unit;
-            $uom->inventory_uom = $inventory_uom ?? $uom->inventory_uom;
-            $uom->production_uom = $production_uom ?? $uom->production_uom;
-            $uom->purchase_uom = $purchase_uom ?? $uom->purchase_uom;
-            $uom->uom_length = $uom_length ?? $uom->uom_length;
-            $uom->uom_width = $uom_width ?? $uom->uom_width;
-            $uom->uom_height = $uom_height ?? $uom->uom_height;
-
-            // Save the updated UOM record to the database
-            $uom->save();
-
-            // Commit the transaction
-            DB::commit();
-
-            // Return a success response with the updated UOM record
-            return response()->json([
-                'status' => 200,
-                'message' => 'UOM Updated Successfully',
-                'result' => $uom,
-            ]);
-        } catch (ModelNotFoundException $e) {
-            // Rollback the transaction in case of a not found exception
-            DB::rollBack();
-
-            // Return a response with the not found error
-            return response()->json([
-                'status' => 404,
-                'message' => 'Error: UOM not found!',
-            ], 404);
-        } catch (\Exception $e) {
-            // Rollback the transaction in case of a general exception
-            DB::rollBack();
-
-            // Return a response with the exception message
-            return response()->json([
-                'status' => 500,
-                'message' => 'An error occurred while updating the UOM.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Only save if there are valid linked UOMs
+            if (!empty($linkedUoms)) {
+                $uom->linkedUoms()->saveMany($linkedUoms);
+            }
         }
+
+        // Save the updated UOM record to the database
+        $uom->save();
+
+        // Commit the transaction
+        DB::commit();
+
+        // Return a success response with the updated UOM record and linked UOMs
+        return response()->json([
+            'status' => 200,
+            'message' => 'UOM Updated Successfully',
+            'result' => [
+                'uom' => $uom
+            ],
+        ]);
+    } catch (ModelNotFoundException $e) {
+        // Rollback the transaction in case of a not found exception
+        DB::rollBack();
+
+        // Return a response with the not found error
+        return response()->json([
+            'status' => 404,
+            'message' => 'Error: UOM not found!',
+        ], 404);
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of a general exception
+        DB::rollBack();
+
+        // Return a response with the exception message
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred while updating the UOM.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
 
     public function destroy($id)

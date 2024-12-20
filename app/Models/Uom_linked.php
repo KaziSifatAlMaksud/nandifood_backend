@@ -17,4 +17,10 @@ class Uom_linked extends Model
 ];
 
 
+public function uom()
+{
+    return $this->belongsTo(Uom::class, 'uom_id');
+}
+
+
 }

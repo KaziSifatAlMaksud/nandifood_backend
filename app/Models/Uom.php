@@ -33,6 +33,11 @@ class Uom extends Model
         return $this->belongsTo(Uom_type::class, 'uom_type_id', 'id'); // Assumes uom_type_id is the foreign key
     }
 
+    public function linkedUoms()
+    {
+        return $this->hasMany(Uom_linked::class, 'uom_id');
+    }
+
 
 public static function fullName($id)
 {
