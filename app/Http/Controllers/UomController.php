@@ -435,7 +435,7 @@ public function update(Request $request, $id)
 
         // Save the updated UOM record to the database
         $uom->save();
-
+        $uom->load('linkedUoms');
         // Commit the transaction
         DB::commit();
 
