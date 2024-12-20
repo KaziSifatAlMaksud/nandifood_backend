@@ -232,11 +232,13 @@ public function show($id)
             $length_cm = $uom->uom_length;  
             $width_cm = $uom->uom_width;  
             $height_cm = $uom->uom_height; 
+            $weight_kg = $uom->weight;
         } else { 
             // Imperial system (inches)
             $length_in = $uom->uom_length;
             $width_in = $uom->uom_width; 
             $height_in = $uom->uom_height;
+            $weight_lb = $uom->weight;
         }
 
         // Assuming `Uom::fullName($uom->uom_id)` returns an array with additional data
@@ -254,6 +256,8 @@ public function show($id)
         $uom->length_cm = $result['length_cm']; 
         $uom->width_cm = $result['width_cm'];   
         $uom->height_cm = $result['height_cm'];
+        $uom->weight_kg = $result['weight_kg'];
+        $uom->weight_lb = $result['weight_lb'];
 
         // Return the modified Uom object in the response
         return response()->json([
