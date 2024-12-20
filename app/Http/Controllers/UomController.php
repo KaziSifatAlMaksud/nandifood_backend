@@ -194,14 +194,8 @@ public function store(Request $request)
         $uom_height = $request->input('uom_height');
 
         $link_uom = $request->input('link_uom');
-
-        // Step 1: Get the maximum uom_id for the given uom_type_id
         $max_uom_id = Uom::max('id');
-
-        // Step 2: Generate the new uom_id
         $new_uom_id = 'U' . $uom_type_id . str_pad(($max_uom_id + 1), 3, '0', STR_PAD_LEFT);
-
-        // Step 3: Create a new UOM record
         $uom = new Uom();
         $uom->uom_id = $new_uom_id;
         $uom->uom_type_id = $uom_type_id;
@@ -216,7 +210,6 @@ public function store(Request $request)
         $uom->uom_width = $uom_width;
         $uom->uom_height = $uom_height;
 
-        // Save the UOM record to the database
      
         $uom->save();
           // Step 4: Save the linked UOM data
@@ -237,6 +230,9 @@ public function store(Request $request)
 
             // Attach linked UOM data to the $uom variable
             $uom->linked_uoms = $linkedUoms;
+        } else {
+            // If $link_uom is empty, set $uom->linked_uoms to an empty array
+            $uom->linked_uoms = [];
         }
 
       
@@ -389,13 +385,8 @@ public function update(Request $request, $id)
 
         // Check if the `uom_type_id` is being updated
         if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
-            // Extract the numeric part from the existing uom_id
             $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
-
-            // Generate the new uom_id using the new uom_type_id and the numeric part
             $new_uom_id = 'U' . $new_uom_type_id . $numeric_part;
-
-            // Update the uom_id and uom_type_id
             $uom->uom_id = $new_uom_id;
             $uom->uom_type_id = $new_uom_type_id;
         }
@@ -434,7 +425,11 @@ public function update(Request $request, $id)
             if (!empty($linkedUoms)) {
                 $uom->linkedUoms()->saveMany($linkedUoms);
             }
+        }else {
+            // If $link_uom is empty, set $uom->linked_uoms to an empty array
+            $uom->linked_uoms = [];
         }
+
 
         // Save the updated UOM record to the database
         $uom->save();
