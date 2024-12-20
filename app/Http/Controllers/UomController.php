@@ -15,6 +15,61 @@ use Illuminate\Support\Facades\DB;
 
 class UomController extends Controller
 {
+
+      public function all_uom(Request $request)
+    {
+        $uoms = Uom::select([
+            'id',
+            'uom_id',
+            'description',
+            'bulk_code',
+            'unit',
+            'inventory_uom',
+            'production_uom',
+            'purchase_uom',
+            'sales_uom'
+        ])->get();
+
+    // Initialize the query for searching and filtering
+    $query = Uom::query();
+
+    $uoms = $uoms->map(function ($uom) {
+        if ($uom->unit == 0) {      
+            $length_cm = $uom->uom_length;  
+            $width_cm = $uom->uom_width;  
+            $height_cm = $uom->uom_height;
+            $weight_kg = $uom->weight; 
+        } else { 
+            $length_in = $uom->uom_length;
+            $width_in = $uom->uom_width; 
+            $height_in = $uom->uom_height;
+            $weight_lb = $uom->weight; 
+        }
+        $result = Uom::fullName($uom->id);
+        $uom->uom_type_name = $result['uom_type_name'];
+        $uom->short_name = $result['short_name']; 
+        $uom->full_name = $result['full_name']; 
+        $uom->volumem3 = $result['volumem3']; 
+        $uom->volumeft3 = $result['volumeft3'];
+        $uom->length_in = $result['length_in'];
+        $uom->width_in = $result['width_in'];
+        $uom->height_in = $result['height_in'];
+        $uom->length_cm = $result['length_cm']; 
+        $uom->width_cm = $result['width_cm'];   
+        $uom->height_cm = $result['height_cm'];
+        $uom->weight_kg = $result['weight_kg'];
+        $uom->weight_lb = $result['weight_lb'];
+
+        return $uom;
+    });
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => $uoms
+        ]);
+    }
+
     public function index(Request $request)
     {
     $uoms = Uom::select([
@@ -51,10 +106,12 @@ class UomController extends Controller
             $length_cm = $uom->uom_length;  
             $width_cm = $uom->uom_width;  
             $height_cm = $uom->uom_height; 
+            $weight_kg = $uom->weight; 
         } else { 
             $length_in = $uom->uom_length;
             $width_in = $uom->uom_width; 
             $height_in = $uom->uom_height;
+            $weight_lb = $uom->weight;
         }
         $result = Uom::fullName($uom->id);
         $uom->uom_type_name = $result['uom_type_name'];
@@ -68,6 +125,8 @@ class UomController extends Controller
         $uom->length_cm = $result['length_cm']; 
         $uom->width_cm = $result['width_cm'];   
         $uom->height_cm = $result['height_cm'];
+        $uom->weight_kg = $result['weight_kg'];
+        $uom->weight_lb = $result['weight_lb'];
 
         return $uom;
     });

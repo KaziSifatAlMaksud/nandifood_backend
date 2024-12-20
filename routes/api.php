@@ -76,6 +76,7 @@ Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destro
 
 // Unit Of Manage  List 
 Route::get('/uom',[UomController::class, 'index']);
+Route::get('/all_uom',[UomController::class, 'all_uom']);
 Route::post('/uom/create', [UomController::class, 'store']);
 Route::get('/uom/{id}', [UomController::class, 'show']);
 Route::get('/uom/{id}/edit', [UomController::class, 'edit']);
