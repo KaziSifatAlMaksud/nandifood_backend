@@ -215,7 +215,7 @@ public function store(Request $request)
           // Step 4: Save the linked UOM data
 
         if (!empty($link_uom) && is_array($link_uom)) {
-            $linkedUoms = [];
+            $linkedUom = [];
             foreach ($link_uom as $link) {
                 $uomLink = new Uom_linked(); // Ensure the model name matches your table
                 $uomLink->uom_id = $uom->id; // Link it to the newly created UOM ID
@@ -225,14 +225,14 @@ public function store(Request $request)
                 $uomLink->save();
 
                 // Add the linked UOM data to the array
-                $linkedUoms[] = $uomLink;
+                $linkedUom[] = $uomLink;
             }
 
             // Attach linked UOM data to the $uom variable
-            $uom->linked_uoms = $linkedUoms;
+            $uom->linked_uom = $linkedUom;
         } else {
-            // If $link_uom is empty, set $uom->linked_uoms to an empty array
-            $uom->linked_uoms = [];
+            // If $link_uom is empty, set $uom->linked_uom to an empty array
+            $uom->linked_uom = [];
         }
 
       
@@ -272,7 +272,7 @@ public function show($id)
     try {
         // Find the Uom by ID
         //$uom = Uom::findOrFail($id);
-        $uom = Uom::with('linkedUoms')->findOrFail($id);
+        $uom = Uom::with('linkedUom')->findOrFail($id);
         // Initialize conversion variables (for metric and imperial units)
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
@@ -367,7 +367,7 @@ public function update(Request $request, $id)
         DB::beginTransaction();
 
         // Find the UOM record by ID and eager load linked UOMs
-        $uom = Uom::with('linkedUoms')->findOrFail($id);
+        $uom = Uom::with('linkedUom')->findOrFail($id);
 
         // Retrieve input data
         $new_uom_type_id = $request->input('uom_type_id');
@@ -408,11 +408,11 @@ public function update(Request $request, $id)
 
         // Step 2: Insert the new linked UOM records if provided
         if (!empty($link_uom) && is_array($link_uom)) {
-            $linkedUoms = []; // Array to store the new Uom_linked instances
+            $linkedUom = []; // Array to store the new Uom_linked instances
             foreach ($link_uom as $link) {
                 // Validate the required fields
                 if (isset($link['conv_form_id'], $link['conv_to_id'], $link['conv_qty'])) {
-                    $linkedUoms[] = new Uom_linked([
+                    $linkedUom[] = new Uom_linked([
                         'uom_id' => $uom->id, // Link it to the updated UOM ID
                         'conv_form_id' => $link['conv_form_id'],
                         'conv_to_id' => $link['conv_to_id'],
@@ -422,18 +422,18 @@ public function update(Request $request, $id)
             }
 
             // Only save if there are valid linked UOMs
-            if (!empty($linkedUoms)) {
-                $uom->linkedUoms()->saveMany($linkedUoms);
+            if (!empty($linkedUom)) {
+                $uom->linkedUom()->saveMany($linkedUom);
             }
         }else {
-            // If $link_uom is empty, set $uom->linked_uoms to an empty array
-            $uom->linked_uoms = [];
+            // If $link_uom is empty, set $uom->linked_uom to an empty array
+            $uom->linked_uom = [];
         }
 
 
         // Save the updated UOM record to the database
         $uom->save();
-        $uom->load('linkedUoms');
+        $uom->load('linkedUom');
         // Commit the transaction
         DB::commit();
 
