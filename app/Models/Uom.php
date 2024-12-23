@@ -35,7 +35,7 @@ class Uom extends Model
 
     public function linkedUoms()
     {
-        return $this->hasMany(Uom_linked::class, 'uom_id');
+        return $this->hasMany(Uom_linked::class,  'uom_id'); // Assumes uom_id is the foreign key
     }
 
 
