@@ -267,15 +267,18 @@ public function uom_export()
 }
 
     // Show a single warehouse record
-public function show($id)
+
+
+    public function show($id)
 {
     try {
-        // Find the Uom by ID
-        //$uom = Uom::findOrFail($id);
+        // Find the Uom by ID and load the linked UOMs
         $uom = Uom::with('linkedUoms')->findOrFail($id);
-        // Initialize conversion variables (for metric and imperial units)
+
+        // Initialize length, width, height, and weight variables
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
+        $weight_kg = $weight_lb = null;
 
         // Check if the unit is metric (0) or imperial (non-0)
         if ($uom->unit == 0) {      
@@ -292,11 +295,45 @@ public function show($id)
             $weight_lb = $uom->weight;
         }
 
-        // Assuming `Uom::fullName($uom->uom_id)` returns an array with additional data
+        // Map over the linked UOMs and enrich with detailed UOM data
+        $linkUom = $uom->linkedUoms->map(function ($linkedUom) {
+            // Find the related UOM based on conv_form_id
+            $relatedUom = Uom::find($linkedUom->conv_form_id);
+            
+            if ($relatedUom) {
+                // If related UOM is found, add its detailed information
+                return [
+                    'conv_form_id' => $linkedUom->conv_form_id,
+                    'related_uom_length' => $relatedUom->uom_length,
+                    'related_uom_width' => $relatedUom->uom_width,
+                    'related_uom_height' => $relatedUom->uom_height,
+                    'related_uom_weight' => $relatedUom->weight,
+                    'related_uom_type_name' => $relatedUom->uom_type_name,
+                    'related_uom_full_name' => $relatedUom->full_name, // Missing comma added here
+                    'conv_to_id' => $linkedUom->conv_to_id,
+                    'conv_qty' => $linkedUom->conv_qty,
+                    'status' => $linkedUom->status,
+                    'created_at' => $linkedUom->created_at,
+                    'updated_at' => $linkedUom->updated_at
+                ];
+            } else {
+                // If related UOM is not found, return only the basic information
+                return [
+                    'conv_form_id' => null,
+                    'conv_to_id' => $linkedUom->conv_to_id,
+                    'conv_qty' => $linkedUom->conv_qty,
+                    'status' => $linkedUom->status,
+                    'created_at' => $linkedUom->created_at,
+                    'updated_at' => $linkedUom->updated_at
+                ];
+            }
+        });
+
+        // Get full name and other details of the UOM
         $result = Uom::fullName($uom->id);
 
-        // Assign the result data to the Uom object
-         $uom->uom_type_name = $result['uom_type_name'];
+        // Enrich the UOM object with the full name and other calculated details
+        $uom->uom_type_name = $result['uom_type_name'];
         $uom->short_name = $result['short_name']; 
         $uom->full_name = $result['full_name']; 
         $uom->volumem3 = $result['volumem3']; 
@@ -309,19 +346,18 @@ public function show($id)
         $uom->height_cm = $result['height_cm'];
         $uom->weight_kg = $result['weight_kg'];
         $uom->weight_lb = $result['weight_lb'];
-        $uom->link_uom = $uom->linkedUoms;
 
-
-
-        // Return the modified Uom object in the response
+        // Change "linked_uoms" to "link_uom"
+        $uom->link_uom = $linkUom;  // Add the enriched linked UOMs with the new key name
+        unset($uom->linkedUoms);
+        // Return the response with the enriched UOM data
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
             'result' => [
-                'data' => $uom, // Return the modified Uom object
+                'data' => $uom, // Return the enriched UOM object
             ],
         ]);
-
     } catch (\Exception $e) {
         // Return error response if something goes wrong
         return response()->json([
@@ -330,8 +366,6 @@ public function show($id)
         ], 500);
     }
 }
-
-
 
 
    public function edit($id)
