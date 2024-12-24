@@ -303,6 +303,7 @@ public function uom_export()
             if ($relatedUom) {
                 // If related UOM is found, add its detailed information
                 return [
+                    'id' => $linkedUom->id,
                     'conv_form_id' => $linkedUom->conv_form_id,
                     'related_uom_length' => $relatedUom->uom_length,
                     'related_uom_width' => $relatedUom->uom_width,
