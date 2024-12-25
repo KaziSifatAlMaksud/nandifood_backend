@@ -406,19 +406,14 @@ public function uom_export()
     try {
         // Begin database transaction
         DB::beginTransaction();
-
-        // Find the UOM record by ID and eager load linked UOMs
-        $uom = Uom::with('linkedUoms')->find($id); // Change findOrFail to find to handle gracefully
+        $uom = Uom::with('linkedUoms')->find($id);
 
         if (!$uom) {
-            // If UOM is not found, return a custom message
             return response()->json([
                 'status' => 404,
-                'message' => 'UOM not found', // Custom message for not found UOM
+                'message' => 'UOM not found',
             ], 404);
         }
-
-        // Retrieve input data
         $new_uom_type_id = $request->input('uom_type_id');
         $description = $request->input('description');
         $weight = $request->input('weight');
@@ -427,7 +422,6 @@ public function uom_export()
         $inventory_uom = $request->input('inventory_uom');
         $production_uom = $request->input('production_uom');
         $purchase_uom = $request->input('purchase_uom');
-
         $uom_length = $request->input('uom_length');
         $uom_width = $request->input('uom_width');
         $uom_height = $request->input('uom_height');
@@ -436,9 +430,8 @@ public function uom_export()
         $eff_date = $request->input('eff_date');
         $status = $request->input('status');
 
-        $link_uom = $request->input('link_uom'); // Added: link_uom input from request
+        $link_uom = $request->input('link_uom'); 
 
-        // Check if the `uom_type_id` is being updated
         if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
             $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
             $new_uom_id = 'U' . $new_uom_type_id . $numeric_part;
@@ -458,12 +451,16 @@ public function uom_export()
         $uom->uom_width = $uom_width ?? $uom->uom_width;
         $uom->uom_height = $uom_height ?? $uom->uom_height;
 
-        // Step 1: Delete the old linked UOM records if any
-        Uom_linked::where('uom_id', $uom->id)->delete();
+        $uom->sales_uom = $sales_uom ?? $uom->sales_uom;
+        $uom->eff_date = $eff_date ?? $uom->eff_date;
+        $uom->status = $status ?? $uom->status;
 
-        // Step 2: Insert the new linked UOM records if provided
+        // Step 1: Delete the old linked UOM records if any
+      
+        Uom_linked::where('uom_id', $uom->id)->delete();
         if (!empty($link_uom) && is_array($link_uom)) {
-            $linkedUoms = []; // Array to store the new Uom_linked instances
+           
+            $linkedUoms = [];
             foreach ($link_uom as $link) {
                 // Validate the required fields
                 if (isset($link['conv_form_id'], $link['conv_to_id'], $link['conv_qty'])) {
@@ -480,9 +477,6 @@ public function uom_export()
         if (!empty($linkedUoms)) {
             $uom->linkedUoms()->saveMany($linkedUoms);
         }
-        } else {
-            // If $link_uom is empty, set $uom->linked_uoms to an empty array
-            $uom->link_uom = [];
         }
 
         // Save the updated UOM record to the database
