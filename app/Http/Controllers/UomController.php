@@ -186,12 +186,15 @@ public function store(Request $request)
         $weight = $request->input('weight');
         $bulk_code = $request->input('bulk_code');
         $unit = $request->input('unit');
+        $eff_date = $request->input('eff_date');
         $inventory_uom = $request->input('inventory_uom');
         $production_uom = $request->input('production_uom');
         $purchase_uom = $request->input('purchase_uom');
+        $sales_uom = $request->input('sales_uom');
         $uom_length = $request->input('uom_length');
         $uom_width = $request->input('uom_width');
         $uom_height = $request->input('uom_height');
+        $status = $request->input('status');
 
         $link_uom = $request->input('link_uom');
         $max_uom_id = Uom::max('id');
@@ -200,15 +203,18 @@ public function store(Request $request)
         $uom->uom_id = $new_uom_id;
         $uom->uom_type_id = $uom_type_id;
         $uom->description = $description;
+        $uom->eff_date = $eff_date;
         $uom->weight = $weight;
         $uom->bulk_code = $bulk_code;
         $uom->unit = $unit;
         $uom->inventory_uom = $inventory_uom;
         $uom->production_uom = $production_uom;
+        $uom->sales_uom = $sales_uom;
         $uom->purchase_uom = $purchase_uom;
         $uom->uom_length = $uom_length;
         $uom->uom_width = $uom_width;
         $uom->uom_height = $uom_height;
+        $uom->status = $status;
 
      
         $uom->save();
@@ -421,9 +427,15 @@ public function uom_export()
         $inventory_uom = $request->input('inventory_uom');
         $production_uom = $request->input('production_uom');
         $purchase_uom = $request->input('purchase_uom');
+
         $uom_length = $request->input('uom_length');
         $uom_width = $request->input('uom_width');
         $uom_height = $request->input('uom_height');
+        
+        $sales_uom = $request->input('sales_uom');
+        $eff_date = $request->input('eff_date');
+        $status = $request->input('status');
+
         $link_uom = $request->input('link_uom'); // Added: link_uom input from request
 
         // Check if the `uom_type_id` is being updated
@@ -465,9 +477,9 @@ public function uom_export()
             }
 
             // Only save if there are valid linked UOMs
-            if (!empty($linkedUoms)) {
-                $uom->linkedUoms()->saveMany($linkedUoms);
-            }
+        if (!empty($linkedUoms)) {
+            $uom->linkedUoms()->saveMany($linkedUoms);
+        }
         } else {
             // If $link_uom is empty, set $uom->linked_uoms to an empty array
             $uom->link_uom = [];
