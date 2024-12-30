@@ -69,7 +69,7 @@ public static function fullName($id)
     if ($hu_list->unit == 0) {
         // Metric system (cm)
         $length_cm = $hu_list->length; // Length in cm
-        $width_cm = $hu_list->weight;   // Width in cm (assuming 'weight' is for width)
+        $width_cm = $hu_list->width;   // Width in cm (assuming 'weight' is for width)
         $height_cm = $hu_list->height; // Height in cm
         $min_weight_kg = $hu_list->min_weight; // Min weight in kg
         $max_weight_kg = $hu_list->max_weight; // Max weight in kg
@@ -86,7 +86,7 @@ public static function fullName($id)
     } else { 
         // Imperial system (inches)
         $length_in = $hu_list->length;  // Length in inches
-        $width_in = $hu_list->weight;   // Width in inches (assuming 'weight' is for width)
+        $width_in = $hu_list->width;   // Width in inches (assuming 'weight' is for width)
         $height_in = $hu_list->height;  // Height in inches
         $min_weight_lb = $hu_list->min_weight; // Min weight in lb
         $max_weight_lb = $hu_list->max_weight; // Max weight in lb
