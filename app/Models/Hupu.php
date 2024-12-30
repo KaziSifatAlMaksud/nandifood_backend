@@ -12,6 +12,7 @@ class Hupu extends Model
 
     protected $fillable = [
         'id',
+        'hu_pu_id',
         'hu_pu_code',
         'hu_pu_type',
         'flex',
@@ -19,17 +20,26 @@ class Hupu extends Model
         'description',                
         'unit',
         'length',
-        'weight',
+        'width',
         'height',
         'hu_empty_weight',
-        'hu_minimum_weight',
+        'min_weight',
         'hu_loaded_weight',
-        'hu_maximum_weight',
+        'max_weight',
+        'status',
+        'bulk_code',
+        'eff_date'
     ];
 
     public function uomType()
     {
         return $this->belongsTo(Uom_type::class,'id', 'pu_hu_name'); // Assumes uom_type_id is the foreign key
+    }
+
+
+    public function linkedhupus()
+    {
+        return $this->hasMany(Uom_linked::class,  'uom_id'); // Assumes uom_id is the foreign key
     }
 
 public static function fullName($id)
@@ -44,6 +54,11 @@ public static function fullName($id)
     $width_cm = 0;
     $height_cm = 0;
 
+    $min_weight_kg = 0;
+    $max_weight_kg = 0;
+    $min_weight_lb = 0;
+    $max_weight_lb = 0;
+
     // Find the UOM record
     $hu_list = Hupu::where('id', $id)->first();
     if (!$hu_list) {
@@ -56,8 +71,8 @@ public static function fullName($id)
         $length_cm = $hu_list->length; // Length in cm
         $width_cm = $hu_list->weight;   // Width in cm (assuming 'weight' is for width)
         $height_cm = $hu_list->height; // Height in cm
-
-        // Calculate volume in cubic meters and cubic feet
+        $min_weight_kg = $hu_list->min_weight; // Min weight in kg
+        $max_weight_kg = $hu_list->max_weight; // Max weight in kg
         $volumem3 = ($length_cm * $width_cm * $height_cm) / 1000000; // cm³ to m³
         $volumeft3 = $volumem3 * 35.3147; // m³ to ft³
 
@@ -65,16 +80,22 @@ public static function fullName($id)
         $length_in = $length_cm * 0.393701; // cm to inches
         $width_in = $width_cm * 0.393701;   // cm to inches
         $height_in = $height_cm * 0.393701; // cm to inches
+
+        $min_weight_lb = $min_weight_kg * 2.20462;  // kg to lb
+        $max_weight_lb = $max_weight_kg * 2.20462;  // kg to lb
     } else { 
         // Imperial system (inches)
         $length_in = $hu_list->length;  // Length in inches
         $width_in = $hu_list->weight;   // Width in inches (assuming 'weight' is for width)
         $height_in = $hu_list->height;  // Height in inches
-
+        $min_weight_lb = $hu_list->min_weight; // Min weight in lb
+        $max_weight_lb = $hu_list->max_weight; // Max weight in lb
         // Convert inches to centimeters
         $length_cm = $length_in * 2.54; // inches to cm
         $width_cm = $width_in * 2.54;   // inches to cm
         $height_cm = $height_in * 2.54; // inches to cm
+        $min_weight_kg = $min_weight_lb * 0.453592; // lb to kg
+        $max_weight_kg = $max_weight_lb * 0.453592; // lb to kg
 
         // Calculate volume in cubic feet and cubic meters
         $volumeft3 = ($length_in * $width_in * $height_in) / 1728; // in³ to ft³
@@ -102,7 +123,12 @@ public static function fullName($id)
         'height_in' => $height_in,
         'length_cm' => $length_cm,
         'width_cm' => $width_cm,
-        'height_cm' => $height_cm
+        'height_cm' => $height_cm,
+        'min_weight_kg' => $min_weight_kg,
+        'max_weight_kg' => $max_weight_kg,
+        'min_weight_lb' => $min_weight_lb,
+        'max_weight_lb' => $max_weight_lb
+        
     ];
 }
 
