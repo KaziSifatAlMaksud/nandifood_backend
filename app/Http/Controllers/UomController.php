@@ -156,13 +156,13 @@ class UomController extends Controller
 
         // Create a LengthAwarePaginator
         $paginated = new LengthAwarePaginator(
-            $paginatedItems, // Items for the current page
-            $uoms->count(), // Total items
-            $limit, // Items per page
-            $currentPage, // Current page number
+            $paginatedItems, 
+            $uoms->count(), 
+            $limit, 
+            $currentPage,
             [
-                'path' => Paginator::resolveCurrentPath(), // Set pagination path
-                'query' => $request->query() // Preserve query parameters
+                'path' => Paginator::resolveCurrentPath(), 
+                'query' => $request->query()
             ]
         );
         return response()->json([
