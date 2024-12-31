@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Warehouse;
 use App\Models\Uom;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 
@@ -32,27 +33,68 @@ class PdfController extends Controller
     }
     
 
+    public function uom_list_pdf()
+{
+    try {
+        // Fetch all UOM data
+        $uom = Uom::all();
+
+        // Path to the company logo
+        $imagePath = public_path('storage/company-logo.png');
+
+        // Prepare data for the PDF view
+        $data = [
+            'title' => 'Unit of Measure (UOM) List',
+            'date' => date('m/d/Y'),
+            'imageSrc' => $imagePath, // Pass the base64 encoded image
+            'result' => $uom,
+        ];
+
+        // Generate the PDF using the view
+        $pdf = Pdf::loadView('pdf.uom_list', $data);
+
+        // Stream the PDF in the browser
+        return $pdf->stream('uom_list.pdf');
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'An error occurred while generating the UOM list PDF.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
 
     
-    public function uom_list_pdf()
-    {
-        $uom = Uom::all(); // Removed the extra ->get() as all() already retrieves the data.
-        $imagePath = public_path('storage/company-logo.png'); 
-        $imageData = base64_encode(file_get_contents($imagePath));
-        $imageSrc = 'data:image/png;base64,' . $imageData;
-    
-        $data = [
-            'title' => 'Unit of Measure (UOM) List',        
-            'date' => date('m/d/Y'),
-            'imageSrc' => $imageSrc ,
-            'result' => $uom,
-        ]; 
-    
-        $pdf = Pdf::loadView('pdf.uom_list', $data);
-    
-        // Use stream to view the PDF in the browser
-        return $pdf->stream('uom_list.pdf');
-    }
-    
+// public function uom_list_pdf()
+// {
+//     try {
+//         // Fetch all UOM data
+//         $uom = Uom::all();
+//         $imagePath = public_path('storage/company-logo.png');
+
+//         if (!file_exists($imagePath)) {
+//             throw new \Exception('Company logo file not found at ' . $imagePath);
+//         }
+//         $imageData = base64_encode(file_get_contents($imagePath));
+//         $imageSrc = 'data:image/png;base64,' . $imageData;
+//         $data = [
+//             'title' => 'Unit of Measure (UOM) List',
+//             'date' => date('m/d/Y'),
+//             'imageSrc' => $imageSrc,
+//             'result' => $uom,
+//         ];
+
+//         $pdf = Pdf::loadView('pdf.uom_list', $data);
+//         return $pdf->stream('uom_list.pdf');
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'message' => 'An error occurred while generating the UOM list PDF.',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+
 }
 
