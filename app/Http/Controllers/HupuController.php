@@ -134,35 +134,29 @@ class HupuController extends Controller
 
 
         $pu_lists = $pu_lists->map(function ($pu_list) {
-            // Variables for centimeters and inches
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
-
-            // Convert based on unit type
-            if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
-                // Values in cm
+            if ($pu_list->unit == 0) {  
                 $length_cm = $pu_list->length;
                 $width_cm = $pu_list->width;
                 $height_cm = $pu_list->height;
                 $min_weight_kg = $pu_list->min_weight; 
                 $max_weight_kg = $pu_list->max_weight; 
-            } else {  // Assuming 1 is for inches
-                // Values in inches
+            } else {  
                 $length_in = $pu_list->length;
                 $width_in = $pu_list->width;
                 $height_in = $pu_list->height;                
                 $min_weight_lb = $pu_list->min_weight; 
                 $max_weight_lb = $pu_list->max_weight;
             }
-            // dd($hu_list->id);
-            // Get full name and volume calculations
+
             $result = Hupu::fullName($pu_list->id);
 
             $pu_list->short_name = $result['short_name'];
             $pu_list->full_name = $result['full_name'];
             $pu_list->volumem3 = $result['volumem3'];
             $pu_list->volumeft3 = $result['volumeft3'];
-            $pu_list->length_in = $length_in ?? $result['length_in'];  // Default to result if not set
+            $pu_list->length_in = $length_in ?? $result['length_in']; 
             $pu_list->width_in = $width_in ?? $result['width_in'];
             $pu_list->height_in = $height_in ?? $result['height_in'];
             $pu_list->length_cm = $length_cm ?? $result['length_cm'];
@@ -218,16 +212,7 @@ class HupuController extends Controller
     {
        $pu_code = 'PU'; // Replace 'PU' with the actual value or variable
         $pu_lists = Hupu::select([
-                'id',
-                'hu_pu_code',
-                'flex',
-                'pu_hu_name',
-                'description',
-                'unit',
-                'length',
-                'width',
-                'height',
-                'min_weight',
+                'id', 'hu_pu_code','flex', 'pu_hu_name', 'description','unit','length','width','height', 'min_weight',
                 'max_weight'
             ])
             ->where('hu_pu_code', $pu_code) // Use the variable or actual value
@@ -446,25 +431,86 @@ class HupuController extends Controller
             ], 500);
         }
     }
-   public function update(Request $request, $id)
-{
-    $hupu = Hupu::find($id);
 
-    if (!$hupu) {
+
+
+
+
+    public function update(Request $request, $id)
+{
+    try {
+        DB::beginTransaction();
+
+        // Retrieve the Hupu record to update
+        $hupu = Hupu::with('linkedhupus')->findOrFail($id);
+
+        // Update Hupu fields
+        $hupu->hu_pu_code = $request->input('hu_pu_code');
+        $hupu->hu_pu_type = $request->input('hu_pu_type');
+        $hupu->flex = $request->input('flex');
+        $hupu->pu_hu_name = $request->input('pu_hu_name');
+        $hupu->description = $request->input('description');
+        $hupu->eff_date = $request->input('eff_date');
+        $hupu->width = $request->input('width');
+        $hupu->bulk_code = $request->input('bulk_code');
+        $hupu->unit = $request->input('unit');
+        $hupu->hu_empty_weight = $request->input('hu_empty_weight');
+        $hupu->min_weight = $request->input('min_weight');
+        $hupu->hu_loaded_weight = $request->input('hu_loaded_weight');
+        $hupu->max_weight = $request->input('max_weight');
+        $hupu->length = $request->input('length');
+        $hupu->height = $request->input('height');
+        $hupu->status = $request->input('status');
+
+        // Generate a new ID if hu_pu_type is updated
+        $new_uom_type_id = $request->input('hu_pu_type');
+        if ($new_uom_type_id && $new_uom_type_id !== $hupu->hu_pu_type) {
+            $numeric_part = substr($hupu->hu_pu_id, strlen($hupu->hu_pu_type) + 1);
+            $hupu->hu_pu_id = 'U' . $new_uom_type_id . $numeric_part;
+        }
+        $hupu->save();
+
+        // Remove existing linked UOMs
+        Uom_linked::where('uom_id', $hupu->id)->delete();
+
+        // Save the updated linked UOM data
+        $link_uom = $request->input('link_uom');
+        if (!empty($link_uom) && is_array($link_uom)) {
+            foreach ($link_uom as $link) {
+                $uomLink = new Uom_linked();
+                $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
+                $uomLink->conv_form_id = $link['conv_form_id'];
+                $uomLink->conv_to_id = $link['conv_to_id'];
+                $uomLink->conv_qty = $link['conv_qty'];
+                $uomLink->save();
+            }
+        }
+
+        $linkedUoms = Uom_linked::where('uom_id', $hupu->id)->get();
+
+        // Add the linked UOMs to the $hupu object
+        $hupu->link_uom = $linkedUoms;
+
+        DB::commit();
+
+        unset($hupu->linkedhupus);
+
         return response()->json([
-            'status' => '404',
-            'message' => 'Error: UOM not found!',
-        ], 404);
+            'status' => 200,
+            'message' => 'Updated successfully',
+            'result' => $hupu,
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage(),
+        ], 500);
     }
-    $hupu->update($request->all());
-    return response()->json([
-        'status' => '200',
-        'message' => 'Ok.',
-        'result' => [
-            'data' => $hupu,
-        ],
-    ]);
 }
+
+
 
 public function store(Request $request)
 {
