@@ -425,9 +425,12 @@ public function store(Request $request)
 }
 
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 79d19d3d99eac6bb3b306f1655505a9d3d87c821
 
     //   public function storeadsfasd(Request $request)
     // {
