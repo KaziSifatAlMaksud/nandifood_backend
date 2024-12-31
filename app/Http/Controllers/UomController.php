@@ -286,7 +286,6 @@ public function uom_export()
         $length_in = $width_in = $height_in = null;
         $weight_kg = $weight_lb = null;
 
-        // Check if the unit is metric (0) or imperial (non-0)
         if ($uom->unit == 0) {      
             // Metric system (centimeters)
             $length_cm = $uom->uom_length;  

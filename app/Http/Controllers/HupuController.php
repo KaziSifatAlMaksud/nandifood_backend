@@ -9,6 +9,7 @@ use App\Models\Hupu;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use App\Models\Uom_type;
 use App\Models\Uom_linked;
 class HupuController extends Controller
 {
@@ -114,7 +115,7 @@ class HupuController extends Controller
 
        public function hu_list(Request $request)
     {
-       $pu_code = 'HU'; // Replace 'PU' with the actual value or variable
+       $hu_code = 'HU'; // Replace 'PU' with the actual value or variable
         $pu_lists = Hupu::select([
                 'id',
                 'hu_pu_code',
@@ -124,9 +125,11 @@ class HupuController extends Controller
                 'unit',
                 'length',
                 'width',
-                'height'
+                'height',
+                'min_weight',
+                'max_weight'
             ])
-            ->where('hu_pu_code', $pu_code) // Use the variable or actual value
+            ->where('hu_pu_code', $hu_code) // Use the variable or actual value
             ->get();
 
 
@@ -223,7 +226,9 @@ class HupuController extends Controller
                 'unit',
                 'length',
                 'width',
-                'height'
+                'height',
+                'min_weight',
+                'max_weight'
             ])
             ->where('hu_pu_code', $pu_code) // Use the variable or actual value
             ->get();
@@ -340,58 +345,72 @@ class HupuController extends Controller
             $max_weight_lb = $hupu->max_weight;
         }
 
-        // Enrich linked UOM data
-        // $linkUom = $hupu->linkedhupus->map(function ($linkedUom) {
-        //     $relatedUom = Hupu::find($linkedUom->conv_form_id);
+       // Enrich linked Hupu data
+       $link_uom = $hupu->linkedhupus->map(function ($linkedhupu) {
+        $relatedUom = Hupu::find($linkedhupu->uom_id);
+       // DD($relatedUom);
+        if ($relatedUom) {
+            return [
+                'id' => $linkedhupu->id,
+                'conv_form_id' => $linkedhupu->conv_form_id,
+                'related_uom_length' => $relatedUom->length,
+                'related_uom_width' => $relatedUom->width,
+                'related_uom_height' => $relatedUom->height,
+                'related_unit' => $relatedUom->unit,
+                'related_uom_max_weight' => $relatedUom->max_weight,
+                 'related_uom_min_weight' => $relatedUom->min_weight,
+                'related_uom_type_name' =>  Uom_type::where('id', $relatedUom->hu_pu_type)->value('uom_name'),
+                       'related_uom_full_name' => 
+                        $relatedUom->hu_pu_id . ' ' . 
+                        Uom_type::where('id', $relatedUom->hu_pu_type)->value('uom_name') . 
+                        ' (' . $relatedUom->description . ')',
 
-        //     if ($relatedUom) {
-        //         return [
-        //             'id' => $linkedUom->id,
-        //             'conv_form_id' => $linkedUom->conv_form_id,
-        //             'related_uom_length' => $relatedUom->length,
-        //             'related_uom_width' => $relatedUom->width,
-        //             'related_uom_height' => $relatedUom->height
-        //             // 'related_uom_type_name' => $relatedUom->uom_type_name,
-        //             // 'related_uom_full_name' => $relatedUom->full_name,
-        //             // 'conv_to_id' => $linkedUom->conv_to_id,
-        //             // 'conv_qty' => $linkedUom->conv_qty,
-        //             // 'status' => $linkedUom->status,
-        //             // 'created_at' => $linkedUom->created_at,
-        //             // 'updated_at' => $linkedUom->updated_at,
-        //         ];
-        //     }
 
-        //     return [
-        //         'conv_form_id' => null,
-        //         'conv_to_id' => $linkedUom->conv_to_id,
-        //         'conv_qty' => $linkedUom->conv_qty,
-        //         'status' => $linkedUom->status,
-        //         'created_at' => $linkedUom->created_at,
-        //         'updated_at' => $linkedUom->updated_at,
-        //     ];
-        // });
+
+                'conv_to_id' => $linkedhupu->conv_to_id,
+                'conv_qty' => $linkedhupu->conv_qty,
+                'created_at' => $linkedhupu->created_at,
+                'updated_at' => $linkedhupu->updated_at,
+            ];
+        }
+
+        return [
+            'conv_form_id' =>  $linkedhupu->conv_to_id,
+            'conv_to_id' => $linkedhupu->conv_to_id,
+            'conv_qty' => $linkedhupu->conv_qty,
+            'status' => $linkedhupu->status,
+            'created_at' => $linkedhupu->created_at,
+            'updated_at' => $linkedhupu->updated_at,
+        ];
+    });
+
 
         // Retrieve UOM full details
         $result = Hupu::fullName($hupu->id);
 
+        
+
         // Attach additional details to the Hupu object
-        // $hupu->uom_type_name = $result['uom_type_name'];
-        // $hupu->short_name = $result['short_name'];
-        // $hupu->full_name = $result['full_name'];
-        // $hupu->volumem3 = $result['volumem3'];
-        // $hupu->volumeft3 = $result['volumeft3'];
-        // $hupu->length_in = $result['length_in'];
-        // $hupu->width_in = $result['width_in'];
-        // $hupu->height_in = $result['height_in'];
-        // $hupu->length_cm = $result['length_cm'];
-        // $hupu->width_cm = $result['width_cm'];
-        // $hupu->height_cm = $result['height_cm'];
-        // $hupu->weight_kg = $result['weight_kg'];
-        // $hupu->weight_lb = $result['weight_lb'];
+        $hupu->short_name = $result['short_name'];
+        $hupu->full_name = $result['full_name'];
+        $hupu->volumem3 = $result['volumem3'];
+        $hupu->volumeft3 = $result['volumeft3'];
+        $hupu->length_in = $result['length_in'];
+
+        $hupu->width_in = $result['width_in'];
+        $hupu->height_in = $result['height_in'];
+        $hupu->length_cm = $result['length_cm'];
+
+        $hupu->width_cm = $result['width_cm'];
+        $hupu->height_cm = $result['height_cm'];
+        $hupu->min_weight_kg = $result['min_weight_kg'];
+        $hupu->max_weight_kg = $result['max_weight_kg'];
+        $hupu->min_weight_lb = $result['min_weight_lb'];
+         $hupu->max_weight_lb = $result['max_weight_lb'];
 
         // Rename "linked_uoms" to "link_uom"
-        // $hupu->link_uom = $linkUom;
-
+        $hupu->link_uom = $link_uom;
+      unset($hupu->linkedhupus);
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
@@ -407,6 +426,7 @@ class HupuController extends Controller
     }
 }
 
+     
 
        public function edit($id)
     {

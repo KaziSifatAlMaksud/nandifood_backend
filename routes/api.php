@@ -83,7 +83,7 @@ Route::get('/uom/{id}/edit', [UomController::class, 'edit']);
 Route::put('/uom/{id}', [UomController::class, 'update']);
 Route::delete('/uom/delete/{id}', [UomController::class, 'destroy'])->name('uom.destroy');
 
-Route::get('/hupu',[HupuController::class, 'hupu_list']);
+Route::get('/hu_pu',[HupuController::class, 'hupu_list']);
 
 // handaling Unit List 
 Route::get('/hu',[HupuController::class, 'hu_list']);

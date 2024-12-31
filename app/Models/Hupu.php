@@ -103,14 +103,14 @@ public static function fullName($id)
     }
 
     // Find the UOM type
-    $uom_type = Uom_type::find($hu_list->pu_hu_name);
+    $uom_type = Uom_type::find($hu_list->hu_pu_type);
     if (!$uom_type) {
         return null; // Return null if UOM type not found
     }
 
     // Generate names
-    $short_name = $hu_list->hu_pu_code . '(' . $uom_type->uom_name . ')';
-    $full_name = $hu_list->hu_pu_code . ' ' . $uom_type->uom_name . ' (' . $hu_list->description . ')';
+    $short_name = $hu_list->hu_pu_id . '(' . $uom_type->uom_name . ')';
+    $full_name = $hu_list->hu_pu_id . ' ' . $uom_type->uom_name . ' (' . $hu_list->description . ')';
 
     // Return the result as an array
     return [
