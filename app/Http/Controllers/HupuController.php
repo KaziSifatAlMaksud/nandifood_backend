@@ -353,7 +353,8 @@ class HupuController extends Controller
 
 
                 'conv_to_id' => $linkedhupu->conv_to_id,
-                'conv_qty' => $linkedhupu->conv_qty,
+                'min_qty' => $linkedhupu->min_qty,
+                'max_qty' => $linkedhupu->max_qty,
                 'created_at' => $linkedhupu->created_at,
                 'updated_at' => $linkedhupu->updated_at,
             ];
@@ -362,8 +363,8 @@ class HupuController extends Controller
         return [
             'conv_form_id' =>  $linkedhupu->conv_to_id,
             'conv_to_id' => $linkedhupu->conv_to_id,
-            'conv_qty' => $linkedhupu->conv_qty,
-            'status' => $linkedhupu->status,
+            'min_qty' => $linkedhupu->min_qty,
+            'max_qty' => $linkedhupu->max_qty,
             'created_at' => $linkedhupu->created_at,
             'updated_at' => $linkedhupu->updated_at,
         ];
@@ -481,7 +482,8 @@ class HupuController extends Controller
                 $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
                 $uomLink->conv_form_id = $link['conv_form_id'];
                 $uomLink->conv_to_id = $link['conv_to_id'];
-                $uomLink->conv_qty = $link['conv_qty'];
+                $uomLink->max_qty = $link['max_qty'];
+                $uomLink->min_qty = $link['min_qty'];
                 $uomLink->save();
             }
         }
@@ -568,7 +570,8 @@ public function store(Request $request)
                 $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
                 $uomLink->conv_form_id = $link['conv_form_id'];
                 $uomLink->conv_to_id = $link['conv_to_id'];
-                $uomLink->conv_qty = $link['conv_qty'];
+                $uomLink->max_qty = $link['max_qty'];
+                $uomLink->min_qty = $link['min_qty'];
                 $uomLink->save();
             }
         }

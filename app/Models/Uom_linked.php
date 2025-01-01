@@ -13,7 +13,9 @@ class Uom_linked extends Model
         'conv_form_id',
         'conv_to_id',
         'conv_qty',     
-        'status'         
+        'status',
+        'max_qty',
+        'min_qty'         
 ];
 
 
