@@ -96,6 +96,9 @@ Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('h
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
+
+Route::get('/linked_hu_pu/{id}', [HupuController::class, 'linked_hu_pu']);
+
 // route::get('/',[HupuController::class, 'pu_list']);
 
 

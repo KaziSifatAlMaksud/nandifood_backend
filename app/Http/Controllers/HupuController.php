@@ -595,6 +595,59 @@ public function store(Request $request)
     }
 }
 
+public function linked_hu_pu($id)
+{
+    try {
+        // Fetch all linked UOMs based on the given ID
+        $LinkedHupus = Uom_linked::where('conv_form_id', $id)->get();
+        $result = [];
+        foreach ($LinkedHupus as $key => $LinkedHupu) {
+            $linkedUom = Hupu::find($LinkedHupu->conv_to_id);
+
+            // Add the linked information to the result array
+             $extra_conv_form = Hupu::fullName($LinkedHupu->conv_form_id);
+            $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
+
+            $result[] = [
+                'linked_id' => $LinkedHupu->id,
+                'conv_form_id' => $LinkedHupu->conv_form_id,
+                'conv_form_full_name' => $extra_conv_form['full_name'],
+                'max_qty' => $LinkedHupu->max_qty,
+                'min_qty' => $LinkedHupu->min_qty,
+
+                'conv_to_id' => [
+                    'id' => $LinkedHupu->conv_to_id,
+                    'hu_pu_code' => $linkedUom->hu_pu_code,
+                    'flex' => $linkedUom->flex,
+                    'unit' => $linkedUom->unit,
+                    'length' => $linkedUom->length,
+                    'width' => $linkedUom->width,
+                    'height' => $linkedUom->height,
+                    'min_weight' => $linkedUom->min_weight,
+                    'max_weight' => $linkedUom->max_weight,
+                    'bulk_code' => $linkedUom->bulk_code,
+                    'hu_pu_id' => $linkedUom->hu_pu_id,
+                    'full_name' => $extra_conv_to['full_name']
+                ]
+
+            ];
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Linked HU/PU information retrieved successfully.',
+            'result' => $result,
+        ]);
+    } catch (\Exception $e) {
+        // Handle exceptions and return an error response
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred while retrieving linked HU/PU information.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 
 
     public function destroy($id)
