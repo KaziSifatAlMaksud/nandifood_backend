@@ -19,6 +19,7 @@ class HupuController extends Controller
        
         $pu_lists = Hupu::select([
                 'id',
+                'hu_pu_id',
                 'hu_pu_code',
                 'flex',
                 'hu_pu_id',
@@ -27,7 +28,8 @@ class HupuController extends Controller
                 'unit',
                 'length',
                 'width',
-                'height'
+                'height',
+                'bulk_code'
             ])->get();
 
 
@@ -118,6 +120,7 @@ class HupuController extends Controller
        $hu_code = 'HU'; // Replace 'PU' with the actual value or variable
         $pu_lists = Hupu::select([
                 'id',
+                'hu_pu_id',
                 'hu_pu_code',
                 'flex',
                 'pu_hu_name',
@@ -127,7 +130,8 @@ class HupuController extends Controller
                 'width',
                 'height',
                 'min_weight',
-                'max_weight'
+                'max_weight',
+                'bulk_code'
             ])
             ->where('hu_pu_code', $hu_code) // Use the variable or actual value
             ->get();
@@ -208,11 +212,171 @@ class HupuController extends Controller
 
     }
 
+
+     public function hu_all(Request $request)
+{
+    $pu_code = 'HU'; // Replace 'PU' with the actual value or variable
+    // Fetch all records without pagination
+    $pu_lists = Hupu::select([
+            'id', 'hu_pu_code',   'hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name', 'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
+        ])
+        ->where('hu_pu_code', $pu_code)
+        ->get(); // No pagination, fetch all records
+
+    // Map through each PU to convert units and calculate additional fields
+    $pu_lists = $pu_lists->map(function ($pu_list) {
+        // Variables for centimeters and inches
+        $length_cm = $width_cm = $height_cm = null;
+        $length_in = $width_in = $height_in = null;
+
+        // Convert based on unit type
+        if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
+            // Values in cm
+            $length_cm = $pu_list->length;
+            $width_cm = $pu_list->width;
+            $height_cm = $pu_list->height;
+            $min_weight_kg = $pu_list->min_weight; 
+            $max_weight_kg = $pu_list->max_weight; 
+        } else {  // Assuming 1 is for inches
+            // Values in inches
+            $length_in = $pu_list->length;
+            $width_in = $pu_list->width;
+            $height_in = $pu_list->height;                
+            $min_weight_lb = $pu_list->min_weight; 
+            $max_weight_lb = $pu_list->max_weight;
+        }
+
+        // Get full name and volume calculations
+        $result = Hupu::fullName($pu_list->id);
+
+        // Assign calculated values
+        $pu_list->short_name = $result['short_name'];
+        $pu_list->full_name = $result['full_name'];
+        $pu_list->volumem3 = $result['volumem3'];
+        $pu_list->volumeft3 = $result['volumeft3'];
+        $pu_list->length_in = $length_in ?? $result['length_in'];  // Default to result if not set
+        $pu_list->width_in = $width_in ?? $result['width_in'];
+        $pu_list->height_in = $height_in ?? $result['height_in'];
+        $pu_list->length_cm = $length_cm ?? $result['length_cm'];
+        $pu_list->width_cm = $width_cm ?? $result['width_cm'];
+        $pu_list->height_cm = $height_cm ?? $result['height_cm'];
+
+        $pu_list->max_weight_kg = $result['max_weight_kg'];
+        $pu_list->min_weight_kg = $result['min_weight_kg'];
+        $pu_list->max_weight_lb = $result['max_weight_lb'];
+        $pu_list->min_weight_lb = $result['min_weight_lb'];
+        
+        return $pu_list;
+    });     
+
+    // Search functionality
+    $search = $request->input('search'); // Space-separated values
+    if ($search) {
+        $terms = explode(' ', $search); // Split by spaces
+        $pu_lists = $pu_lists->filter(function ($pu_list) use ($terms) {
+            foreach ($terms as $term) {
+                if (stripos($pu_list->pu_hu_name, $term) !== false || 
+                    stripos($pu_list->description, $term) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    // Return all PU records as JSON without pagination
+    return response()->json([
+        'status' => 200,
+        'message' => 'All HU List.',
+        'result' => $pu_lists
+    ]);
+}
+
+    public function pu_all(Request $request)
+{
+    $pu_code = 'PU'; // Replace 'PU' with the actual value or variable
+    // Fetch all records without pagination
+    $pu_lists = Hupu::select([
+            'id', 'hu_pu_code','hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name', 'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
+        ])
+        ->where('hu_pu_code', $pu_code)
+        ->get(); // No pagination, fetch all records
+
+    // Map through each PU to convert units and calculate additional fields
+    $pu_lists = $pu_lists->map(function ($pu_list) {
+        // Variables for centimeters and inches
+        $length_cm = $width_cm = $height_cm = null;
+        $length_in = $width_in = $height_in = null;
+
+        // Convert based on unit type
+        if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
+            // Values in cm
+            $length_cm = $pu_list->length;
+            $width_cm = $pu_list->width;
+            $height_cm = $pu_list->height;
+            $min_weight_kg = $pu_list->min_weight; 
+            $max_weight_kg = $pu_list->max_weight; 
+        } else {  // Assuming 1 is for inches
+            // Values in inches
+            $length_in = $pu_list->length;
+            $width_in = $pu_list->width;
+            $height_in = $pu_list->height;                
+            $min_weight_lb = $pu_list->min_weight; 
+            $max_weight_lb = $pu_list->max_weight;
+        }
+
+        // Get full name and volume calculations
+        $result = Hupu::fullName($pu_list->id);
+
+        // Assign calculated values
+        $pu_list->short_name = $result['short_name'];
+        $pu_list->full_name = $result['full_name'];
+        $pu_list->volumem3 = $result['volumem3'];
+        $pu_list->volumeft3 = $result['volumeft3'];
+        $pu_list->length_in = $length_in ?? $result['length_in'];  // Default to result if not set
+        $pu_list->width_in = $width_in ?? $result['width_in'];
+        $pu_list->height_in = $height_in ?? $result['height_in'];
+        $pu_list->length_cm = $length_cm ?? $result['length_cm'];
+        $pu_list->width_cm = $width_cm ?? $result['width_cm'];
+        $pu_list->height_cm = $height_cm ?? $result['height_cm'];
+
+        $pu_list->max_weight_kg = $result['max_weight_kg'];
+        $pu_list->min_weight_kg = $result['min_weight_kg'];
+        $pu_list->max_weight_lb = $result['max_weight_lb'];
+        $pu_list->min_weight_lb = $result['min_weight_lb'];
+        
+        return $pu_list;
+    });     
+
+    // Search functionality
+    $search = $request->input('search'); // Space-separated values
+    if ($search) {
+        $terms = explode(' ', $search); // Split by spaces
+        $pu_lists = $pu_lists->filter(function ($pu_list) use ($terms) {
+            foreach ($terms as $term) {
+                if (stripos($pu_list->pu_hu_name, $term) !== false || 
+                    stripos($pu_list->description, $term) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    // Return all PU records as JSON without pagination
+    return response()->json([
+        'status' => 200,
+        'message' => 'All PU List.',
+        'result' => $pu_lists
+    ]);
+}
+
+
      public function pu_list(Request $request)
     {
        $pu_code = 'PU'; // Replace 'PU' with the actual value or variable
         $pu_lists = Hupu::select([
-                'id', 'hu_pu_code','flex', 'pu_hu_name', 'description','unit','length','width','height', 'min_weight',
+                'id', 'hu_pu_code', 'hu_pu_id', 'bulk_code','flex', 'pu_hu_name', 'description','unit','length','width','height', 'min_weight',
                 'max_weight'
             ])
             ->where('hu_pu_code', $pu_code) // Use the variable or actual value

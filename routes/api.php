@@ -87,6 +87,7 @@ Route::get('/hu_pu',[HupuController::class, 'hupu_list']);
 
 // handaling Unit List 
 Route::get('/hu',[HupuController::class, 'hu_list']);
+route::get('/all_hu',[HupuController::class, 'hu_all']);
 Route::POST('hu_pu/create',[HupuController::class, 'store']);
 Route::Get('hu_pu/{id}',[HupuController::class, 'show']);
 Route::Get('hu_pu/{id}/edit',[HupuController::class, 'edit']);
@@ -96,6 +97,7 @@ Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('h
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
+route::get('/all_pu',[HupuController::class, 'pu_all']);
 
 Route::get('/linked_hu_pu/{id}', [HupuController::class, 'linked_hu_pu']);
 
