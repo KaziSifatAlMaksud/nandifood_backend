@@ -35,7 +35,7 @@ class HupuController extends Controller
 
 
         $pu_lists = $pu_lists->map(function ($pu_list) {
-             $pu_list->hu_pu_type = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
+             $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
             // Variables for centimeters and inches
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
@@ -141,7 +141,7 @@ class HupuController extends Controller
 
 
         $pu_lists = $pu_lists->map(function ($pu_list) {
-            $pu_list->hu_pu_type = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
+            $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
             if ($pu_list->unit == 0) {  
@@ -229,7 +229,7 @@ class HupuController extends Controller
 
     // Map through each PU to convert units and calculate additional fields
     $pu_lists = $pu_lists->map(function ($pu_list) {
-        $pu_list->hu_pu_type = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
+        $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
         // Variables for centimeters and inches
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
@@ -309,7 +309,7 @@ class HupuController extends Controller
 
     // Map through each PU to convert units and calculate additional fields
     $pu_lists = $pu_lists->map(function ($pu_list) {
-        $pu_list->hu_pu_type = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
+        $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
         // Variables for centimeters and inches
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
@@ -393,7 +393,7 @@ class HupuController extends Controller
             // Variables for centimeters and inches
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
-            $pu_list->hu_pu_type = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
+            $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
             // Convert based on unit type
             if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
                 // Values in cm
@@ -475,7 +475,7 @@ class HupuController extends Controller
     try {
         $hupu = Hupu::with('linkedhupus')->findOrFail($id);
 
-        $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
+        $hupu->hu_pu_type_name = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
 
       //   $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
         $length_cm = $width_cm = $height_cm = null;
