@@ -475,6 +475,8 @@ class HupuController extends Controller
     try {
         $hupu = Hupu::with('linkedhupus')->findOrFail($id);
 
+        $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
+
       //   $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
