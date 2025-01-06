@@ -219,15 +219,12 @@ class HupuController extends Controller
 
      public function hu_all(Request $request)
 {
-    $pu_code = 'HU'; // Replace 'PU' with the actual value or variable
-    // Fetch all records without pagination
+    $pu_code = 'HU';
     $pu_lists = Hupu::select([
             'id', 'hu_pu_code', 'hu_pu_type', 'hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name', 'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
         ])
         ->where('hu_pu_code', $pu_code)
-        ->get(); // No pagination, fetch all records
-
-    // Map through each PU to convert units and calculate additional fields
+        ->get(); 
     $pu_lists = $pu_lists->map(function ($pu_list) {
         $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
         // Variables for centimeters and inches
@@ -250,16 +247,12 @@ class HupuController extends Controller
             $min_weight_lb = $pu_list->min_weight; 
             $max_weight_lb = $pu_list->max_weight;
         }
-
-        // Get full name and volume calculations
         $result = Hupu::fullName($pu_list->id);
-
-        // Assign calculated values
         $pu_list->short_name = $result['short_name'];
         $pu_list->full_name = $result['full_name'];
         $pu_list->volumem3 = $result['volumem3'];
         $pu_list->volumeft3 = $result['volumeft3'];
-        $pu_list->length_in = $length_in ?? $result['length_in'];  // Default to result if not set
+        $pu_list->length_in = $length_in ?? $result['length_in'];
         $pu_list->width_in = $width_in ?? $result['width_in'];
         $pu_list->height_in = $height_in ?? $result['height_in'];
         $pu_list->length_cm = $length_cm ?? $result['length_cm'];
@@ -273,11 +266,10 @@ class HupuController extends Controller
         
         return $pu_list;
     });     
+    $search = $request->input('search');
 
-    // Search functionality
-    $search = $request->input('search'); // Space-separated values
     if ($search) {
-        $terms = explode(' ', $search); // Split by spaces
+        $terms = explode(' ', $search); 
         $pu_lists = $pu_lists->filter(function ($pu_list) use ($terms) {
             foreach ($terms as $term) {
                 if (stripos($pu_list->pu_hu_name, $term) !== false || 
@@ -288,8 +280,6 @@ class HupuController extends Controller
             return false;
         });
     }
-
-    // Return all PU records as JSON without pagination
     return response()->json([
         'status' => 200,
         'message' => 'All HU List.',
@@ -300,30 +290,23 @@ class HupuController extends Controller
     public function pu_all(Request $request)
 {
     $pu_code = 'PU'; // Replace 'PU' with the actual value or variable
-    // Fetch all records without pagination
     $pu_lists = Hupu::select([
             'id', 'hu_pu_code','hu_pu_type','hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name', 'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
         ])
         ->where('hu_pu_code', $pu_code)
-        ->get(); // No pagination, fetch all records
-
-    // Map through each PU to convert units and calculate additional fields
+        ->get();
     $pu_lists = $pu_lists->map(function ($pu_list) {
         $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
         // Variables for centimeters and inches
         $length_cm = $width_cm = $height_cm = null;
         $length_in = $width_in = $height_in = null;
-
-        // Convert based on unit type
-        if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
-            // Values in cm
+        if ($pu_list->unit == 0) { 
             $length_cm = $pu_list->length;
             $width_cm = $pu_list->width;
             $height_cm = $pu_list->height;
             $min_weight_kg = $pu_list->min_weight; 
             $max_weight_kg = $pu_list->max_weight; 
-        } else {  // Assuming 1 is for inches
-            // Values in inches
+        } else { 
             $length_in = $pu_list->length;
             $width_in = $pu_list->width;
             $height_in = $pu_list->height;                
@@ -394,24 +377,19 @@ class HupuController extends Controller
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
             $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
-            // Convert based on unit type
-            if ($pu_list->unit == 0) {  // Assuming 0 is for centimeters
-                // Values in cm
+            if ($pu_list->unit == 0) { 
                 $length_cm = $pu_list->length;
                 $width_cm = $pu_list->width;
                 $height_cm = $pu_list->height;
                 $min_weight_kg = $pu_list->min_weight; 
                 $max_weight_kg = $pu_list->max_weight; 
-            } else {  // Assuming 1 is for inches
-                // Values in inches
+            } else {  
                 $length_in = $pu_list->length;
                 $width_in = $pu_list->width;
                 $height_in = $pu_list->height;                
                 $min_weight_lb = $pu_list->min_weight; 
                 $max_weight_lb = $pu_list->max_weight;
             }
-            // dd($hu_list->id);
-            // Get full name and volume calculations
             $result = Hupu::fullName($pu_list->id);
 
             $pu_list->short_name = $result['short_name'];
@@ -449,8 +427,6 @@ class HupuController extends Controller
         $currentPage = Paginator::resolveCurrentPage(); // Get current page
         $limit = (int) $request->input('limit', 5); // Default limit to 5
         $paginatedItems = $pu_lists->slice(($currentPage - 1) * $limit, $limit)->values(); // Slice the collection
-
-        // Create a LengthAwarePaginator
         $paginated = new LengthAwarePaginator(
             $paginatedItems, // Items for the current page
             $pu_lists->count(), // Total items
@@ -504,8 +480,8 @@ class HupuController extends Controller
 
        // Enrich linked Hupu data
        $link_uom = $hupu->linkedhupus->map(function ($linkedhupu) {
-        $relatedUom = Hupu::find($linkedhupu->uom_id);
-       // DD($relatedUom);
+        $relatedUom = Hupu::find($linkedhupu->conv_form_id);
+        DD($relatedUom);
         if ($relatedUom) {
             return [
                 'id' => $linkedhupu->id,
@@ -514,8 +490,7 @@ class HupuController extends Controller
                 'related_uom_width' => $relatedUom->width,
                 'related_uom_height' => $relatedUom->height,
                 'related_unit' => $relatedUom->unit,
-                'related_uom_max_weight' => $relatedUom->max_weight,
-                 'related_uom_min_weight' => $relatedUom->min_weight,
+                'related_uom_weight' => $relatedUom->weight,
                 'related_uom_type_name' =>  Uom_type::where('id', $relatedUom->hu_pu_type)->value('uom_name'),
                        'related_uom_full_name' => 
                         $relatedUom->hu_pu_id . ' ' . 
