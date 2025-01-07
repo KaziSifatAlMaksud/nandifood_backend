@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Uom_type;
+use App\Models\Uom;
 use App\Models\Uom_linked;
 class HupuController extends Controller
 {
@@ -451,7 +452,7 @@ class HupuController extends Controller
     try {
         $hupu = Hupu::with('linkedhupus')->findOrFail($id);
 
-        $hupu->hu_pu_type_name = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
+        $hupu->hu_pu_type_name = Uom_type::where('id', $hupu->conv_form_id)->value('uom_name');
 
       //   $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
         $length_cm = $width_cm = $height_cm = null;
@@ -478,27 +479,30 @@ class HupuController extends Controller
             $max_weight_lb = $hupu->max_weight;
         }
 
+       // dd($hupu->linkedhupus);
+
        // Enrich linked Hupu data
        $link_uom = $hupu->linkedhupus->map(function ($linkedhupu) {
-        $relatedUom = Hupu::find($linkedhupu->conv_form_id);
-        DD($relatedUom);
+        $relatedUom = Uom::find($linkedhupu->conv_form_id);
+       // DD($relatedUom);
         if ($relatedUom) {
             return [
                 'id' => $linkedhupu->id,
                 'conv_form_id' => $linkedhupu->conv_form_id,
-                'related_uom_length' => $relatedUom->length,
-                'related_uom_width' => $relatedUom->width,
-                'related_uom_height' => $relatedUom->height,
+                'related_uom_length' => $relatedUom->uom_length,
+                'related_uom_width' => $relatedUom->uom_width,
+                'related_uom_height' => $relatedUom->uom_height,
                 'related_unit' => $relatedUom->unit,
                 'related_uom_weight' => $relatedUom->weight,
-                'related_uom_type_name' =>  Uom_type::where('id', $relatedUom->hu_pu_type)->value('uom_name'),
-                       'related_uom_full_name' => 
-                        $relatedUom->hu_pu_id . ' ' . 
-                        Uom_type::where('id', $relatedUom->hu_pu_type)->value('uom_name') . 
+                'related_uom_type_name' =>  Uom_type::where('id', $relatedUom->uom_type_id)->value('uom_name'),
+                
+                'related_uom_full_name' => 
+                        $relatedUom->uom_id . ' ' . 
+                        Uom_type::where('id', $relatedUom->uom_type_id)->value('uom_name') . 
                         ' (' . $relatedUom->description . ')',
 
-
-
+            
+                
                 'conv_to_id' => $linkedhupu->conv_to_id,
                 'min_qty' => $linkedhupu->min_qty,
                 'max_qty' => $linkedhupu->max_qty,
