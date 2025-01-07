@@ -501,7 +501,6 @@ class HupuController extends Controller
                         Uom_type::where('id', $relatedUom->uom_type_id)->value('uom_name') . 
                         ' (' . $relatedUom->description . ')',
 
-            
                 
                 'conv_to_id' => $linkedhupu->conv_to_id,
                 'min_qty' => $linkedhupu->min_qty,
