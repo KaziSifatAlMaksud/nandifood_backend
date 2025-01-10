@@ -21,7 +21,25 @@ class Employee extends Model
         'email',
         'off_phone',
         'phone',
-        'status'
+        'status',
+        'address1',
+        'address2',
+        'city',
+        'state',
+        'zip_code',
+        'certificates1',
+        'certificates2',
+        'certificates3',
+        'certificates4',
+        'eff_date',
+        'end_date',
+        'start_date',
+        'last_update',
+        'updated_by',
+        'img1',
+        'img2',
+        'img3',
+
     ];
     // public $timestamps = false; 
 

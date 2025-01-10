@@ -26,6 +26,9 @@ route::resource('/warehouse', WarehouseController::class);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
+route::post('/employee/create', [EmployeeController::class, 'store']);
+// route::get('/employee/{id}', [EmployeeController::class, 'show']);
+route::get('/employee/{id}/edit', [EmployeeController::class, 'edit']);
 
 // route::get('/country',[WarehouseController::class, 'country']);
 
