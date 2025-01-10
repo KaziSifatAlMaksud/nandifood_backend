@@ -39,6 +39,10 @@ route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 
 
 //warehouse information
 Route::get('/employee', [EmployeeController::class, 'index']);
+
+// route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
+route::post('/employee_notes/create', [EmployeeController::class, 'employee_notes_store']);
+
 route::get('/country',[WarehouseController::class, 'country']);
 
 

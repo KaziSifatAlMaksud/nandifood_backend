@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Warehouse;
+use App\Models\EmployeeNotes;
 
 class EmployeeController extends Controller
 {
@@ -49,8 +50,8 @@ class EmployeeController extends Controller
     {
         $employee = new Employee();
         $employee->first_name = $request->first_name;
-        $employee->country_id = $request->country;
-        $employee->position_id = $request->position;
+        $employee->country = $request->country;
+        $employee->position_id = $request->position_id;
         $employee->warehouse_id = $request->warehouse_id;
         $employee->middle_name = $request->middle_name;
         $employee->last_name = $request->last_name;
@@ -71,7 +72,7 @@ class EmployeeController extends Controller
         $employee->end_date = $request->end_date;
         $employee->start_date = $request->start_date;
         $employee->last_update = $request->last_update;
-        $employee->updated_by = $request->updated_by;
+        $employee->update_by = $request->update_by;
 
         // Handle image uploads
         $uploadedImages = [];
@@ -185,7 +186,7 @@ class EmployeeController extends Controller
         $employee->end_date = $request->end_date;
         $employee->start_date = $request->start_date;
         $employee->last_update = $request->last_update;
-        $employee->updated_by = $request->updated_by;
+        $employee->update_by = $request->update_by;
         $employee->img1 = $request->img1;
         $employee->img2 = $request->img2;
         $employee->img3 = $request->img3;
@@ -200,6 +201,53 @@ class EmployeeController extends Controller
             'result' => $employee
         ]);
     }
+
+
+    public function employee_notes_store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'employee_id' => 'required|string|max:11',
+                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000000',
+                'note_date' => 'nullable|string', 
+                'file_description' => 'nullable|string|max:255',
+            ]);
+        
+            DB::beginTransaction();
+            
+            if ($request->hasFile('file_path')) {
+                $file = $request->file('file_path');
+                $fileName =  $file->getClientOriginalName(); 
+                $path = "uploads/employee_notes/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+                if ($uploaded) {
+                    $validated['file_path'] = $path; 
+                } else {
+                    throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
+                }
+            }
+
+            $employeeNote  = EmployeeNotes::create($validated);
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Employee Notes created successfully.',
+                'result' => $employeeNote ,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     
 

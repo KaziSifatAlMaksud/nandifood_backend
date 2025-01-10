@@ -13,7 +13,7 @@ class Employee extends Model
     protected $keyType = 'string'; 
     protected $fillable = [
         'first_name',
-        'country_id',
+        'country',
         'position_id',
         'warehouse_id',
         'middle_name',
@@ -35,18 +35,23 @@ class Employee extends Model
         'end_date',
         'start_date',
         'last_update',
-        'updated_by',
+        'update_by',
         'img1',
         'img2',
         'img3',
 
     ];
-    // public $timestamps = false; 
+    public $timestamps = false; 
 
 
     public function employee()
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    public function employee_notes()
+    {
+        return $this->hasMany(Employee_notes::class);
     }
     
     
