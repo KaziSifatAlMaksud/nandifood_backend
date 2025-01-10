@@ -416,7 +416,7 @@ public function warehouse_attachment_store(Request $request)
         $validated = $request->validate([
             'warehouse_id' => 'required|string|max:11',
             'type' => 'required|integer',
-            'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000',
+            'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048000000',
             'created_by' => 'nullable|string|max:11', 
             'updated_by' => 'nullable|string|max:11',
             'date_uploaded' => 'nullable|date', 
