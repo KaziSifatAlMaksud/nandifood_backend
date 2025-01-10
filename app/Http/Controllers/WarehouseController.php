@@ -237,6 +237,16 @@ public function show($id)
             return $binLocation;
         });
 
+        $warehouse->warehouse_attachment->map(function ($attachment) {
+            if ($attachment->file) {
+                $attachment->file = Storage::disk('spaces')->url($attachment->file);
+                $attachment->file_name = basename($attachment->file);
+            } else {
+                $attachment->file = null; // If there's no file, set it to null
+            }
+            return $attachment;
+        });
+
         // Return the data, including binLocations with the full_bin_location
         return response()->json([
             'status' => 200,
