@@ -37,7 +37,7 @@ class HupuController extends Controller
 
         $pu_lists = $pu_lists->map(function ($pu_list) {
              $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
-            // Variables for centimeters and inches
+
             $length_cm = $width_cm = $height_cm = null;
             $length_in = $width_in = $height_in = null;
 
@@ -452,7 +452,7 @@ class HupuController extends Controller
     try {
         $hupu = Hupu::with('linkedhupus')->findOrFail($id);
 
-        $hupu->hu_pu_type_name = Uom_type::where('id', $hupu->conv_form_id)->value('uom_name');
+        $hupu->hu_pu_type_name = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
 
       //   $hupu->hu_pu_type = Uom_type::where('id', $hupu->hu_pu_type)->value('uom_name');
         $length_cm = $width_cm = $height_cm = null;
