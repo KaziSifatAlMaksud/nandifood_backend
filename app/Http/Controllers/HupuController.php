@@ -777,7 +777,13 @@ public function linked_hu_pu($id)
                     'max_weight' => $linkedUom->max_weight,
                     'bulk_code' => $linkedUom->bulk_code,
                     'hu_pu_id' => $linkedUom->hu_pu_id,
-                    'full_name' => $extra_conv_to['full_name']
+                    'full_name' => $extra_conv_to['full_name'],
+                    if(unit == 0){
+                        'volume' => $extra_conv_to['volumem3'],
+                    }else{
+                        'volume' => $extra_conv_to['volumeft3'],
+                        
+                    }
                 ]
 
             ];
