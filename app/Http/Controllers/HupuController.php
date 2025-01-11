@@ -751,11 +751,11 @@ public function linked_hu_pu($id)
         // Fetch all linked UOMs based on the given ID
         $LinkedHupus = Uom_linked::where('conv_form_id', $id)->get();
         $result = [];
+  
         foreach ($LinkedHupus as $key => $LinkedHupu) {
-            $linkedUom = Hupu::find($LinkedHupu->conv_to_id);
+            $linkedUom = Hupu::find($LinkedHupu->uom_id);
 
-            // Add the linked information to the result array
-             $extra_conv_form = Hupu::fullName($LinkedHupu->conv_form_id);
+            $extra_conv_form = Uom::fullName($LinkedHupu->conv_form_id);
             $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
 
             $result[] = [

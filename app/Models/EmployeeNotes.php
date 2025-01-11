@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeNotes extends Model
 {
-    use HasFactory;
+     use HasFactory;
     protected $table = 'employee_notes';
-    protected $primaryKey = 'id';
     protected $fillable = [
+        'id',
         'employee_id',
         'file_description',
         'note_date',
