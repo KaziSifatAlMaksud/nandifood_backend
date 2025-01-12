@@ -155,17 +155,31 @@ public function getEmployee($warehouse_id)
 }
 
 public function getAttachment($warehouse_id)
-{    // Fetch the employees associated with the warehouse
-    $attachment = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
+{
+    // Fetch the attachments associated with the warehouse
+    $attachments = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
 
+    // Map through the attachments and add the file URL and file name
+    $attachments->map(function ($attachment) {
+        if ($attachment->file) {
+            $attachment->file = Storage::disk('spaces')->url($attachment->file);
+            $attachment->file_name = basename($attachment->file);
+        } else {
+            $attachment->file = null; // If there's no file, set it to null
+        }
+        return $attachment;
+    });
+
+    // Return the response with the attachment data
     return response()->json([
         'status' => '200',
         'message' => 'Ok',
         'result' => [
-            'data' => $attachment,
+            'data' => $attachments,
         ],
     ]);
 }
+
 
 public function getBinLocation($warehouse_id)
 {    // Fetch the employees associated with the warehouse
