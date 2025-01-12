@@ -319,7 +319,7 @@ public function store(Request $request)
             'bus_hours_open' => 'nullable|string|max:10',
             'bus_hours_close' => 'nullable|string|max:10',
             'status' => 'nullable|string|max:50',
-            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048',
+            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf',
         ]);
 
         DB::beginTransaction();  // Start transaction
@@ -440,7 +440,7 @@ public function warehouse_attachment_store(Request $request)
         $validated = $request->validate([
             'warehouse_id' => 'required|string|max:11',
             'type' => 'required|integer',
-            'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048000000',
+            'file' => 'required|file|mimes:pdf,png,jpg,jpeg',
             'created_by' => 'nullable|string|max:11', 
             'updated_by' => 'nullable|string|max:11',
             'date_uploaded' => 'nullable|date', 
