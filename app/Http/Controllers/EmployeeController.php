@@ -13,8 +13,10 @@ use App\Models\Positions;
 use App\Models\BinStatus;
 use App\Models\BinStorageType;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 class EmployeeController extends Controller
+
 {
 
     public function index(Request $request)
@@ -186,7 +188,7 @@ class EmployeeController extends Controller
 
    public function edit($id)
     {
-        $employee = Employee::with('position','notes')->find($id);
+        $employee = Employee::with('notes')->find($id);
         if (!$employee) {
             return response()->json([
                 'status' => 404,
@@ -194,6 +196,10 @@ class EmployeeController extends Controller
                 'result' => []
             ]);
         }
+        $employee->position_name = Positions::find($employee->position_id)->position_name;
+        $warehouse = Warehouse::find($employee->warehouse_id);
+        $employee->warehouse_name = $warehouse ? $warehouse->warehouse_name : null;
+
 
             // Process the notes to include file URLs and file names
         $employee->notes->map(function ($note) {
