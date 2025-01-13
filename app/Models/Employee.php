@@ -12,6 +12,7 @@ class Employee extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'string'; 
     protected $fillable = [
+        'id',
         'first_name',
         'country',
         'position_id',

@@ -77,7 +77,7 @@ class EmployeeController extends Controller
         $employee->eff_date = $request->eff_date;
         $employee->end_date = $request->end_date;
         $employee->start_date = $request->start_date;
-        $employee->last_update = $request->last_update;
+        $employee->last_update = now()->format('Y-m-d H:i:s');
         $employee->update_by = $request->update_by;
 
         // Handle image uploads
@@ -143,13 +143,19 @@ class EmployeeController extends Controller
         }
 
         // Save the employee
-        $employee->save();
+         $employee->save();
 
+        $employee_info = Employee::where('first_name', $request->first_name)
+        ->where('email', $request->email)
+        ->orderBy('last_update', 'desc')
+        ->first();
+
+         
         // Return a successful response
         return response()->json([
             'status' => 200,
             'message' => 'Employee created successfully.',
-            'result' => $employee
+            'result' => $employee_info
         ]);
     }
 
