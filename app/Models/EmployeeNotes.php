@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeNotes extends Model
 {
-     use HasFactory;
     protected $table = 'employee_notes';
     protected $fillable = [
         'id',
@@ -19,8 +18,8 @@ class EmployeeNotes extends Model
         'updated_at',
     ];
 
-    // public function employee()
-    // {
-    //     return $this->belongsTo(Employee::class);
-    // }
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
 }

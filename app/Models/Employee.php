@@ -49,9 +49,15 @@ class Employee extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function employee_notes()
+    
+    public function notes()
     {
-        return $this->hasMany(Employee_notes::class);
+        return $this->hasMany(EmployeeNotes::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Positions::class, 'position_id');
     }
     
     

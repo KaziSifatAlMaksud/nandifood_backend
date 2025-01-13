@@ -203,8 +203,6 @@ public function warehouse_compliance(Request $request)
 {
     // Optionally, limit the records or paginate them based on the request
     $limit = $request->input('limit', 10); // Default to 10 items per page
-
-    // Fetch records with pagination or all records (adjust as needed)
     $warehouseattachments = WarehouseAttachment::paginate($limit); // Use pagination for better performance
 
     // Loop through each attachment and generate file URL
@@ -395,7 +393,7 @@ public function update(Request $request, $warehouseId)
         ], 404);
     }
     $request->validate([
-        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048000', 
+        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', 
     ]);
     $imagePath = $warehouse->wh_image; 
     if ($request->hasFile('wh_image')) {

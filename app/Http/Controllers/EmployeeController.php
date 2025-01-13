@@ -7,7 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Warehouse;
 use App\Models\EmployeeNotes;
-
+ use Illuminate\Support\Facades\Storage;
+ use Illuminate\Support\Facades\DB;
+use App\Models\Positions;
+use App\Models\BinStatus;
+use App\Models\BinStorageType;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 class EmployeeController extends Controller
 {
 
@@ -147,8 +153,65 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function get_all_notes($id)
+    {
+        // Retrieve employee notes for the given employee ID
+        $employee_notes = EmployeeNotes::where('employee_id', $id)->get();
 
-    public function edit(Request $request, $id)
+        // Map over the notes and handle attachments properly
+        $employee_notes->map(function ($note) {
+            if ($note->file_path) {
+                $note->file = Storage::disk('spaces')->url($note->file_path);
+                $note->file_name = basename($note->file_path);
+            } else {
+                $note->file = null; // If there's no file, set it to null
+            }
+            return $note;
+        });
+
+        // Return the response with the retrieved notes
+        return response()->json([
+            'status' => 200,
+            'message' => 'Employee Notes retrieved successfully.',
+            'result' => $employee_notes
+        ]);
+    }
+
+
+   public function edit($id)
+    {
+        $employee = Employee::with('position','notes')->find($id);
+        if (!$employee) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Employee not found.',
+                'result' => []
+            ]);
+        }
+
+            // Process the notes to include file URLs and file names
+        $employee->notes->map(function ($note) {
+            if ($note->file_path) {
+                $note->file = Storage::disk('spaces')->url($note->file_path);
+                $note->file_name = basename($note->file_path);
+            } else {
+                $note->file = null; // If there's no file, set it to null
+                $note->file_name = null; // No file name if no file exists
+            }
+            return $note;
+        });
+
+
+        // Return the employee details
+        return response()->json([
+            'status' => 200,
+            'message' => 'Employee retrieved successfully.',
+            'result' => $employee
+        ]);
+    }
+
+
+    public function update(Request $request, $id)
     {
         $employee = Employee::find($id);
 
@@ -208,7 +271,7 @@ class EmployeeController extends Controller
         try {
             $validated = $request->validate([
                 'employee_id' => 'required|string|max:11',
-                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000000',
+                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
                 'note_date' => 'nullable|string', 
                 'file_description' => 'nullable|string|max:255',
             ]);
@@ -246,6 +309,42 @@ class EmployeeController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function destroy($id)
+    {
+        $employee = Employee::find($id);
+
+        // Check if the employee exists
+        if (!$employee) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Employee not found.',
+                'result' => []
+            ]);
+        }
+
+        // Delete the employee
+        $employee->delete();
+
+        // Return a successful response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Employee deleted successfully.',
+            'result' => []
+        ]);
+    }
+
+    
+
+    public function get_position()
+    {
+        $positions = Positions::all();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Positions retrieved successfully.',
+            'result' => $positions
+        ]);
     }
 
 

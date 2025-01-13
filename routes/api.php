@@ -27,8 +27,12 @@ route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 route::post('/employee/create', [EmployeeController::class, 'store']);
-// route::get('/employee/{id}', [EmployeeController::class, 'show']);
 route::get('/employee/{id}/edit', [EmployeeController::class, 'edit']);
+route::put('/employee/{id}', [EmployeeController::class, 'update']);
+
+route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+
+
 
 // route::get('/country',[WarehouseController::class, 'country']);
 
@@ -107,6 +111,12 @@ route::get('/pu',[HupuController::class, 'pu_list']);
 route::get('/all_pu',[HupuController::class, 'pu_all']);
 
 Route::get('/linked_hu_pu/{id}', [HupuController::class, 'linked_hu_pu']);
+
+
+// Helper API Route
+
+route::get('/get_position',[EmployeeController::class, 'get_position']);
+route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 
 // route::get('/',[HupuController::class, 'pu_list']);
 
