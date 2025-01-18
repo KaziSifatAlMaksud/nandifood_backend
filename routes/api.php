@@ -9,6 +9,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\UomController;
 use App\Http\Controllers\HupuController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProductController;
 
 
 
@@ -120,6 +121,12 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 
 // route::get('/',[HupuController::class, 'pu_list']);
 
+
+
+//Product API
+
+Route::get('/product', [ProductController::class, 'index']);
+Route::Post('/product/create', [ProductController::class, 'store']);
 
 
 

@@ -582,12 +582,116 @@ class HupuController extends Controller
             ], 500);
         }
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+>>>>>>> 1d36031c646ea6f4111ada0ac96c10fba45e91d7
 
 
 
 
 
     public function update(Request $request, $id)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Retrieve input data
+            $hu_pu_code = $request->input('hu_pu_code');
+            $hu_pu_type = $request->input('hu_pu_type');
+            $flex = $request->input('flex');
+            $pu_hu_name = $request->input('pu_hu_name');
+            $description = $request->input('description');
+            $unit = $request->input('unit');
+            $eff_date = $request->input('eff_date');
+            $length = $request->input('length');
+            $width = $request->input('width');
+            $height = $request->input('height');
+            $hu_empty_weight = $request->input('hu_empty_weight');
+            $min_weight = $request->input('min_weight');
+            $hu_loaded_weight = $request->input('hu_loaded_weight');
+            $max_weight = $request->input('max_weight');
+            $bulk_code = $request->input('bulk_code');
+            $status = $request->input('status');
+            $link_uom = $request->input('link_uom');
+    
+            // Generate a unique hu_pu_id
+            $max_hupu_id = Hupu::max('id');
+            $hu_pu_id = 'U' . $hu_pu_type . str_pad(($max_hupu_id + 1), 3, '0', STR_PAD_LEFT);
+    
+            // Save the Hupu data
+            $hupu = new Hupu();
+            $hupu->hu_pu_id = $hu_pu_id;
+            $hupu->hu_pu_code = $hu_pu_code;
+            $hupu->hu_pu_type = $hu_pu_type;
+            $hupu->flex = $flex;
+            $hupu->pu_hu_name = $pu_hu_name;
+            $hupu->description = $description;
+            $hupu->eff_date = $eff_date;
+            $hupu->width = $width;
+            $hupu->bulk_code = $bulk_code;
+            $hupu->unit = $unit;
+            $hupu->hu_empty_weight = $hu_empty_weight;
+            $hupu->min_weight = $min_weight;
+            $hupu->hu_loaded_weight = $hu_loaded_weight;
+            $hupu->max_weight = $max_weight;
+            $hupu->length = $length;
+            $hupu->height = $height;
+            $hupu->status = $status;
+            $hupu->save();
+    
+            // Save the linked UOM data
+            if (!empty($link_uom) && is_array($link_uom)) {
+                foreach ($link_uom as $link) {
+                    $uomLink = new Uom_linked();
+                    $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
+                    $uomLink->conv_form_id = $link['conv_form_id'];
+                    $uomLink->conv_to_id = $link['conv_to_id'];
+                    $uomLink->conv_qty = $link['conv_qty'];
+                    $uomLink->save();
+                }
+            }
+            $linkedUoms = Uom_linked::where('uom_id', $hupu->id)->get();
+    
+            // Add the linked UOMs to the $hupu object
+            $hupu->link_uom = $linkedUoms;
+            DB::commit();
+    
+            return response()->json([
+                'status' => 200,
+                'message' => 'Created successfully',
+                'result' => $hupu,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+
+
+    public function update(Request $request, $id){
+    $hupu = Hupu::find($id);
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+
+
+
+
+
+    public function update(Request $request, $id)
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+>>>>>>> 1d36031c646ea6f4111ada0ac96c10fba45e91d7
 {
     try {
         DB::beginTransaction();
@@ -754,6 +858,8 @@ public function linked_hu_pu($id)
   
         foreach ($LinkedHupus as $key => $LinkedHupu) {
             $linkedUom = Hupu::find($LinkedHupu->uom_id);
+<<<<<<< HEAD
+=======
 
             $extra_conv_form = Uom::fullName($LinkedHupu->conv_form_id);
             $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
@@ -803,7 +909,154 @@ public function linked_hu_pu($id)
 }
 
 
+>>>>>>> 1d36031c646ea6f4111ada0ac96c10fba45e91d7
 
+            $extra_conv_form = Uom::fullName($LinkedHupu->conv_form_id);
+            $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
+
+            $result[] = [
+                'linked_id' => $LinkedHupu->id,
+                'conv_form_id' => $LinkedHupu->conv_form_id,
+                'conv_form_full_name' => $extra_conv_form['full_name'],
+                'max_qty' => $LinkedHupu->max_qty,
+                'min_qty' => $LinkedHupu->min_qty,
+
+                'conv_to_id' => [
+                    'id' => $LinkedHupu->conv_to_id,
+                    'hu_pu_code' => $linkedUom->hu_pu_code,
+                    'flex' => $linkedUom->flex,
+                    'unit' => $linkedUom->unit,
+                    'length' => $linkedUom->length,
+                    'width' => $linkedUom->width,
+                    'height' => $linkedUom->height,
+                    'min_weight' => $linkedUom->min_weight,
+                    'max_weight' => $linkedUom->max_weight,
+                    'bulk_code' => $linkedUom->bulk_code,
+                    'hu_pu_id' => $linkedUom->hu_pu_id,
+                    'full_name' => $extra_conv_to['full_name'],
+                    'volume' => $linkedUom->unit == 0 
+                        ? $extra_conv_to['volumem3'] 
+                        : $extra_conv_to['volumeft3']
+                    
+                    ]
+
+            ];
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Linked HU/PU information retrieved successfully.',
+            'result' => $result,
+        ]);
+    } catch (\Exception $e) {
+        // Handle exceptions and return an error response
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred while retrieving linked HU/PU information.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+<<<<<<< HEAD
+
+
+=======
+    //   public function storeadsfasd(Request $request)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'hu_pu_code' => 'required|string',                
+    //             'hu_pu_type' => 'required|integer',                
+    //             'flex' => 'nullable|string',                        
+    //             'pu_hu_name' => 'required|integer',                
+    //             'description' => 'required|string',               
+    //             'unit' => 'required|integer',                    
+    //             'length' => 'required|numeric',                   
+    //             'weight' => 'required|numeric',                        
+    //             'height' => 'required|numeric',                       
+    //             'hu_empty_weight' => 'nullable|numeric',              
+    //             'hu_minimum_weight' => 'nullable|numeric',            
+    //             'hu_loaded_weight' => 'nullable|numeric',             
+    //             'hu_maximum_weight' => 'nullable|numeric',          
+    //         ]);
+
+
+    //         DB::beginTransaction();
+    //            $hupu_list = Hupu::create($validated);
+    //         DB::commit();
+    //         return response()->json([
+    //             'status' => 200,
+    //             'message' => 'created successfully',
+    //             'result' => $hupu_list,
+    //         ]);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'status' => 422,
+    //             'errors' => $e->errors(),
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'status' => 500,
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+=======
+            $extra_conv_form = Uom::fullName($LinkedHupu->conv_form_id);
+            $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
+
+            $result[] = [
+                'linked_id' => $LinkedHupu->id,
+                'conv_form_id' => $LinkedHupu->conv_form_id,
+                'conv_form_full_name' => $extra_conv_form['full_name'],
+                'max_qty' => $LinkedHupu->max_qty,
+                'min_qty' => $LinkedHupu->min_qty,
+
+                'conv_to_id' => [
+                    'id' => $LinkedHupu->conv_to_id,
+                    'hu_pu_code' => $linkedUom->hu_pu_code,
+                    'flex' => $linkedUom->flex,
+                    'unit' => $linkedUom->unit,
+                    'length' => $linkedUom->length,
+                    'width' => $linkedUom->width,
+                    'height' => $linkedUom->height,
+                    'min_weight' => $linkedUom->min_weight,
+                    'max_weight' => $linkedUom->max_weight,
+                    'bulk_code' => $linkedUom->bulk_code,
+                    'hu_pu_id' => $linkedUom->hu_pu_id,
+                    'full_name' => $extra_conv_to['full_name'],
+                    'volume' => $linkedUom->unit == 0 
+                        ? $extra_conv_to['volumem3'] 
+                        : $extra_conv_to['volumeft3']
+                    
+                    ]
+
+            ];
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Linked HU/PU information retrieved successfully.',
+            'result' => $result,
+        ]);
+    } catch (\Exception $e) {
+        // Handle exceptions and return an error response
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred while retrieving linked HU/PU information.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+>>>>>>> 1d36031c646ea6f4111ada0ac96c10fba45e91d7
     public function destroy($id)
     {
         try {
