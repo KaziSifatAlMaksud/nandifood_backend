@@ -583,12 +583,16 @@ class HupuController extends Controller
         }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
 
 
 
 
 
     public function update(Request $request, $id)
+<<<<<<< HEAD
     {
         try {
             DB::beginTransaction();
@@ -680,6 +684,8 @@ class HupuController extends Controller
 
 
     public function update(Request $request, $id)
+=======
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
 {
     try {
         DB::beginTransaction();
@@ -847,10 +853,56 @@ public function linked_hu_pu($id)
         foreach ($LinkedHupus as $key => $LinkedHupu) {
             $linkedUom = Hupu::find($LinkedHupu->uom_id);
 
+            $extra_conv_form = Uom::fullName($LinkedHupu->conv_form_id);
+            $extra_conv_to = Hupu::fullName($LinkedHupu->conv_to_id);
+
+            $result[] = [
+                'linked_id' => $LinkedHupu->id,
+                'conv_form_id' => $LinkedHupu->conv_form_id,
+                'conv_form_full_name' => $extra_conv_form['full_name'],
+                'max_qty' => $LinkedHupu->max_qty,
+                'min_qty' => $LinkedHupu->min_qty,
+
+                'conv_to_id' => [
+                    'id' => $LinkedHupu->conv_to_id,
+                    'hu_pu_code' => $linkedUom->hu_pu_code,
+                    'flex' => $linkedUom->flex,
+                    'unit' => $linkedUom->unit,
+                    'length' => $linkedUom->length,
+                    'width' => $linkedUom->width,
+                    'height' => $linkedUom->height,
+                    'min_weight' => $linkedUom->min_weight,
+                    'max_weight' => $linkedUom->max_weight,
+                    'bulk_code' => $linkedUom->bulk_code,
+                    'hu_pu_id' => $linkedUom->hu_pu_id,
+                    'full_name' => $extra_conv_to['full_name'],
+                    'volume' => $linkedUom->unit == 0 
+                        ? $extra_conv_to['volumem3'] 
+                        : $extra_conv_to['volumeft3']
+                    
+                    ]
+
+            ];
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Linked HU/PU information retrieved successfully.',
+            'result' => $result,
+        ]);
+    } catch (\Exception $e) {
+        // Handle exceptions and return an error response
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred while retrieving linked HU/PU information.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+
 <<<<<<< HEAD
-
-
-
 
     //   public function storeadsfasd(Request $request)
     // {
@@ -943,6 +995,8 @@ public function linked_hu_pu($id)
 
 
 
+>>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
+=======
 >>>>>>> 1d4e2b0c648686684ea0c9af400bb6ad325f974f
     public function destroy($id)
     {
