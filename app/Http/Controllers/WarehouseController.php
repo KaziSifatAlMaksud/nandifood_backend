@@ -155,17 +155,31 @@ public function getEmployee($warehouse_id)
 }
 
 public function getAttachment($warehouse_id)
-{    // Fetch the employees associated with the warehouse
-    $attachment = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
+{
+    // Fetch the attachments associated with the warehouse
+    $attachments = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
 
+    // Map through the attachments and add the file URL and file name
+    $attachments->map(function ($attachment) {
+        if ($attachment->file) {
+            $attachment->file = Storage::disk('spaces')->url($attachment->file);
+            $attachment->file_name = basename($attachment->file);
+        } else {
+            $attachment->file = null; // If there's no file, set it to null
+        }
+        return $attachment;
+    });
+
+    // Return the response with the attachment data
     return response()->json([
         'status' => '200',
         'message' => 'Ok',
         'result' => [
-            'data' => $attachment,
+            'data' => $attachments,
         ],
     ]);
 }
+
 
 public function getBinLocation($warehouse_id)
 {    // Fetch the employees associated with the warehouse
@@ -189,8 +203,6 @@ public function warehouse_compliance(Request $request)
 {
     // Optionally, limit the records or paginate them based on the request
     $limit = $request->input('limit', 10); // Default to 10 items per page
-
-    // Fetch records with pagination or all records (adjust as needed)
     $warehouseattachments = WarehouseAttachment::paginate($limit); // Use pagination for better performance
 
     // Loop through each attachment and generate file URL
@@ -212,37 +224,6 @@ public function warehouse_compliance(Request $request)
     ]);
 }
 
-
-  
-// public function show($id)
-// {
-//     // Find the warehouse by ID with related models
-//     $warehouse = Warehouse::with('binLocations') // Add other relationships as needed
-//         ->find($id);
-
-//     // Check if the warehouse exists
-//     if ($warehouse) {
-//         // Calculate the totals if necessary
-//         $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
-//         $warehouse->volume_m3 = $totals['total_volume'];
-//         $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
-
-//         // Return the response in the desired format with all information
-//         return response()->json([
-//             'status' => '200',
-//             'message' => 'Ok',
-//             'result' => [
-//                 'data' => $warehouse, // The warehouse with all loaded relationships
-//             ],
-//         ]);
-//     } else {
-//         // If the warehouse is not found, return an error message
-//         return response()->json([
-//             'status' => '404',
-//             'message' => 'Error: Warehouse not found!',
-//         ]);
-//     }
-// }
 
 
 public function show($id)
@@ -266,6 +247,16 @@ public function show($id)
             $totals = BinLocation::calculateTotalVolume($binLocation->id);
             $binLocation->volume_m3 = $totals;
             return $binLocation;
+        });
+
+        $warehouse->warehouse_attachment->map(function ($attachment) {
+            if ($attachment->file) {
+                $attachment->file = Storage::disk('spaces')->url($attachment->file);
+                $attachment->file_name = basename($attachment->file);
+            } else {
+                $attachment->file = null; // If there's no file, set it to null
+            }
+            return $attachment;
         });
 
         // Return the data, including binLocations with the full_bin_location
@@ -326,7 +317,7 @@ public function store(Request $request)
             'bus_hours_open' => 'nullable|string|max:10',
             'bus_hours_close' => 'nullable|string|max:10',
             'status' => 'nullable|string|max:50',
-            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048',
+            'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf',
         ]);
 
         DB::beginTransaction();  // Start transaction
@@ -391,115 +382,29 @@ public function store(Request $request)
 }
 
 
-
-    // Store a new warehouse record
-// public function store(Request $request)
-// {
-//     try {
-//         // Validate the request (including the file upload)
-//         $validated = $request->validate([
-//             'entity' => 'nullable|string|max:255',
-//             'warehouse_name' => 'nullable|string|max:255',
-//             'global_default_warehouse'  => 'nullable|string|max:10',
-//             'warehouse_capacity_in_kg' => 'nullable|string|max:10',
-//             'address1' => 'nullable|string|max:255',
-//             'country' => 'nullable|string|max:25',
-//             'state' => 'nullable|string|max:25',
-//             'city' => 'nullable|string|max:25',
-//             'zip_code' => 'nullable|string|max:20',
-//             'email' => 'nullable|email|max:255', 
-//             'phone' => 'nullable|string|max:255', 
-//             'address2' => 'nullable|string|max:255',
-//             'warehouse_contact' => 'nullable|string|max:255',
-//             'emergency_phone' => 'nullable|string|max:255',
-//             'eff_date' => 'nullable|string', 
-//             'loc_work_week' => 'nullable|string', 
-//             'work_week_days' => 'nullable|string|max:50', 
-//             'warehouse_manager' => 'nullable|string|max:255',
-//             'warehouse_supervisor' => 'nullable|string|max:255',
-//             'bus_hours_open' => 'nullable|string|max:10', 
-//             'bus_hours_close' => 'nullable|string|max:10',
-//             'status' => 'nullable|string|max:50',
-//             'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf|max:200048'
-//         ]);
-
-//         DB::beginTransaction();
-
-//         $filePath = null;
-//         if ($request->hasFile('wh_image')) {
-//             $filePath = $request->file('wh_image')->store('uploads/warehouse_image', 'public');
-//         }
-//         $warehouseData = $validated;
-//         if ($filePath) {
-//             $warehouseData['wh_image'] = $filePath;
-//         }
-
-//         $warehouse = Warehouse::create($warehouseData);
-
-//         DB::commit();
-
-//         return response()->json([
-//             'status' => 200,
-//             'message' => 'Warehouse created successfully',
-//             'result' => $warehouse,
-//         ]);
-//     } catch (\Illuminate\Validation\ValidationException $e) {
-//         return response()->json([
-//             'status' => 422,
-//             'errors' => $e->errors(),
-//         ], 422);
-//     } catch (\Exception $e) {
-//         DB::rollBack();
-
-//         return response()->json([
-//             'status' => 500,
-//             'error' => $e->getMessage(),
-//         ], 500);
-//     }
-// }
-
 public function update(Request $request, $warehouseId)
 {
-    // Find warehouse by ID
-    $warehouse = Warehouse::find($warehouseId);
 
-    // Check if the warehouse exists
+    $warehouse = Warehouse::find($warehouseId);
     if (!$warehouse) {
         return response()->json([
             'status' => '404',
             'message' => 'Error: Warehouse not found!',
         ], 404);
     }
-
-    // Validate the incoming request
     $request->validate([
-        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048000', // Validate image
-        // Add validation for other fields if needed
+        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', 
     ]);
-
-    // Initialize the image path variable
-    $imagePath = $warehouse->wh_image; // Keep the old image path if no new image is uploaded
-
-    // Check if the 'wh_image' file is present in the request
+    $imagePath = $warehouse->wh_image; 
     if ($request->hasFile('wh_image')) {
         $file = $request->file('wh_image');
-
-        // Validate if the file is a valid image
         if ($file->isValid()) {
-            // Delete the old image from DigitalOcean Spaces if it exists
             if ($warehouse->wh_image) {
-                // Remove the old image from DigitalOcean Spaces
                 Storage::disk('spaces')->delete($warehouse->wh_image);
             }
-
-            // Generate a new file name to avoid conflicts
             $fileName = time() . '_' . $file->getClientOriginalName();
             $path = "uploads/warehouse_image/{$fileName}";
-
-            // Upload the new image to DigitalOcean Spaces
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-
-            // If upload was successful, set the image path
             if ($uploaded) {
                 $imagePath = $path; // Update the image path
             } else {
@@ -515,15 +420,9 @@ public function update(Request $request, $warehouseId)
             ], 400);
         }
     }
-
-    // Update all warehouse fields from the request, including the image path
     $warehouse->fill($request->all());
-    $warehouse->wh_image = $imagePath; // Ensure the correct image path is saved
-
-    // Save the updated warehouse
+    $warehouse->wh_image = $imagePath; 
     $warehouse->save();
-
-    // Return success response with the updated warehouse data
     return response()->json([
         'status' => '200',
         'message' => 'Warehouse updated successfully.',
@@ -533,132 +432,13 @@ public function update(Request $request, $warehouseId)
     ]);
 }
 
-
-// public function update(Request $request, $warehouseId)
-// {
-//     // Find warehouse by ID
-//     $warehouse = Warehouse::find($warehouseId);
-
-//     // Check if the warehouse exists
-//     if (!$warehouse) {
-//         return response()->json([
-//             'status' => '404',
-//             'message' => 'Error: Warehouse not found!',
-//         ], 404);
-//     }
-
-//     // Validate the incoming request
-//     $request->validate([
-//         'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048000', // Validate image
-//         // Add validation for other fields if needed
-//     ]);
-
-//     // Initialize the image path variable
-//     $imagePath = $warehouse->wh_image; // Keep the old image path if no new image is uploaded
-
-//     // Check if the 'wh_image' file is present in the request
-//     if ($request->hasFile('wh_image')) {
-//         $file = $request->file('wh_image');
-
-//         // Validate if the file is a valid image
-//         if ($file->isValid()) {
-//             // Delete the old image if it exists
-//             if ($warehouse->wh_image) {
-//                 // Remove the old image from storage
-//                 Storage::disk('public')->delete($warehouse->wh_image);
-//             }
-
-//             // Store the new image and get the path
-//             $imagePath = $file->store('uploads/warehouse_image', 'public');
-//         } else {
-//             return response()->json([
-//                 'status' => '400',
-//                 'message' => 'Error: File upload is not valid!',
-//             ], 400);
-//         }
-//     }
-
-//     // Update all warehouse fields from the request, including the image path
-//     $warehouse->fill($request->all());
-//     $warehouse->wh_image = $imagePath; // Ensure the correct image path is saved
-
-//     // Save the updated warehouse
-//     $warehouse->save();
-
-//     // Return success response with the updated warehouse data
-//     return response()->json([
-//         'status' => '200',
-//         'message' => 'Warehouse updated successfully.',
-//         'result' => [
-//             'data' => $warehouse, // Return the updated warehouse data
-//         ],
-//     ]);
-// }
-
- 
-
-    
-//     public function warehouse_attachment_store(Request $request)
-// {
-//     try {
-//         // Validate the incoming request data
-//         $validated = $request->validate([
-//             // 'type' => 'required|integer', 
-//             'warehouse_id' => 'required|string|max:11',
-//             'type' => 'required|integer',
-//             'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000',
-//             'created_by' => 'nullable|string|max:11', 
-//             'updated_by' => 'nullable|string|max:11',
-//             'date_uploaded' => 'nullable|date', 
-//             'description' => 'nullable|string|max:255',
-//         ]);
-      
-//         DB::beginTransaction();
-        
-//         // Check if the request has a file
-//         if ($request->hasFile('file')) {
-//             // Store the file in the 'public' disk and get the file path
-//             $filePath = $request->file('file')->store('uploads/attachment', 'public');
-//             $validated['file'] = $filePath;  // Add the file path to the validated data
-//         }
-
-//         // Create the warehouse attachment record
-//         $warehouse = WarehouseAttachment::create($validated);
-
-//         DB::commit();
-
-//         // Return a success response
-//         return response()->json([
-//             'status' => 200,
-//             'message' => 'Warehouse attachment created successfully.',
-//             'result' => $warehouse,
-//         ]);
-//     } catch (\Illuminate\Validation\ValidationException $e) {
-//         // Return a custom response with validation errors
-//         return response()->json([
-//             'status' => 422,
-//             'errors' => $e->errors(),
-//         ], 422);
-//     } catch (\Exception $e) {
-//         // Roll back the transaction in case of an exception
-//         DB::rollBack();
-
-//         // Return a response with the exception message
-//         return response()->json([
-//             'status' => 500,
-//             'error' => $e->getMessage(),
-//         ], 500);
-//     }
-// }
-
 public function warehouse_attachment_store(Request $request)
 {
     try {
-        // Validate the incoming request data
         $validated = $request->validate([
             'warehouse_id' => 'required|string|max:11',
             'type' => 'required|integer',
-            'file' => 'required|file|mimes:pdf,png,jpg,jpeg|max:20480000',
+            'file' => 'required|file|mimes:pdf,png,jpg,jpeg',
             'created_by' => 'nullable|string|max:11', 
             'updated_by' => 'nullable|string|max:11',
             'date_uploaded' => 'nullable|date', 
@@ -667,47 +447,32 @@ public function warehouse_attachment_store(Request $request)
       
         DB::beginTransaction();
         
-        // Check if the request has a file
         if ($request->hasFile('file')) {
-            // Get the uploaded file
             $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName(); 
+            $fileName =  $file->getClientOriginalName(); 
             $path = "uploads/warehouse_attachment/{$fileName}";
-            
-            // Upload the file to DigitalOcean Spaces using 'put' method
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-            
-            // If the upload was successful, store the file path
             if ($uploaded) {
-                $validated['file'] = $path;  // Add the file path to the validated data
+                $validated['file'] = $path; 
             } else {
                 throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
             }
         }
 
-        // Create the warehouse attachment record
         $warehouse = WarehouseAttachment::create($validated);
-
-        // Commit the transaction
         DB::commit();
-
-        // Return a success response
         return response()->json([
             'status' => 200,
             'message' => 'Warehouse attachment created successfully.',
             'result' => $warehouse,
         ]);
     } catch (\Illuminate\Validation\ValidationException $e) {
-        // Return a custom response with validation errors
         return response()->json([
             'status' => 422,
             'errors' => $e->errors(),
         ], 422);
     } catch (\Exception $e) {
-        // Roll back the transaction in case of an exception
         DB::rollBack();
-
-        // Return a response with the exception message
         return response()->json([
             'status' => 500,
             'error' => $e->getMessage(),
@@ -724,11 +489,7 @@ public function warehouse_attachment_store(Request $request)
         if (!$warehouse) {
             return response()->json(['message' => 'Warehouse not found'], 404);
         }
-
-        // Delete the warehouse
         $warehouse->delete();
-
-        // Return a success message
         return response()->json([
             'status' => '200',
             'message' => 'Warehouse deleted successfully'
