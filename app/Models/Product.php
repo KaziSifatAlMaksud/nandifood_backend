@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
@@ -38,12 +39,6 @@ class Product extends Model
         'last_updated_by',
         'img1',
         'upc_barcode',
-    ];
-
-    protected $casts = [
-        'eff_date' => 'date',
-        'end_date' => 'date',
-        'last_updated' => 'datetime',
     ];
 
 }

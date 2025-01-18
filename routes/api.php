@@ -126,7 +126,7 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 //Product API
 
 Route::get('/product', [ProductController::class, 'index']);
-Route::Post('/product/create', [ProductController::class, 'store']);
+Route::POST('/product/create', [ProductController::class, 'store']);
 
 
 //Helper Common API

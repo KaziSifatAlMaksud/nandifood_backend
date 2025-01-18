@@ -196,7 +196,6 @@ public function store(Request $request)
         $uom_width = $request->input('uom_width');
         $uom_height = $request->input('uom_height');
         $status = $request->input('status');
-
         $link_uom = $request->input('link_uom');
         $max_uom_id = Uom::max('id');
         $new_uom_id = 'U' . $uom_type_id . str_pad(($max_uom_id + 1), 3, '0', STR_PAD_LEFT);
@@ -353,11 +352,8 @@ public function uom_export()
         $uom->height_cm = $result['height_cm'];
         $uom->weight_kg = $result['weight_kg'];
         $uom->weight_lb = $result['weight_lb'];
-
-        // Change "linked_uoms" to "link_uom"
         $uom->link_uom = $linkUom;  // Add the enriched linked UOMs with the new key name
         unset($uom->linkedUoms);
-        // Return the response with the enriched UOM data
         return response()->json([
             'status' => 200,
             'message' => 'Ok',
@@ -366,7 +362,6 @@ public function uom_export()
             ],
         ]);
     } catch (\Exception $e) {
-        // Return error response if something goes wrong
         return response()->json([
             'status' => 500,
             'error' => $e->getMessage(),
@@ -454,15 +449,12 @@ public function uom_export()
         $uom->sales_uom = $sales_uom ?? $uom->sales_uom;
         $uom->eff_date = $eff_date ?? $uom->eff_date;
         $uom->status = $status ?? $uom->status;
-
-        // Step 1: Delete the old linked UOM records if any
       
         Uom_linked::where('uom_id', $uom->id)->delete();
         if (!empty($link_uom) && is_array($link_uom)) {
            
             $linkedUoms = [];
             foreach ($link_uom as $link) {
-                // Validate the required fields
                 if (isset($link['conv_form_id'], $link['conv_to_id'], $link['conv_qty'])) {
                     $linkedUoms[] = new Uom_linked([
                         'uom_id' => $uom->id, // Link it to the updated UOM ID
@@ -474,19 +466,13 @@ public function uom_export()
             }
 
             // Only save if there are valid linked UOMs
-        if (!empty($linkedUoms)) {
-            $uom->linkedUoms()->saveMany($linkedUoms);
+            if (!empty($linkedUoms)) {
+                $uom->linkedUoms()->saveMany($linkedUoms);
+            }
         }
-        }
-
-        // Save the updated UOM record to the database
         $uom->save();
-        $uom->load('linkedUoms'); // Re-load the linked UOMs after saving
-
-        // Commit the transaction
+        $uom->load('linkedUoms');
         DB::commit();
-
-        // Return a success response with the updated UOM record and linked UOMs
         return response()->json([
             'status' => 200,
             'message' => 'UOM Updated Successfully',
@@ -495,7 +481,6 @@ public function uom_export()
             ],
         ]);
     } catch (\Exception $e) {
-        // Rollback the transaction in case of a general exception
         DB::rollBack();
         return response()->json([
             'status' => 500,
@@ -527,16 +512,10 @@ public function uom_export()
 
     public function uom_name()
     {
-        // Get Uom data with the related 'linked' Uoms (Uom_linked)
-        $uoms = Uom::with('uomType') // Eager load the related 'Uom_linked' data
-                    ->select('id', 'uom_id', 'uom_type_id')
-                    ->get();
-        
-        // Iterate through each Uom and get the uom_name from the related linked Uoms
-        $uoms->each(function ($uom) {
-            // Check if 'uomType' relation exists and assign uom_name
+        $uoms = Uom::with('uomType')->select('id', 'uom_id', 'uom_type_id')->get();
+        $uoms->each(function ($uom) { 
             $uom->uom_name = $uom->uomType->uom_name ?? null;
-            unset($uom->uomType); // Remove 'uomType' from the response
+            unset($uom->uomType); 
         });
 
         return response()->json([

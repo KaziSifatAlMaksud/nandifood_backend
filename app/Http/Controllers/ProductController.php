@@ -14,7 +14,52 @@ use App\Models\Sizes;
 class ProductController extends Controller
 {
 
-   
+    public function index(Request $request)
+    {
+        try {
+            // Initialize the query for products
+            $query = Product::query();
+
+            // Handle search input (search by product name, SKU, or category)
+            $search = $request->input('search');
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('p_long_name', 'LIKE', "%{$search}%")
+                    ->orWhere('p_sku_no', 'LIKE', "%{$search}%")
+                    ->orWhere('product_category', 'LIKE', "%{$search}%");
+                });
+            }
+
+            // Handle filtering by product ID if provided
+            $id = $request->input('id');
+            if ($id) {
+                $query->where('id', $id);
+            }
+
+            // Apply pagination with a default limit
+            $limit = $request->input('limit', 10); // Default limit set to 10
+            $productsPaginated = $query->paginate($limit);
+
+            // Return the paginated response
+            return response()->json([
+                'status' => 200,
+                'message' => 'OK',
+                'result' => [
+                    'data' => $productsPaginated,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Catch any exceptions and return an error response
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+                'result' => [
+                    'data' => [],
+                ],
+            ]);
+        }
+    }
+
 
     //Endpoint to get all products
     public function store(Request $request)
@@ -39,11 +84,9 @@ class ProductController extends Controller
             'warehouse_state' => 'nullable|string|max:100',
             'warehouse_country' => 'nullable|string|max:100',
             'product_manager' => 'nullable|string|max:100',
-            'eff_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
+            'eff_date' => 'nullable|string',
+            'end_date' => 'nullable|string',
             'status' => 'nullable|string|max:50',
-            'img1' => 'nullable|string|max:255',
-            'upc_barcode' => 'nullable|string|max:255',
         ]);
 
         // Create the product
