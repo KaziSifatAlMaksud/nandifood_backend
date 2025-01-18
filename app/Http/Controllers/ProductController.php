@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Product_category;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product_sub_category1;
+use App\Models\Product_sub_category2;
+use App\Models\Sizes;
+
 
 class ProductController extends Controller
 {
+
+   
+
+    //Endpoint to get all products
     public function store(Request $request)
     {
         // Validate the request
@@ -41,8 +51,72 @@ class ProductController extends Controller
 
         // Return a JSON response
         return response()->json([
-            'message' => 'Product created successfully.',
-            'product' => $product,
+            'status' => 200,
+            'success' => 'Product created successfully.',
+            'data' => $product,
         ], 201);
+        return response()->json([
+        'status' => 200,
+        'message' => 'Product categories fetched successfully.',
+        'result' => [
+            'data' => $product
+            ],
+        ]);
+
     }
+
+
+
+     // Helper Apis for Product Controller
+
+     public function getproduct_cat(){
+        $product_category = Product_category::select('id', 'category_name')->get(); // Fetch only id and category_name columns
+
+        return response()->json([
+        'status' => 200,
+        'message' => 'Product categories fetched successfully.',
+        'result' => [
+            'data' => $product_category
+            ],
+        ]);
+     }
+     
+     public function getproduct_sub_cat(){
+        $product_sub_category1 = product_sub_category1::select('id', 'category_name')->get(); // Fetch only id and category_name columns
+
+        return response()->json([
+        'status' => 200,
+        'message' => 'Product Sub categories 1 fetched successfully.',
+        'result' => [
+            'data' => $product_sub_category1
+            ],
+        ]);
+     }
+
+     public function getproduct_sub_cat2(){
+        $product_sub_category2 = Product_sub_category2::select('id', 'category_name')->get(); // Fetch only id and category_name columns
+
+        return response()->json([
+        'status' => 200,
+        'message' => 'Product Sub categories 2 fetched successfully.',
+        'result' => [
+            'data' => $product_sub_category2
+            ],
+        ]);
+     }
+
+     public function size_name(){
+        $size = Sizes::select('size_name')->get(); 
+
+        return response()->json([
+        'status' => 200,
+        'message' => 'Product Size fetched successfully.',
+        'result' => [
+            'data' => $size
+            ],
+        ]);
+
+     }
+     
+
 }

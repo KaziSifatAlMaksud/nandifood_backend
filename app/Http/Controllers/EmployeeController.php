@@ -41,14 +41,18 @@ class EmployeeController extends Controller
               return response()->json([
                 'status' => 200,
                 'message' => 'OK.',
-                'result' => $employeesPaginated
+                'result' => [
+                    'data' => $employeesPaginated
+                ],
             ]);
         } catch (\Exception $e) {
             // Catch any exceptions and return an error response
             return response()->json([
                 'status' => '500',
                 'message' => 'An error occurred: ' . $e->getMessage(),
-                'result' => []
+                'result' => [
+                    'data' => [],
+                ]
             ]);
         }
     }
@@ -157,7 +161,9 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Employee created successfully.',
-            'result' => $employee_info
+            'result' => [
+                'data' => $employee_info
+            ],
         ]);
     }
 
@@ -181,7 +187,9 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Employee Notes retrieved successfully.',
-            'result' => $employee_notes
+            'result' => [
+                'data' => $employee_notes
+            ],
         ]);
     }
 
@@ -193,7 +201,9 @@ class EmployeeController extends Controller
             return response()->json([
                 'status' => 404,
                 'message' => 'Employee not found.',
-                'result' => []
+                'result' => [
+                    'data' => []
+                ]
             ]);
         }
         $employee->position_name = Positions::find($employee->position_id)->position_name;
@@ -218,7 +228,9 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Employee retrieved successfully.',
-            'result' => $employee
+            'result' => [
+                'data' => $employee
+            ],
         ]);
     }
 
@@ -232,7 +244,9 @@ class EmployeeController extends Controller
             return response()->json([
                 'status' => 404,
                 'message' => 'Employee not found.',
-                'result' => []
+                'result' => [
+                    'data' => []
+                ]
             ]);
         }
 
@@ -273,7 +287,9 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Employee updated successfully.',
-            'result' => $employee
+            'result' => [
+                'data' => $employee
+            ],
         ]);
     }
 
@@ -307,7 +323,9 @@ class EmployeeController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Employee Notes created successfully.',
-                'result' => $employeeNote ,
+                'result' => [
+                    'data' => $employeeNote
+                ],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -332,7 +350,9 @@ class EmployeeController extends Controller
             return response()->json([
                 'status' => 404,
                 'message' => 'Employee not found.',
-                'result' => []
+                'result' => [
+                    'data' => []
+                ]
             ]);
         }
 
@@ -343,7 +363,9 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Employee deleted successfully.',
-            'result' => []
+            'result' => [
+                'data' => []
+            ]
         ]);
     }
 
@@ -355,7 +377,23 @@ class EmployeeController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Positions retrieved successfully.',
-            'result' => $positions
+            'result' => [
+                'data' => $positions
+            ],
+        ]);
+    }
+
+
+    public function get_employee_name(){
+    
+        $employee = Employee::select('id', 'first_name','middle_name', 'last_name')->get(); // Fetch only id and first_name columns
+
+        return response()->json([
+        'status' => 200,
+        'message' => 'Employee name fetched successfully.',
+        'result' => [
+            'data' => $employee
+            ],
         ]);
     }
 

@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Uom_linked;
+use App\Models\Uom_type;
 
 class UomController extends Controller
 {
@@ -523,6 +524,30 @@ public function uom_export()
             ], 500);
         }
     }
+
+    public function uom_name()
+    {
+        // Get Uom data with the related 'linked' Uoms (Uom_linked)
+        $uoms = Uom::with('uomType') // Eager load the related 'Uom_linked' data
+                    ->select('id', 'uom_id', 'uom_type_id')
+                    ->get();
+        
+        // Iterate through each Uom and get the uom_name from the related linked Uoms
+        $uoms->each(function ($uom) {
+            // Check if 'uomType' relation exists and assign uom_name
+            $uom->uom_name = $uom->uomType->uom_name ?? null;
+            unset($uom->uomType); // Remove 'uomType' from the response
+        });
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $uoms
+            ],
+        ]);
+    }
+
 
 
   

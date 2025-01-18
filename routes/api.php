@@ -24,7 +24,7 @@ Route::get('/user', function (Request $request) {
 //warehouse route 
 route::resource('/warehouse', WarehouseController::class);
 
-route::get('/war_name', [WarehouseController::class,'warehouse_name']);
+
 
 Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
 route::post('/employee/create', [EmployeeController::class, 'store']);
@@ -62,7 +62,7 @@ Route::get('/warhouse/bin_location/{warehouse_id}', [WarehouseController::class,
 
 Route::get('/bin_status', [WarehouseController::class, 'bin_status']);
 route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type']);
-route::get('/uom_type',[WarehouseController::class, 'uom_type']);
+
 
 //download PDF route
 // route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
@@ -129,6 +129,20 @@ Route::get('/product', [ProductController::class, 'index']);
 Route::Post('/product/create', [ProductController::class, 'store']);
 
 
+//Helper Common API
+route::get('/uom_type',[WarehouseController::class, 'uom_type']);
+Route::get('/product_category', [ProductController::class, 'getproduct_cat']);
+Route::get('/product_sub_category', [ProductController::class, 'getproduct_sub_cat']);
+Route::get('/product_sub_category2', [ProductController::class, 'getproduct_sub_cat2']);
+Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
+route::get('/war_name', [WarehouseController::class,'warehouse_name']);
+route::get('/size_name', [ProductController::class,'size_name']);
+route::get('/uom_name',[UomController::class, 'uom_name']);
+
+
+route::get('/country_name',[WarehouseController::class, 'getCountries']);
+Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
+Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 
 
