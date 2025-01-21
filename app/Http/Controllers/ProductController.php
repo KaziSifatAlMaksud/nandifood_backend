@@ -13,7 +13,10 @@ use App\Models\Sizes;
 use App\Models\Employee;
 use App\Models\ProductNote;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+ use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
 
@@ -107,7 +110,7 @@ class ProductController extends Controller
         try {
             $validated = $request->validate([
                 'product_id' => 'required|string|max:11',
-                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg|max:2048', // Added file size limit
+                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg', // Added file size limit
                 'note_date' => 'nullable|date', // Changed to date validation for consistency
                 'file_description' => 'nullable|string|max:255',
             ]);
