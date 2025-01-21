@@ -19,30 +19,42 @@ class EmployeeController extends Controller
 
 {
 
-    public function index(Request $request)
+ public function index(Request $request)
     {
         try {
             // Initialize the query
             $query = Employee::query();
             $id = $request->input('id');
-    
+
             // Handle search input (search by name or employee_id)
             $search = $request->input('search');
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'LIKE', "%{$search}%")
-                      ->orWhere('id', 'LIKE', "%{$search}%");
+                    ->orWhere('id', 'LIKE', "%{$search}%");
                 });
             }
-    
+
             // Apply pagination with a default limit
             $limit = $request->input('limit', 10); // Default limit set to 10
             $employeesPaginated = $query->paginate($limit);
-              return response()->json([
+
+            // Transform each employee to include the full URLs for images
+            $employeesTransformed = $employeesPaginated->getCollection()->map(function ($employee) {
+                $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
+                $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
+                $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
+                return $employee;
+            });
+
+            // Update the pagination collection
+            $employeesPaginated->setCollection($employeesTransformed);
+
+            return response()->json([
                 'status' => 200,
                 'message' => 'OK.',
                 'result' => [
-                    'data' => $employeesPaginated
+                    'data' => $employeesPaginated,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -52,10 +64,11 @@ class EmployeeController extends Controller
                 'message' => 'An error occurred: ' . $e->getMessage(),
                 'result' => [
                     'data' => [],
-                ]
+                ],
             ]);
         }
     }
+
 
 
     public function store(Request $request)
