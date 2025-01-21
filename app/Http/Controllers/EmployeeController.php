@@ -210,6 +210,10 @@ class EmployeeController extends Controller
         $employee->position_name = Positions::find($employee->position_id)->position_name;
         $warehouse = Warehouse::find($employee->warehouse_id);
         $employee->warehouse_name = $warehouse ? $warehouse->warehouse_name : null;
+        $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
+        $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
+        $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
+
 
 
             // Process the notes to include file URLs and file names
@@ -277,9 +281,85 @@ class EmployeeController extends Controller
         $employee->start_date = $request->start_date;
         $employee->last_update = $request->last_update;
         $employee->update_by = $request->update_by;
-        $employee->img1 = $request->img1;
-        $employee->img2 = $request->img2;
-        $employee->img3 = $request->img3;
+     // Handle image updates
+        $uploadedImages = [];
+
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/warehouse_image/{$fileName}";
+            
+            // Upload the new image
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+            
+            if ($uploaded) {
+                // Delete the old image if it exists
+                if ($employee->img1) {
+                    Storage::disk('spaces')->delete($employee->img1);
+                }
+                $uploadedImages['img1'] = $path;
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'error' => 'Failed to upload img1 to DigitalOcean Spaces',
+                ], 500);
+            }
+        }
+
+        if ($request->hasFile('img2')) {
+            $file = $request->file('img2');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/warehouse_image/{$fileName}";
+            
+            // Upload the new image
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+            
+            if ($uploaded) {
+                // Delete the old image if it exists
+                if ($employee->img2) {
+                    Storage::disk('spaces')->delete($employee->img2);
+                }
+                $uploadedImages['img2'] = $path;
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'error' => 'Failed to upload img2 to DigitalOcean Spaces',
+                ], 500);
+            }
+        }
+
+        if ($request->hasFile('img3')) {
+            $file = $request->file('img3');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/warehouse_image/{$fileName}";
+            
+            // Upload the new image
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+            
+            if ($uploaded) {
+                // Delete the old image if it exists
+                if ($employee->img3) {
+                    Storage::disk('spaces')->delete($employee->img3);
+                }
+                $uploadedImages['img3'] = $path;
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'error' => 'Failed to upload img3 to DigitalOcean Spaces',
+                ], 500);
+            }
+        }
+
+        // If images were uploaded, assign their paths to the employee model
+        if (isset($uploadedImages['img1'])) {
+            $employee->img1 = $uploadedImages['img1'];
+        }
+        if (isset($uploadedImages['img2'])) {
+            $employee->img2 = $uploadedImages['img2'];
+        }
+        if (isset($uploadedImages['img3'])) {
+            $employee->img3 = $uploadedImages['img3'];
+        }
 
         // Save the updated employee
         $employee->save();
