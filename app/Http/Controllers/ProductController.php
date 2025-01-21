@@ -15,19 +15,17 @@ use App\Models\Employee;
 class ProductController extends Controller
 {
 
+  
     public function index(Request $request)
     {
         try {
-            // Initialize the query for products
             $query = Product::query();
-
-            // Handle search input (search by product name, SKU, or category)
             $search = $request->input('search');
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('p_long_name', 'LIKE', "%{$search}%")
-                    ->orWhere('p_sku_no', 'LIKE', "%{$search}%")
-                    ->orWhere('product_category', 'LIKE', "%{$search}%");
+                        ->orWhere('p_sku_no', 'LIKE', "%{$search}%")
+                        ->orWhere('product_category', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -41,7 +39,17 @@ class ProductController extends Controller
             $limit = $request->input('limit', 10); // Default limit set to 10
             $productsPaginated = $query->paginate($limit);
 
-            // Return the paginated response
+            // Enrich each product with additional data
+            $productsPaginated->getCollection()->transform(function ($product) {
+                $product->product_category_name = Product_category::find($product->product_category)?->category_name ?? '';
+                $product->sub_category1_name = Product_sub_category1::find($product->sub_category1)?->category_name ?? '';
+                $product->sub_category2_name = Product_sub_category2::find($product->sub_category2)?->category_name ?? '';
+                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
+                $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id ?? '';
+                return $product;
+            });
+
+            // Return the paginated and enriched response
             return response()->json([
                 'status' => 200,
                 'message' => 'OK',
@@ -60,6 +68,7 @@ class ProductController extends Controller
             ]);
         }
     }
+
 
 
     //Endpoint to get all products
