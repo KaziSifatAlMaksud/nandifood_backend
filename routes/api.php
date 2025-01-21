@@ -127,10 +127,12 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 
 Route::get('/product', [ProductController::class, 'index']);
 Route::POST('/product/create', [ProductController::class, 'store']);
+Route::Get('/product/{id}',[ProductController::class, 'show']);
+Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
 
 
 //Helper Common API
-route::get('/uom_type',[WarehouseController::class, 'uom_type']);
+Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 Route::get('/product_category', [ProductController::class, 'getproduct_cat']);
 Route::get('/product_sub_category', [ProductController::class, 'getproduct_sub_cat']);
 Route::get('/product_sub_category2', [ProductController::class, 'getproduct_sub_cat2']);

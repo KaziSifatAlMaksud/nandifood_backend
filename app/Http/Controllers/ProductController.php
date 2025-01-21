@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Uom;
 use App\Models\Product_category;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product_sub_category1;
 use App\Models\Product_sub_category2;
 use App\Models\Sizes;
-
+use App\Models\Employee;
 
 class ProductController extends Controller
 {
@@ -106,6 +107,61 @@ class ProductController extends Controller
             ],
         ]);
 
+    }
+
+    public function show($id)
+    {
+        try {
+            // Find the product by ID or throw a 404 error if not found
+            $product = Product::findOrFail($id);
+            $product->product_category_name = Product_category::find($id)?->category_name ?? '';
+            $product->sub_category1_name = product_sub_category1::find($id)?->category_name ?? '';
+            $product->sub_category2_name = product_sub_category2::find($id)?->category_name ?? '';
+            $product->default_sales_uom_name = Uom::find($id)?->uom_id ?? '';
+            $product->inventory_uom_name = Uom::find($id)?->uom_id ?? '';
+            $product->product_manager_name = Employee::find($id)?->first_name . ' ' . Employee::find($id)?->middle_name . ' ' . Employee::find($id)?->last_name ?? null;
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Product fetched successfully.',
+                'data' => $product,
+            ], 200);
+        } catch (\Exception $e) {
+            // Handle exceptions and return an error response
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Product not found.',
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
+
+
+    
+
+    public function destroy($id)
+    {
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product deleted successfully',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 404,
+                'error' => 'Product not found',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => 'An error occurred while deleting the product',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 
