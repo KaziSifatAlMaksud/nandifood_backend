@@ -194,6 +194,7 @@ class EmployeeController extends Controller
     }
 
 
+
    public function edit($id)
     {
         $employee = Employee::with('notes')->find($id);
@@ -340,6 +341,31 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    public function employee_notes_delete($id)
+    {
+        try {
+            $employeeNote = EmployeeNotes::findOrFail($id);
+            if ($employeeNote->file_path) {
+                $filePath = $employeeNote->file_path;
+                if (Storage::disk('spaces')->exists($filePath)) {
+                    Storage::disk('spaces')->delete($filePath);
+                }
+            }
+
+            $employeeNote->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Employee Note deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function destroy($id)
     {

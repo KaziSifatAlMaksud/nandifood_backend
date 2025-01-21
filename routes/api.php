@@ -47,7 +47,7 @@ Route::get('/employee', [EmployeeController::class, 'index']);
 
 // route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
 route::post('/employee_notes/create', [EmployeeController::class, 'employee_notes_store']);
-
+route::delete('/employee/notes/delete/{id}', [EmployeeController::class, 'employee_notes_delete']);
 route::get('/country',[WarehouseController::class, 'country']);
 
 
@@ -128,7 +128,12 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 Route::get('/product', [ProductController::class, 'index']);
 Route::POST('/product/create', [ProductController::class, 'store']);
 Route::Get('/product/{id}',[ProductController::class, 'show']);
+Route::put('/product/{id}', [ProductController::class, 'update']);
 Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
+
+route::post('/product_attachment/create', [ProductController::class, 'product_notes_store']);
+route::get('/product_attachment/{id}', [ProductController::class, 'get_all_notes']);
+Route::delete('/product/notes/delete/{id}', [ProductController::class, 'product_notes_delete']);
 
 
 //Helper Common API
