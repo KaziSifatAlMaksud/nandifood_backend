@@ -42,54 +42,6 @@ public function index(Request $request)
             'bin_location.bin_barcode_img',
             'bin_location.bin_image'
         ]);
-
-    // $query = BinLocation::join('warehouse', 'bin_location.warehouse_id', '=', 'warehouse.id')
-    // ->select([
-    //     'bin_location.id',
-    //     'bin_location.warehouse_id',
-    //     'bin_location.effective_date',
-    //     'bin_location.storage_type_id',
-    //     'bin_location.asset_type_id',
-    //     'bin_location.zone_number',
-    //     'bin_location.zone_name',
-    //     'bin_location.section_number',
-    //     'bin_location.section_name',
-    //     'bin_location.aisle_number',
-    //     'bin_location.aisle_name',
-    //     'bin_location.rack_number',
-    //     'bin_location.rack_name',
-    //     'bin_location.shelf_number',
-    //     'bin_location.shelf_name',
-    //     'bin_location.bin_number',
-    //     'bin_location.bin_name',
-    //     'bin_location.metric_unit',
-    //     'bin_location.bin_length',
-    //     'bin_location.bin_width',
-    //     'bin_location.bin_height',
-    //     'bin_location.storage_capacity_slp',
-    //     'bin_location.start_date',
-    //     'bin_location.end_date',
-    //     'bin_location.status',
-    //     'bin_location.created_at',
-    //     'bin_location.created_by',
-    //     'bin_location.updated_at',
-    //     'bin_location.updated_by',
-    //     'bin_location.description',
-    //     'bin_location.file',
-    //     'bin_location.bin_barcode_img',
-    //     'bin_location.bin_image',
-        
-    //     // Selecting warehouse-related values and adding formatted values
-    //     DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
-    //     DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location")
-    // ]);
-
-
     // Check if an ID is provided
     $id = $request->input('id');
     $limit = (int) $request->input('limit', 5);
@@ -100,8 +52,8 @@ public function index(Request $request)
 
         // Transform the collection
         $binLocations->getCollection()->transform(function ($binLocation) {
-            $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
-            $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+            $binLocation->file_url = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
+            $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
             return $binLocation;
         });
 
@@ -130,8 +82,9 @@ public function index(Request $request)
 
     // Transform the result to add file and barcode image URLs
     $binLocations->getCollection()->transform(function ($binLocation) {
-        $binLocation->file_url = $binLocation->file ? Storage::url($binLocation->file) : null;
-        $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
+        $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
+        $binLocation->file_url = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
+        $binLocation->bin_barcode_img_url = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
         return $binLocation;
     });
 
@@ -179,9 +132,9 @@ public function show($id)
             'bin_location.updated_at',
             'bin_location.updated_by',
             'bin_location.description',
-            'bin_location.file',
-            'bin_location.bin_barcode_img',
             'bin_location.bin_image',
+            'bin_location.file',
+            'bin_location.bin_barcode_img',         
             'bin_location.bin_weight_kg',
 
             // Warehouse-related and formatted values
@@ -195,11 +148,11 @@ public function show($id)
         ])
         ->where('bin_location.id', $id)
         ->firstOrFail(); // Retrieve the first result or fail if not found
+        // Prepare the file URLs
+        $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
+        $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
+        $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
 
-    // Prepare the file URLs
-    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
-    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
-    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
 
     // Calculate total volume (if needed)
     $totals = BinLocation::calculateTotalVolume($id);
@@ -239,9 +192,9 @@ public function edit($id)
     }
 
     // Prepare the file URLs
-    $binLocation->bin_image = $binLocation->bin_image ? Storage::url($binLocation->bin_image) : null;
-    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::url($binLocation->bin_barcode_img) : null;
-    $binLocation->file = $binLocation->file ? Storage::url($binLocation->file) : null;
+    $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;
+    $binLocation->bin_barcode_img = $binLocation->bin_barcode_img ? Storage::disk('spaces')->url($binLocation->bin_barcode_img) : null;
+    $binLocation->file = $binLocation->file ? Storage::disk('spaces')->url($binLocation->file) : null;
 
     // Return the bin location with the updated file URLs
     return response()->json([
@@ -253,7 +206,6 @@ public function edit($id)
         ],
     ]);
 }
-
 
 
 public function update(Request $request, $id)
@@ -276,23 +228,52 @@ public function update(Request $request, $id)
 
         // Handle file upload for 'file' field (general file)
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('uploads/files', 'public');
-            $data['file'] = $filePath;
-        }
+            if ($binlocation->file && Storage::disk('spaces')->exists($binlocation->file)) {
+                Storage::disk('spaces')->delete($binlocation->file);
+            }
 
-        // Handle file upload for 'bin_image' field (image file)
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = "uploads/warehouse_file/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['file'] = $filePath;  // Update the file path in the data array
+            }
+        }
         if ($request->hasFile('bin_image')) {
-            $binImagePath = $request->file('bin_image')->store('uploads/bin_images', 'public');
-            $data['bin_image'] = $binImagePath;
+            // Delete the old bin image from DigitalOcean Spaces if it exists
+            if ($binlocation->bin_image && Storage::disk('spaces')->exists($binlocation->bin_image)) {
+                Storage::disk('spaces')->delete($binlocation->bin_image);
+            }
+            $binImage = $request->file('bin_image');
+            $binImageName = time() . '_' . $binImage->getClientOriginalName();
+            $binImagePath = "uploads/warehouse_file/{$binImageName}";
+            $uploaded = Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['bin_image'] = $binImagePath;
+            }
         }
 
-        // Handle file upload for 'bin_barcode_img' field (barcode image)
         if ($request->hasFile('bin_barcode_img')) {
-            $barcodeImagePath = $request->file('bin_barcode_img')->store('uploads/barcodes', 'public');
-            $data['bin_barcode_img'] = $barcodeImagePath;
+            // Delete the old barcode image from DigitalOcean Spaces if it exists
+            if ($binlocation->bin_barcode_img && Storage::disk('spaces')->exists($binlocation->bin_barcode_img)) {
+                Storage::disk('spaces')->delete($binlocation->bin_barcode_img);
+            }
+
+            // Upload new barcode image to DigitalOcean Spaces
+            $barcodeImage = $request->file('bin_barcode_img');
+            $barcodeImageName = time() . '_' . $barcodeImage->getClientOriginalName();
+            $barcodeImagePath = "uploads/warehouse_file/{$barcodeImageName}";
+            $uploaded = Storage::disk('spaces')->put($barcodeImagePath, file_get_contents($barcodeImage), ['visibility' => 'public']);
+            
+            if ($uploaded) {
+                $data['bin_barcode_img'] = $barcodeImagePath;  // Update the barcode image path in the data array
+            }
         }
 
-        // Update the BinLocation with the validated data
+        // Update the BinLocation with the new data
         $binlocation->update($data);
 
         // Commit the transaction if everything is successful
@@ -318,6 +299,7 @@ public function update(Request $request, $id)
         ], 500);
     }
 }
+
 
 /*
 public function update(Request $request, $id)
@@ -368,7 +350,7 @@ public function store(Request $request)
                 }
             }
 
-            // Handle file upload for 'bin_image' field (image file)
+
             if ($request->hasFile('bin_image')) {
                 $bin_image = $request->file('bin_image');
                 $bin_imageName = time() . '_' . $bin_image->getClientOriginalName(); 
@@ -383,7 +365,6 @@ public function store(Request $request)
                 }
             }
 
-            // Handle file upload for 'bin_barcode_img' field (barcode image)
             if ($request->hasFile('bin_barcode_img')) {
                 $bin_bar_image = $request->file('bin_barcode_img');
                 $bin_bar_imageName = time() . '_' . $bin_bar_image->getClientOriginalName(); 
@@ -398,7 +379,6 @@ public function store(Request $request)
                 }
             }
 
-            // Create BinLocation with the uploaded data
             $binlocation = BinLocation::create($data);
 
             // Commit the transaction
