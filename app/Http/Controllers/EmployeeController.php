@@ -13,6 +13,7 @@ use App\Models\Positions;
 use App\Models\BinStatus;
 use App\Models\BinStorageType;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 class EmployeeController extends Controller
@@ -44,6 +45,10 @@ class EmployeeController extends Controller
                 $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
                 $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
                 $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
+                if ($employee->position_id) {
+                    $position = Positions::find($employee->position_id);
+                    $employee->position = $position ? $position->position_name : "";
+                } 
                 return $employee;
             });
 
