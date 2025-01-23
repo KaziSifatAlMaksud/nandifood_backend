@@ -262,16 +262,14 @@ class EmployeeController extends Controller
             return response()->json([
                 'status' => 404,
                 'message' => 'Employee not found.',
-                'result' => [
-                    'data' => []
-                ]
+                'result' => ['data' => []],
             ]);
         }
 
-        // Update the employee's fields with the incoming request data
+        // Update employee's fields
         $employee->id = $request->id;
         $employee->first_name = $request->first_name;
-        $employee->country_id = $request->country;
+        $employee->country = $request->country;
         $employee->position_id = $request->position;
         $employee->warehouse_id = $request->warehouse_id;
         $employee->middle_name = $request->middle_name;
@@ -292,98 +290,29 @@ class EmployeeController extends Controller
         $employee->eff_date = $request->eff_date;
         $employee->end_date = $request->end_date;
         $employee->start_date = $request->start_date;
-        $employee->last_update = $request->last_update;
+        $employee->last_update = now()->format('Y-m-d H:i:s');
         $employee->update_by = $request->update_by;
-     // Handle image updates
-        $uploadedImages = [];
 
-        if ($request->hasFile('img1')) {
-            $file = $request->file('img1');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = "uploads/warehouse_image/{$fileName}";
-            
-            // Upload the new image
-            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
-            
-            if ($uploaded) {
-                // Delete the old image if it exists
-                if ($employee->img1) {
-                    Storage::disk('spaces')->delete($employee->img1);
+        // Handle image updates
+        $imageFields = ['img1', 'img2', 'img3'];
+        foreach ($imageFields as $imageField) {
+            if ($request->hasFile($imageField)) {
+                $uploadedPath = $this->handleImageUpload($request->file($imageField), $employee->$imageField);
+                if ($uploadedPath) {
+                    $employee->$imageField = $uploadedPath;
+                } else {
+                    return response()->json([
+                        'status' => 500,
+                        'error' => "Failed to upload $imageField to DigitalOcean Spaces",
+                    ], 500);
                 }
-                $uploadedImages['img1'] = $path;
-            } else {
-                return response()->json([
-                    'status' => 500,
-                    'error' => 'Failed to upload img1 to DigitalOcean Spaces',
-                ], 500);
             }
         }
-
-        if ($request->hasFile('img2')) {
-            $file = $request->file('img2');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = "uploads/warehouse_image/{$fileName}";
-            
-            // Upload the new image
-            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
-            
-            if ($uploaded) {
-                // Delete the old image if it exists
-                if ($employee->img2) {
-                    Storage::disk('spaces')->delete($employee->img2);
-                }
-                $uploadedImages['img2'] = $path;
-            } else {
-                return response()->json([
-                    'status' => 500,
-                    'error' => 'Failed to upload img2 to DigitalOcean Spaces',
-                ], 500);
-            }
-        }
-
-        if ($request->hasFile('img3')) {
-            $file = $request->file('img3');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $path = "uploads/warehouse_image/{$fileName}";
-            
-            // Upload the new image
-            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
-            
-            if ($uploaded) {
-                // Delete the old image if it exists
-                if ($employee->img3) {
-                    Storage::disk('spaces')->delete($employee->img3);
-                }
-                $uploadedImages['img3'] = $path;
-            } else {
-                return response()->json([
-                    'status' => 500,
-                    'error' => 'Failed to upload img3 to DigitalOcean Spaces',
-                ], 500);
-            }
-        }
-
-        // If images were uploaded, assign their paths to the employee model
-        if (isset($uploadedImages['img1'])) {
-            $employee->img1 = $uploadedImages['img1'];
-        }
-        if (isset($uploadedImages['img2'])) {
-            $employee->img2 = $uploadedImages['img2'];
-        }
-        if (isset($uploadedImages['img3'])) {
-            $employee->img3 = $uploadedImages['img3'];
-        }
-
-        // Save the updated employee
         $employee->save();
-
-        // Return a successful response
         return response()->json([
             'status' => 200,
             'message' => 'Employee updated successfully.',
-            'result' => [
-                'data' => $employee
-            ],
+            'result' => ['data' => $employee],
         ]);
     }
 
@@ -486,6 +415,22 @@ class EmployeeController extends Controller
                 'data' => []
             ]
         ]);
+    }
+
+    private function handleImageUpload($file, $oldPath = null)
+    {
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $path = "uploads/warehouse_image/{$fileName}";
+        $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+
+        if ($uploaded) {
+            if ($oldPath) {
+                Storage::disk('spaces')->delete($oldPath);
+            }
+            return $path;
+        }
+
+        return null;
     }
 
     
