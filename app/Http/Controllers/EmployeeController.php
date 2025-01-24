@@ -20,59 +20,48 @@ class EmployeeController extends Controller
 
 {
 
- public function index(Request $request)
-    {
-        try {
-            // Initialize the query
-            $query = Employee::query();
-            $id = $request->input('id');
-
-            // Handle search input (search by name or employee_id)
-            $search = $request->input('search');
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'LIKE', "%{$search}%")
-                    ->orWhere('id', 'LIKE', "%{$search}%");
-                });
-            }
-
-            // Apply pagination with a default limit
-            $limit = $request->input('limit', 10); // Default limit set to 10
-            $employeesPaginated = $query->paginate($limit);
-
-            // Transform each employee to include the full URLs for images
-            $employeesTransformed = $employeesPaginated->getCollection()->map(function ($employee) {
-                $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
-                $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
-                $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
-                if ($employee->position_id) {
-                    $position = Positions::find($employee->position_id);
-                    $employee->position = $position ? $position->position_name : "";
-                } 
-                return $employee;
+public function index(Request $request)
+{
+    try {
+        // Initialize the query
+        $query = Employee::query();
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                  ->orWhere('id', 'LIKE', "%{$search}%");
             });
-
-            // Update the pagination collection
-            $employeesPaginated->setCollection($employeesTransformed);
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'OK.',
-                'result' => [
-                    'data' => $employeesPaginated,
-                ],
-            ]);
-        } catch (\Exception $e) {
-            // Catch any exceptions and return an error response
-            return response()->json([
-                'status' => '500',
-                'message' => 'An error occurred: ' . $e->getMessage(),
-                'result' => [
-                    'data' => [],
-                ],
-            ]);
         }
+        $limit = $request->input('limit', 10); 
+        $employeesPaginated = $query->paginate($limit);
+        $employeesPaginated->getCollection()->transform(function ($employee) {
+            $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
+            $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
+            $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
+            $employee->position = $employee->position_id
+                ? optional(Positions::find($employee->position_id))->position_name
+                : "";
+
+            return $employee;
+        });
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'OK.',
+            'result' => [
+                'data' => $employeesPaginated,
+            ],
+        ]);
+    } catch (\Exception $e) {
+        // Return an error response in case of exception
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred: ' . $e->getMessage(),
+            'result' => [
+                'data' => [],
+            ],
+        ]);
     }
+}
 
 
 
@@ -213,7 +202,7 @@ class EmployeeController extends Controller
 
 
 
-   public function edit($id)
+   public function show($id)
     {
         $employee = Employee::with('notes')->find($id);
         if (!$employee) {

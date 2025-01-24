@@ -26,9 +26,9 @@ route::resource('/warehouse', WarehouseController::class);
 
 
 
-Route::get('/employee/{id?}', [EmployeeController::class, 'index']);
+Route::get('/employee', [EmployeeController::class, 'index']);
 route::post('/employee/create', [EmployeeController::class, 'store']);
-route::get('/employee/{id}/edit', [EmployeeController::class, 'edit']);
+route::get('/employee/{id}', [EmployeeController::class, 'show']);
 route::put('/employee/{id}', [EmployeeController::class, 'update']);
 
 route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
@@ -145,6 +145,7 @@ Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 route::get('/size_name', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
+route::get('/')
 
 
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
