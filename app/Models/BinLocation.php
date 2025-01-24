@@ -56,7 +56,8 @@ class BinLocation extends Model
         'file',
         'bin_barcode_img',
         'bin_image',
-        'bin_weight_kg'
+        'bin_weight_kg',
+        'eff_date',
     ];
 
     // Optionally, define the data types of attributes (for casting)

@@ -136,6 +136,7 @@ public function show($id)
             'bin_location.file',
             'bin_location.bin_barcode_img',         
             'bin_location.bin_weight_kg',
+            'bin_location.eff_date',
 
             // Warehouse-related and formatted values
             DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
