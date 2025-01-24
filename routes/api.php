@@ -145,7 +145,6 @@ Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 route::get('/size_name', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
-route::get('/')
 
 
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
