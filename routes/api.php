@@ -58,6 +58,7 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 Route::get('/warhouse/employee/{warehouse_id}', [WarehouseController::class, 'getEmployee']);
 Route::get('/warhouse/attachment/{warehouse_id}', [WarehouseController::class, 'getAttachment']);
 Route::get('/warhouse/bin_location/{warehouse_id}', [WarehouseController::class, 'getBinLocation']);
+Route::get('/warhouse/capacity/{warehouse_id}', [WarehouseController::class, 'getCapacity']);
 // addtional information
 
 Route::get('/bin_status', [WarehouseController::class, 'bin_status']);

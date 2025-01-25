@@ -432,6 +432,22 @@ public function update(Request $request, $warehouseId)
     ]);
 }
 
+public function getCapacity($warehouse_id)
+{
+    $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
+    $totalCapacity = 0;
+    foreach ($binLocations as $binLocation) {
+        $totalCapacity += $binLocation->capacity;
+    }
+    return response()->json([
+        'status' => '200',
+        'message' => 'Ok',
+        'result' => [
+            'total_capacity' => $totalCapacity,
+        ]
+    ]);
+}
+
 public function warehouse_attachment_store(Request $request)
 {
     try {

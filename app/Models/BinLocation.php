@@ -14,18 +14,10 @@ class BinLocation extends Model
 
     // Specify the table associated with the model
     protected $table = 'bin_location';  // Optional, only needed if your table name is not the plural form of the model
-
-
-    // The primary key for the model (optional if using default 'id')
     protected $primaryKey = 'id'; 
-
-    // Disable the timestamps if your table doesn't have 'created_at' and 'updated_at' columns
     public $timestamps = true;  // Set to false if your table does not have timestamps
-
-    // Specify which columns are mass assignable
     protected $fillable = [
         'warehouse_id',
-        'effective_date',
         'storage_type_id',
         'asset_type_id',
         'zone_number',
