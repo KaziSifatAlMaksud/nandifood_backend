@@ -437,15 +437,26 @@ public function update(Request $request, $warehouseId)
 public function getCapacity($warehouse_id)
 {
     $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
-    $totalCapacity = 0;
+    $totalCapacity = new \stdClass();
+    $totalCapacity->totalCapacity_spl = 0;
+    $totalCapacity->storage_used = '0%'; 
+    $totalCapacity->storage_available = '100%'; 
+
     foreach ($binLocations as $binLocation) {
-        $totalCapacity += $binLocation->capacity;
+        // Add the storage capacity from each bin location to totalCapacity_spl
+        $totalCapacity->totalCapacity_spl += $binLocation->storage_capacity_slp;
+
+        // You can calculate storage_used and storage_available if needed
+        // For example, if you have the values for storage used and storage available, add them:
+        // $totalCapacity->storage_used += $binLocation->storage_used;
+        // $totalCapacity->storage_available += $binLocation->storage_available;
     }
+
     return response()->json([
         'status' => '200',
         'message' => 'Ok',
         'result' => [
-            'total_capacity' => $totalCapacity,
+            'data' => $totalCapacity,
         ]
     ]);
 }
