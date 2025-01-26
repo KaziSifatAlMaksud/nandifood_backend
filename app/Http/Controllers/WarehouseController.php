@@ -50,6 +50,8 @@ class WarehouseController extends Controller
         $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
         $warehouse->volume_m3 = $totals['total_volume'];
         $warehouse->total_storage_capacity = $totals['total_storage_capacity_slp'];
+        $warehouse->total_capacity_kg = $totals['total_capacity_kg'];
+        $warehouse->total_capacity_lb = $totals['total_capacity_lb'];
         return $warehouse;
     });
     $warehousesPaginated->setCollection($warehouses);
