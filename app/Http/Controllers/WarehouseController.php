@@ -443,7 +443,6 @@ public function getCapacity($warehouse_id)
     $totalCapacity->storage_available = '100%'; 
 
     foreach ($binLocations as $binLocation) {
-        // Add the storage capacity from each bin location to totalCapacity_spl
         $totalCapacity->totalCapacity_spl += $binLocation->storage_capacity_slp;
 
         // You can calculate storage_used and storage_available if needed
