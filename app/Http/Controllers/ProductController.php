@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Uom;
+use App\Models\Uom_type;    
 use App\Models\Product_category;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product_sub_category1;
@@ -49,10 +50,20 @@ class ProductController extends Controller
                 $product->product_category_name = Product_category::find($product->product_category)?->category_name ?? '';
                 $product->sub_category1_name = Product_sub_category1::find($product->sub_category1)?->category_name ?? '';
                 $product->sub_category2_name = Product_sub_category2::find($product->sub_category2)?->category_name ?? '';
-                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
-                $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id ?? '';
-                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
-                $product->size_kg = Sizes::find($product->size)?->size_name ?? '';
+                
+
+                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id 
+                ? Uom::find($product->default_sales_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->default_sales_uom)?->uom_type_id)?->uom_name 
+                : '';
+
+                $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id 
+                ? Uom::find($product->inventory_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->inventory_uom)?->uom_type_id)?->uom_name 
+                : '';
+           
+                $product->size_kg = Sizes::find($product->size)?->size_kg ?? '';
+                $product->size_lb = Sizes::find($product->size)?->size_lb ?? '';
                 return $product;
             });
 
