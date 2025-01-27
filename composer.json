@@ -12,13 +12,14 @@
         "ext-gd": "*",
         "aws/aws-sdk-php": "^3.334",
         "barryvdh/laravel-dompdf": "^3.0",
+        "laravel/fortify": "*",
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
         "livewire/livewire": "^3.0",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "*",
         "phpoffice/phpspreadsheet": "^1.29"
     },
     "require-dev": {
