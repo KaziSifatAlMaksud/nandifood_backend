@@ -234,7 +234,7 @@ class ProductController extends Controller
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
             if ($uploaded) {
-                $product->file_path = $path;
+                $product->img1 = $path;
             } else {
                 throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
             }
@@ -248,7 +248,7 @@ class ProductController extends Controller
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
             if ($uploaded) {
-                $product->upc_barcode_path = $path;  // Assuming you want to store the path in a different field
+                $product->upc_barcode = $path;  // Assuming you want to store the path in a different field
             } else {
                 throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
             }
@@ -311,7 +311,7 @@ class ProductController extends Controller
 
                 if ($uploaded) {
                     // Update image path in the database
-                    $product->file_path = $path;
+                    $product->img1 = $path;
                 } else {
                     throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
                 }
@@ -326,7 +326,7 @@ class ProductController extends Controller
 
                 if ($uploaded) {
                     // Update barcode path in the database
-                    $product->upc_barcode_path = $path; // Assuming you want to store it in a different field
+                    $product->upc_barcode = $path; // Assuming you want to store it in a different field
                 } else {
                     throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
                 }
