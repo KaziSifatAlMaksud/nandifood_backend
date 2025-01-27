@@ -368,7 +368,8 @@ class ProductController extends Controller
             $product->default_sales_uom_name = Uom::find($id)?->uom_id ?? '';
             $product->inventory_uom_name = Uom::find($id)?->uom_id ?? '';
             $product->product_manager_name = Employee::find($id)?->first_name . ' ' . Employee::find($id)?->middle_name . ' ' . Employee::find($id)?->last_name ?? null;
-
+            $product->img1 = $product->img1 ? Storage::disk('spaces')->url($product->img1) : null;
+            $product->upc_barcode = $product->upc_barcode ? Storage::disk('spaces')->url($product->upc_barcode) : null;
             return response()->json([
                 'status' => 200,
                 'success' => true,
