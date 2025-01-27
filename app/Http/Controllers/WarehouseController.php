@@ -182,20 +182,24 @@ public function getAttachment($warehouse_id)
     ]);
 }
 
-
 public function getBinLocation($warehouse_id)
-{    // Fetch the employees associated with the warehouse
-    $binLocation = BinLocation::where('warehouse_id', $warehouse_id)->get();
+{
+    $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
+
+    $result = [];
+    foreach ($binLocations as $binLocation) {
+        $extraInfo = BinLocation::getExtraInfo($binLocation->id);
+        $result[] = array_merge($binLocation->toArray(), $extraInfo);
+    }
 
     return response()->json([
         'status' => '200',
         'message' => 'Ok',
         'result' => [
-            'data' => $binLocation,
+            'data' => $result,
         ],
     ]);
 }
-
 
 
 

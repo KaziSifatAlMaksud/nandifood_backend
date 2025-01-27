@@ -118,23 +118,79 @@ class BinLocation extends Model
      }
 
 
-public static function calculateTotalVolume($id)
+    public static function calculateTotalVolume($id)
+    {
+        // Use `find` for a single bin, as `id` is unique
+        $bin = self::find($id);
+
+        if (!$bin) {
+            // Handle case where no bin is found
+            return 0;
+        }
+
+        // Ensure bin dimensions are valid numbers
+        $length = $bin->bin_length ?? 0;
+        $width = $bin->bin_width ?? 0;
+        $height = $bin->bin_height ?? 0;
+
+
+
+        return ($length * $width * $height) / 1000000;
+    }
+
+    public static function getExtraInfo($id)
 {
-    // Use `find` for a single bin, as `id` is unique
     $bin = self::find($id);
 
     if (!$bin) {
-        // Handle case where no bin is found
-        return 0;
+        return [
+            'bin_length' => 0,
+            'bin_width' => 0,
+            'bin_height' => 0,
+            'volume_m3' => 0,
+            'full_bin_location' => null,
+            'bin_weight_kg' => 0,
+        ];
     }
 
-    // Ensure bin dimensions are valid numbers
     $length = $bin->bin_length ?? 0;
     $width = $bin->bin_width ?? 0;
     $height = $bin->bin_height ?? 0;
+    $metricUnit = $bin->metric_unit ?? 0;
+    $bin_weight_kg = $bin->bin_weight_kg ?? 0;
 
-    // Calculate and return volume in cubic meters
-    return ($length * $width * $height) / 1000000;
+    // Concatenate full bin location (including weight if necessary)
+    $fullBinLocation = implode('', [
+        $bin->zone_number,
+        $bin->section_number,
+        $bin->aisle_number,
+        $bin->rack_number,
+        $bin->shelf_number,
+        $bin->bin_number,
+    ]);
+
+    // If the metric_unit is 1 (imperial), convert dimensions to cm (Inches to cm)
+    if ($metricUnit == 1) {
+        $length *= 2.54; // Inches to cm
+        $width *= 2.54;  // Inches to cm
+        $height *= 2.54; // Inches to cm
+
+        // Convert bin weight from pounds (lb) to kilograms (kg) if it's in pounds
+        $bin_weight_kg *= 0.453592;  // lb to kg
+    }
+
+    // Calculate volume in cubic centimeters (cm³) and convert to cubic meters (m³)
+    $volumeInCm3 = $length * $width * $height;
+    $volumeInM3 = $volumeInCm3 / 1_000_000; // 1 m³ = 1,000,000 cm³
+
+    return [
+        'bin_length' => $length,
+        'bin_width' => $width,
+        'bin_height' => $height,
+        'volume_m3' => $volumeInM3,
+        'full_bin_location' => $fullBinLocation,
+        'bin_weight_kg' => $bin_weight_kg,
+    ];
 }
 
 
