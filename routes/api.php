@@ -77,7 +77,7 @@ Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 
 
-Route::post('price/upload-excel', [ProductPriceController::class, 'upload']);
+Route::post('price/upload_excel', [ProductPriceController::class, 'validateAndUpload']);
 
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
@@ -146,7 +146,7 @@ Route::get('/product_sub_category', [ProductController::class, 'getproduct_sub_c
 Route::get('/product_sub_category2', [ProductController::class, 'getproduct_sub_cat2']);
 Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
-route::get('/size_name', [ProductController::class,'size_name']);
+route::get('/product_size', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
 
 

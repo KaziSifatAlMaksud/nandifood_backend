@@ -51,6 +51,8 @@ class ProductController extends Controller
                 $product->sub_category2_name = Product_sub_category2::find($product->sub_category2)?->category_name ?? '';
                 $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
                 $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id ?? '';
+                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
+                $product->size_kg = Sizes::find($product->size)?->size_name ?? '';
                 return $product;
             });
 
@@ -379,7 +381,7 @@ class ProductController extends Controller
      }
 
      public function size_name(){
-        $size = Sizes::select('size_name')->get(); 
+        $size = Sizes::all(); 
 
         return response()->json([
         'status' => 200,
