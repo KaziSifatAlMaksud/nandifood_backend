@@ -10,6 +10,7 @@ use App\Http\Controllers\UomController;
 use App\Http\Controllers\HupuController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductPriceController;
 
 
 
@@ -76,6 +77,7 @@ Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 
 
+Route::post('price/upload-excel', [ProductPriceController::class, 'upload']);
 
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
@@ -146,6 +148,7 @@ Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 route::get('/size_name', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
+
 
 
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
