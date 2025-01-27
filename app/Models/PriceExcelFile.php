@@ -9,8 +9,7 @@ class PriceExcelFile extends Model
 {
     use HasFactory;
     protected $table = 'price_excel_file';
-    protected $primaryKey = 'id';
-
+     protected $primaryKey = 'id';
     protected $fillable = [
         'price_list_id',
         'price_list_name',
@@ -22,7 +21,5 @@ class PriceExcelFile extends Model
         'action',
         'file',
     ];
-
-    public $incrementing = true;
-    public $timestamps = true;
+        public $timestamps = false;
 }

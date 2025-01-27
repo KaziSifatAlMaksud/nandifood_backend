@@ -219,10 +219,43 @@ class ProductController extends Controller
             'eff_date' => 'nullable|string',
             'end_date' => 'nullable|string',
             'status' => 'nullable|string|max:50',
+            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
+            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
         ]);
 
         // Create the product
         $product = Product::create($validatedData);
+
+        // Handle image file (img1)
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $product->file_path = $path;
+            } else {
+                throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
+            }
+        }
+
+        // Handle barcode file (upc_barcode)
+        if ($request->hasFile('upc_barcode')) {
+            $file = $request->file('upc_barcode');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $product->upc_barcode_path = $path;  // Assuming you want to store the path in a different field
+            } else {
+                throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
+            }
+        }
+
+        // Save the product with the file paths if uploaded
+        $product->save();
 
         // Return a JSON response
         return response()->json([
@@ -230,15 +263,8 @@ class ProductController extends Controller
             'success' => 'Product created successfully.',
             'data' => $product,
         ], 201);
-        return response()->json([
-        'status' => 200,
-        'message' => 'Product categories fetched successfully.',
-        'result' => [
-            'data' => $product
-            ],
-        ]);
-
     }
+
 
     public function update(Request $request, $id)
     {
@@ -246,7 +272,7 @@ class ProductController extends Controller
             // Find the product by ID
             $product = Product::findOrFail($id);
 
-            // Validate the request
+            // Validate the request (including optional fields)
             $validatedData = $request->validate([
                 'p_sku_no' => 'nullable|string|max:50',
                 'p_long_name' => 'nullable|string|max:255',
@@ -269,10 +295,45 @@ class ProductController extends Controller
                 'eff_date' => 'nullable|string',
                 'end_date' => 'nullable|string',
                 'status' => 'nullable|string|max:50',
+                'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
+                'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
             ]);
 
             // Update the product with the validated data
             $product->update($validatedData);
+
+            // Handle image file (img1)
+            if ($request->hasFile('img1')) {
+                $file = $request->file('img1');
+                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+                $path = "uploads/products/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+                if ($uploaded) {
+                    // Update image path in the database
+                    $product->file_path = $path;
+                } else {
+                    throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
+                }
+            }
+
+            // Handle barcode file (upc_barcode)
+            if ($request->hasFile('upc_barcode')) {
+                $file = $request->file('upc_barcode');
+                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+                $path = "uploads/products/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+                if ($uploaded) {
+                    // Update barcode path in the database
+                    $product->upc_barcode_path = $path; // Assuming you want to store it in a different field
+                } else {
+                    throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
+                }
+            }
+
+            // Save the product with the updated file paths if uploaded
+            $product->save();
 
             // Return a success response
             return response()->json([
