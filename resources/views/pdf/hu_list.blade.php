@@ -176,7 +176,7 @@
             @foreach ($pu_lists as $pu_list)
             
             <tr>
-                <td class="uom-id">{{ $pu_list->uom_id }}</td>
+                <td class="uom-id">{{ $pu_list->hu_pu_id }}</td>
                 <td class="uom-name">{{ $uomNames[$pu_list->uom_type_id] ?? 'Unknown' }}</td>
                 <td class="description">{{ $pu_list->description }}</td>
                 <td class="inventory-uom">{{ $pu_list->inventory_uom }}</td>

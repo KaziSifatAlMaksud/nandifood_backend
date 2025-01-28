@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Uom;
+use App\Models\Uom_type;    
 use App\Models\Product_category;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product_sub_category1;
@@ -49,8 +50,20 @@ class ProductController extends Controller
                 $product->product_category_name = Product_category::find($product->product_category)?->category_name ?? '';
                 $product->sub_category1_name = Product_sub_category1::find($product->sub_category1)?->category_name ?? '';
                 $product->sub_category2_name = Product_sub_category2::find($product->sub_category2)?->category_name ?? '';
-                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id ?? '';
-                $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id ?? '';
+                
+
+                $product->default_sales_uom_name = Uom::find($product->default_sales_uom)?->uom_id 
+                ? Uom::find($product->default_sales_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->default_sales_uom)?->uom_type_id)?->uom_name 
+                : '';
+
+                $product->inventory_uom_name = Uom::find($product->inventory_uom)?->uom_id 
+                ? Uom::find($product->inventory_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->inventory_uom)?->uom_type_id)?->uom_name 
+                : '';
+           
+                $product->size_kg = Sizes::find($product->size)?->size_kg ?? '';
+                $product->size_lb = Sizes::find($product->size)?->size_lb ?? '';
                 return $product;
             });
 
@@ -206,10 +219,43 @@ class ProductController extends Controller
             'eff_date' => 'nullable|string',
             'end_date' => 'nullable|string',
             'status' => 'nullable|string|max:50',
+            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
+            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
         ]);
 
         // Create the product
         $product = Product::create($validatedData);
+
+        // Handle image file (img1)
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $product->img1 = $path;
+            } else {
+                throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
+            }
+        }
+
+        // Handle barcode file (upc_barcode)
+        if ($request->hasFile('upc_barcode')) {
+            $file = $request->file('upc_barcode');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $product->upc_barcode = $path;  // Assuming you want to store the path in a different field
+            } else {
+                throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
+            }
+        }
+
+        // Save the product with the file paths if uploaded
+        $product->save();
 
         // Return a JSON response
         return response()->json([
@@ -217,15 +263,8 @@ class ProductController extends Controller
             'success' => 'Product created successfully.',
             'data' => $product,
         ], 201);
-        return response()->json([
-        'status' => 200,
-        'message' => 'Product categories fetched successfully.',
-        'result' => [
-            'data' => $product
-            ],
-        ]);
-
     }
+
 
     public function update(Request $request, $id)
     {
@@ -233,7 +272,7 @@ class ProductController extends Controller
             // Find the product by ID
             $product = Product::findOrFail($id);
 
-            // Validate the request
+            // Validate the request (including optional fields)
             $validatedData = $request->validate([
                 'p_sku_no' => 'nullable|string|max:50',
                 'p_long_name' => 'nullable|string|max:255',
@@ -256,10 +295,45 @@ class ProductController extends Controller
                 'eff_date' => 'nullable|string',
                 'end_date' => 'nullable|string',
                 'status' => 'nullable|string|max:50',
+                'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
+                'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
             ]);
 
             // Update the product with the validated data
             $product->update($validatedData);
+
+            // Handle image file (img1)
+            if ($request->hasFile('img1')) {
+                $file = $request->file('img1');
+                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+                $path = "uploads/products/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+                if ($uploaded) {
+                    // Update image path in the database
+                    $product->img1 = $path;
+                } else {
+                    throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
+                }
+            }
+
+            // Handle barcode file (upc_barcode)
+            if ($request->hasFile('upc_barcode')) {
+                $file = $request->file('upc_barcode');
+                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+                $path = "uploads/products/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+                if ($uploaded) {
+                    // Update barcode path in the database
+                    $product->upc_barcode = $path; // Assuming you want to store it in a different field
+                } else {
+                    throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
+                }
+            }
+
+            // Save the product with the updated file paths if uploaded
+            $product->save();
 
             // Return a success response
             return response()->json([
@@ -294,7 +368,8 @@ class ProductController extends Controller
             $product->default_sales_uom_name = Uom::find($id)?->uom_id ?? '';
             $product->inventory_uom_name = Uom::find($id)?->uom_id ?? '';
             $product->product_manager_name = Employee::find($id)?->first_name . ' ' . Employee::find($id)?->middle_name . ' ' . Employee::find($id)?->last_name ?? null;
-
+            $product->img1 = $product->img1 ? Storage::disk('spaces')->url($product->img1) : null;
+            $product->upc_barcode = $product->upc_barcode ? Storage::disk('spaces')->url($product->upc_barcode) : null;
             return response()->json([
                 'status' => 200,
                 'success' => true,
@@ -379,7 +454,7 @@ class ProductController extends Controller
      }
 
      public function size_name(){
-        $size = Sizes::select('size_name')->get(); 
+        $size = Sizes::all(); 
 
         return response()->json([
         'status' => 200,
