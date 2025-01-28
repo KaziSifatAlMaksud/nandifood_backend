@@ -119,7 +119,7 @@
         <table style="border: none; width: 100%; border-collapse: collapse;">
             <tr style="border: none;">
                 <td style="border: none; text-align:start;">
-                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Company Logo" class="logo">
+                   <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
                 </td>
                 <td style="border: none; " colspan="5">
                     <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>

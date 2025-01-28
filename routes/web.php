@@ -66,11 +66,10 @@ Route::get('/uom-list-view', function () {
 
 });
 
-// Route::get('/employee-list-view', function () {
+Route::get('/employee-list-view', function () {
    
-//         return view('pdf.employee_list', ['employees' => $employees]);
-
-// });
+        return view('pdf.product_list', ['employees' => $employees]);
+});
 
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);

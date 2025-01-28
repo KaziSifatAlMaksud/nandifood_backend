@@ -250,8 +250,6 @@ public function index(Request $request)
     public function update(Request $request, $id)
     {
         $employee = Employee::find($id);
-
-        // Check if the employee exists
         if (!$employee) {
             return response()->json([
                 'status' => 404,

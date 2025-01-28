@@ -117,7 +117,7 @@
 
     <header>
         <!-- Company Logo -->
-        <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Company Logo" class="logo">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
         <h1>{{ $title }}</h1>
     </header>
 

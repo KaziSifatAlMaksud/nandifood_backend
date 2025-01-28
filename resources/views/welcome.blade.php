@@ -53,7 +53,7 @@
 </head>
 <body>
     <div class="container">
-        <img src="{{ asset('storage/company-logo.png') }}" alt="Company Logo" class="logo">
+        <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Company Logo" class="logo">
         <h1 class="title">Welcome to NandiFoods</h1>
         <p class="message">Server is Successfully Connected</p>
     </div>

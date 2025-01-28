@@ -57,7 +57,7 @@
 <div class="container">
    <header>
         <!-- Company Logo -->
-        <img src="{{ asset('$imageSrc') }}" alt="Company Logo" class="logo">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
         <h3>{{ $title }}</h3>
         {{-- <p>{{ $company_name }} | {{ $company_contact }}</p>  <!-- Uncomment this to show company details --> --}}
     </header>

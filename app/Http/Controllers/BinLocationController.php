@@ -214,7 +214,7 @@ public function update(Request $request, $id)
     DB::beginTransaction(); // Start the transaction
 
     try {
-        // Find the BinLocation by ID
+        // Find the BinLocation record
         $binlocation = BinLocation::find($id);
         if (!$binlocation) {
             return response()->json([
@@ -224,74 +224,69 @@ public function update(Request $request, $id)
             ], 404);
         }
 
-        // Prepare the data to be updated
-        $data = $request->all();
+        // Update all request data except file fields
+        $binlocation->fill($request->except(['file', 'bin_image', 'bin_barcode_img']));
 
-        // Handle file upload for 'file' field (general file)
+        // Handle file upload for 'file'
         if ($request->hasFile('file')) {
+            // Delete old file if it exists
             if ($binlocation->file && Storage::disk('spaces')->exists($binlocation->file)) {
                 Storage::disk('spaces')->delete($binlocation->file);
             }
 
+            // Upload new file
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = "uploads/warehouse_file/{$fileName}";
-            $uploaded = Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
-            
-            if ($uploaded) {
-                $data['file'] = $filePath;  // Update the file path in the data array
-            }
+            Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
+            $binlocation->file = $filePath;
         }
+
+        // Handle file upload for 'bin_image'
         if ($request->hasFile('bin_image')) {
-            // Delete the old bin image from DigitalOcean Spaces if it exists
+            // Delete old image if it exists
             if ($binlocation->bin_image && Storage::disk('spaces')->exists($binlocation->bin_image)) {
                 Storage::disk('spaces')->delete($binlocation->bin_image);
             }
+
+            // Upload new bin image
             $binImage = $request->file('bin_image');
             $binImageName = time() . '_' . $binImage->getClientOriginalName();
             $binImagePath = "uploads/warehouse_file/{$binImageName}";
-            $uploaded = Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
-            
-            if ($uploaded) {
-                $data['bin_image'] = $binImagePath;
-            }
+            Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
+            $binlocation->bin_image = $binImagePath;
         }
 
+        // Handle file upload for 'bin_barcode_img'
         if ($request->hasFile('bin_barcode_img')) {
-            // Delete the old barcode image from DigitalOcean Spaces if it exists
+            // Delete old barcode image if it exists
             if ($binlocation->bin_barcode_img && Storage::disk('spaces')->exists($binlocation->bin_barcode_img)) {
                 Storage::disk('spaces')->delete($binlocation->bin_barcode_img);
             }
 
-            // Upload new barcode image to DigitalOcean Spaces
+            // Upload new barcode image
             $barcodeImage = $request->file('bin_barcode_img');
             $barcodeImageName = time() . '_' . $barcodeImage->getClientOriginalName();
             $barcodeImagePath = "uploads/warehouse_file/{$barcodeImageName}";
-            $uploaded = Storage::disk('spaces')->put($barcodeImagePath, file_get_contents($barcodeImage), ['visibility' => 'public']);
-            
-            if ($uploaded) {
-                $data['bin_barcode_img'] = $barcodeImagePath;  // Update the barcode image path in the data array
-            }
+            Storage::disk('spaces')->put($barcodeImagePath, file_get_contents($barcodeImage), ['visibility' => 'public']);
+            $binlocation->bin_barcode_img = $barcodeImagePath;
         }
 
-        // Update the BinLocation with the new data
-        $binlocation->update($data);
+        // Save updated data
+        $binlocation->save();
 
-        // Commit the transaction if everything is successful
-        DB::commit();
+        DB::commit(); // Commit the transaction
 
         // Return a successful response
         return response()->json([
             'status' => 200,
-            'message' => 'Update successful.',
-            'result' => [
-                'data' => $binlocation,
-            ],
+            'message' => 'Binlocation Update successful.',
+            'result' => $binlocation,
         ], 200);
     } catch (\Exception $e) {
-        // If an exception occurs, rollback the transaction
-        DB::rollback();
+        DB::rollback(); // Rollback the transaction
 
+        // Return an error response
         return response()->json([
             'status' => 500,
             'success' => false,
@@ -300,31 +295,6 @@ public function update(Request $request, $id)
         ], 500);
     }
 }
-
-
-/*
-public function update(Request $request, $id)
-{
-    $binlocation = BinLocation::find($id);
-    if (!$binlocation) {
-        return response()->json([
-            'status' => 404,
-            'success' => false,
-            'message' => 'Bin location not found.',
-        ], 404);
-    }
-    // Update the BinLocation with the validated data
-    $binlocation->update($request->all());
-
-    // Return a successful response
-    return response()->json([
-        'status' => 200,
-        'message' => 'Update Ok.!',
-        'result' => [
-            'data' => $binlocation,
-        ],
-    ], 200);
-} */
 
 
 public function store(Request $request)
@@ -341,11 +311,7 @@ public function store(Request $request)
                 $file = $request->file('file');
                 $fileName = time() . '_' . $file->getClientOriginalName(); 
                 $path = "uploads/warehouse_file/{$fileName}";
-                
-                // Upload the file to DigitalOcean Spaces using 'put' method
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-                
-                // If upload was successful, set the file path
                 if ($uploaded) {
                     $data['file'] = $path;  // Save the correct file path
                 }

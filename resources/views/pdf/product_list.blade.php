@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nandi Foods - All Employee List</title>
+    <title>Nandi Foods - All Product List</title>
     <style>
         body {
             font-family: "Times New Roman", sans-serif;
@@ -132,20 +132,25 @@
     <table>
         <thead>
             <tr>
-                <th class="uom-id" width="2%">SI</th>
-                <th class="uom-name" width="5%">Employee ID</th>
-                <th class="description" width="5%">First Name</th>
-                <th class="hu_long_name" width="5%">Middle Name</th>
-                <th class="production-uom" width="5%">Last Name</th>
-                <th class="purchase-uom" width="5%">Position</th>     
-                <th class="sales-uom" width="5%">Country</th>
-                <th class="sales-uom" width="5%">State</th>
-                <th class="sales-uom" width="5%">City</th>
-                <th class="sales-uom" width="15%">Warehouse</th>
-                <th class="sales-uom" width="12%">Email</th>
-                <th class="purchase-uom" width="10%">Office Phone</th>     
-                <th class="sales-uom" width="10%">Mobile</th>
+                <th class="uom-id" colspan="2" width="2%">SI</th>
+                <th class="uom-name"  colspan="2" width="5%">Country</th>
+                <th class="description" colspan="2" width="5%">State</th>
+                <th class="hu_long_name" colspan="2" width="5%">City</th>
+                <th class="production-uom" colspan="2" width="5%">Warehouse</th>
+                <th class="purchase-uom"  colspan="2" width="5%">Defult Warehouse</th>     
+                <th class="sales-uom" colspan="2" width="5%">SKU</th>
+                <th class="sales-uom" colspan="2" width="5%">UPC</th>
+                <th class="sales-uom" colspan="2" width="5%">Product Name</th>
+                <th class="sales-uom" colspan="2" width="15%">Category</th>
+                <th class="sales-uom" colspan="2" width="12%">Sub-Category</th>
+                <th class="purchase-uom" colspan="2" width="10%">Sub-Category 1</th>    
+                <th class="purchase-uom" colspan="2" width="10%">Sub-Category 2</th>      
+                <th class="sales-uom" width="10%" rowspan="5">Inventory UOM</th>
+                <th class="sales-uom" colspan="2" width="10%">sales UOM 1 </th>
+                <th class="sales-uom" colspan="2" width="10%">On Hand Qty</th>
+                 <th class="sales-uom" colspan="2" width="10%">Sales UOM 2 </th>
             </tr>
+           
             
         </thead>
         <tbody>
