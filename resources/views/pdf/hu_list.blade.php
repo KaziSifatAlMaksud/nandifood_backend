@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $title }}</title>
+    {{-- <title>{{ $title }}</title> --}}
     <style>
         body {
             font-family: "Times New Roman", sans-serif;
@@ -116,12 +116,22 @@
 <div class="container">
 
     <header>
-        <!-- Company Logo -->
-        <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Company Logo" class="logo">
-        <h1>{{ $title }}</h1>
+        <table style="border: none; width: 100%; border-collapse: collapse;">
+            <tr style="border: none;">
+                <td style="border: none; text-align:start;">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Company Logo" class="logo">
+                </td>
+                <td style="border: none; " colspan="5">
+                    <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
+                    <p style="line-height: 0.5;">A Passion for Good Food</p>
+                    {{-- <h1 style="font-size: 18px; line-height: 2;">{{ $title }}</h1> --}}
+                </td>                
+            </tr>
+        </table>
     </header>
+    
 
-    <h4>Date: {{ $date }}</h4>
+    {{-- <h4>Date: {{ $date }}</h4> --}}
 
     @php
         // Mapping of id to uom_name
@@ -136,55 +146,62 @@
             8 => "TEU"
         ];
     @endphp
-
+    {{ $pu_lists }}
     <table>
         <thead>
             <tr>
-                <th class="uom-id">UOM ID</th>
-                <th class="uom-name">UOM Name</th>
+                <th class="uom-id">HU ID</th>
+                <th class="uom-name">HU Name</th>
                 <th class="description">Description</th>
-                <th class="inventory-uom">Inventory UOM</th>
-                <th class="production-uom">Production UOM</th>
-                <th class="purchase-uom">Purchase UOM</th>
-                <th class="sales-uom">Sales UOM</th>
-                <th class="unit">Unit</th>
-                <th class="right-align">Length</th>
-                <th class="right-align">Width</th>
-                <th class="right-align">Height</th>
-                <th class="right-align">Weight</th>
-                <th class="right-align">Bulk Code</th>
+                <th class="hu_long_name">HU Long Name</th>
+                <th class="production-uom">HU Short Name</th>
+                <th class="purchase-uom">Leanth (CM)</th>     
+                <th class="sales-uom">Weith (CM)</th>
+                <th class="sales-uom">Hight (CM)</th>
+                <th class="sales-uom">Volume (M <sub>3</sub>)</th>
+                <th class="sales-uom">Minimum Weight</th>
+                <th class="sales-uom">Maximum Weight</th>
+                <th class="purchase-uom">Leanth (IN)</th>     
+                <th class="sales-uom">Weith (IN)</th>
+                <th class="sales-uom">Hight (IN)</th>
+                <th class="sales-uom">Volume (FT <sub>3</sub>)</th>
+                <th class="center-align">Maximum Weight</th>
+                <th class="center-align">Maximum Weight</th>
+                <th class="center-align">SLP</th>
+                <th class="center-align">Bulk Code</th>
             </tr>
             
         </thead>
         <tbody>
-            @foreach ($result as $uom)
+            @foreach ($pu_lists as $pu_list)
             
             <tr>
-                <td class="uom-id">{{ $uom->uom_id }}</td>
-                <td class="uom-name">{{ $uomNames[$uom->uom_type_id] ?? 'Unknown' }}</td>
-                <td class="description">{{ $uom->description }}</td>
-                <td class="inventory-uom">{{ $uom->inventory_uom }}</td>
-                <td class="production-uom">{{ $uom->production_uom }}</td>
-                <td class="purchase-uom">{{ $uom->purchase_uom }}</td>
-                <td class="sales-uom">{{ $uom->sales_uom }}</td>
+                <td class="uom-id">{{ $pu_list->uom_id }}</td>
+                <td class="uom-name">{{ $uomNames[$pu_list->uom_type_id] ?? 'Unknown' }}</td>
+                <td class="description">{{ $pu_list->description }}</td>
+                <td class="inventory-uom">{{ $pu_list->inventory_uom }}</td>
+                <td class="production-uom">{{ $pu_list->production_uom }}</td>
+                <td class="purchase-uom">{{ $pu_list->purchase_uom }}</td>
+                <td class="sales-uom">{{ $pu_list->sales_uom }}</td>
                 <td class="unit">
-                    @if ($uom->unit == 0)
+                    @if ($pu_list->unit == 0)
                         Matrix
-                    @elseif ($uom->unit == 1)
+                    @elseif ($pu_list->unit == 1)
                         Imperial
                     @else
                         Unknown
                     @endif
                 </td>
-                <td class="right-align">{{ $uom->uom_length }}</td>
-                <td class="right-align">{{ $uom->uom_width }}</td>
-                <td class="right-align">{{ $uom->uom_height }}</td>
-                <td class="right-align">{{ $uom->weight }}</td>
-                <td class="right-align">{{ $uom->bulk_code }}</td>
+                <td class="right-align">{{ $pu_list->uom_length }}</td>
+                <td class="right-align">{{ $pu_list->uom_width }}</td>
+                <td class="right-align">{{ $pu_list->uom_height }}</td>
+                <td class="right-align">{{ $pu_list->weight }}</td>
+                <td class="right-align">{{ $pu_list->bulk_code }}</td>
             </tr>
             @endforeach            
         </tbody>
     </table>
+    {{-- <h4 class="center-align">Printed By: {{ $date }}</h4> --}}
 </div>
 
 </body>
