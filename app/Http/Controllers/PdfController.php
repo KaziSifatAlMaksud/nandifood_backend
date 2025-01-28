@@ -8,6 +8,8 @@ use App\Models\Warehouse;
 use App\Models\Uom;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Models\Employee;
+use App\Models\Positions;
 
 
 class PdfController extends Controller
@@ -135,6 +137,20 @@ class PdfController extends Controller
     }
 }
 
+    public function employee_list_pdf()
+    {
+        // Get the employee data with necessary joins
+        $employees = Employee::query()
+            ->leftJoin('positions', 'employee.position_id', '=', 'positions.id')
+            ->leftJoin('warehouse', 'employee.warehouse_id', '=', 'warehouse.id')
+            ->select('employee.*', 'positions.position_name as position_name', 'warehouse.warehouse_name as warehouse_name')
+            ->get();
+
+        $pdf = PDF::loadView('pdf.employee_list', ['employees' => $employees]);
+
+        // Download the generated PDF
+        return $pdf->download('employee_list.pdf');
+    }
 
 
     

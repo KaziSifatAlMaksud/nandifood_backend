@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfController;
 use App\Models\Hupu;
 use App\Models\Uom_type;
+use App\Models\Employee;
+use App\Models\Positions;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -63,8 +66,15 @@ Route::get('/uom-list-view', function () {
 
 });
 
+// Route::get('/employee-list-view', function () {
+   
+//         return view('pdf.employee_list', ['employees' => $employees]);
+
+// });
+
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
 route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
 route::get('/hu/downloadpdf', [PdfController::class, 'hu_list_pdf'] );
 route::get('/pu/downloadpdf', [PdfController::class, 'pu_list_pdf'] );
+route::get('/employee/downloadpdf', [PdfController::class, 'employee_list_pdf'] );
