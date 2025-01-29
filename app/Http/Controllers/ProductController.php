@@ -309,7 +309,7 @@ class ProductController extends Controller
             }
 
             // Update only the fields provided in the request
-            $product->update($validatedData);
+            $product->save($validatedData);
 
             return response()->json([
                 'status' => 200,
