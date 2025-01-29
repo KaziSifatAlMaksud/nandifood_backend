@@ -152,13 +152,13 @@ route::get('/uom_name',[UomController::class, 'uom_name']);
 
 
 
-// route::get('/country_name',[WarehouseController::class, 'getCountries']);
-// Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
-// Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
+route::get('/country_name',[WarehouseController::class, 'getCountries']);
+Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
+Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 
 
-Route::middleware('cors')->get('/country_name',[WarehouseController::class, 'getCountries']);
-Route::middleware('cors')->get('/states/{countryName}', [WarehouseController::class, 'getStates']);
-Route::middleware('cors')->get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
+// Route::middleware('cors')->get('/country_name',[WarehouseController::class, 'getCountries']);
+// Route::middleware('cors')->get('/states/{countryName}', [WarehouseController::class, 'getStates']);
+// Route::middleware('cors')->get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
