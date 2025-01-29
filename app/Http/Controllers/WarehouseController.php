@@ -89,38 +89,96 @@ public function getCountries()
 }
 
 
+    // public function getStates($countryName)
+    // {
+    //     // Fetch distinct states for the specified country
+    // $distinctStates = Country::where('country', $countryName)
+    //     ->selectRaw('MIN(id) as id, state as name')
+    //     ->groupBy('state')
+    //     ->get();
+
+
+
+    //     // Check if there are any states
+    //     if ($distinctStates->isEmpty()) {
+    //         return response()->json([
+    //             'status' => '404',
+    //             'message' => 'No states found for the specified country.',
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'status' => '200',
+    //         'message' => 'Ok',
+    //         'result' => [
+    //             'data' => $distinctStates
+    //         ]
+    //     ]);
+    // }
+
     public function getStates($countryName)
-    {
-        // Fetch distinct states for the specified country
+{
+    // Fetch distinct states for the specified country
     $distinctStates = Country::where('country', $countryName)
         ->selectRaw('MIN(id) as id, state as name')
         ->groupBy('state')
         ->get();
 
-
-
-        // Check if there are any states
-        if ($distinctStates->isEmpty()) {
-            return response()->json([
-                'status' => '404',
-                'message' => 'No states found for the specified country.',
-            ]);
-        }
-
+    // Check if there are any states
+    if ($distinctStates->isEmpty()) {
         return response()->json([
-            'status' => '200',
-            'message' => 'Ok',
-            'result' => [
-                'data' => $distinctStates
-            ]
-        ]);
+            'status' => '404',
+            'message' => 'No states found for the specified country.'
+        ], 404)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
 
+    // Return states if found
+    return response()->json([
+        'status' => '200',
+        'message' => 'States retrieved successfully.',
+        'result' => [
+            'data' => $distinctStates
+        ]
+    ], 200)
+    ->header('Access-Control-Allow-Origin', '*')
+    ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
 
+
+
+
+// public function getCities($stateName)
+// {
+//       $distinctCities = Country::where('state', $stateName)
+//         ->selectRaw('MIN(id) as id, city as name')
+//         ->groupBy('city')
+//         ->get();
+
+//     // Check if cities were found
+//     if ($distinctCities->isEmpty()) {
+//         return response()->json([
+//             'status' => '404',
+//             'message' => 'No cities found for the specified state.',
+//         ]);
+//     }
+
+//     return response()->json([
+//         'status' => '200',
+//         'message' => 'Ok',
+//         'result' => [
+//                     'data' =>$distinctCities
+//         ]
+//     ]);
+// }
 
 public function getCities($stateName)
 {
-      $distinctCities = Country::where('state', $stateName)
+    // Retrieve distinct cities for the given state
+    $distinctCities = Country::where('state', $stateName)
         ->selectRaw('MIN(id) as id, city as name')
         ->groupBy('city')
         ->get();
@@ -129,18 +187,26 @@ public function getCities($stateName)
     if ($distinctCities->isEmpty()) {
         return response()->json([
             'status' => '404',
-            'message' => 'No cities found for the specified state.',
-        ]);
+            'message' => 'No cities found for the specified state.'
+        ], 404)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
 
+    // Return cities if found
     return response()->json([
         'status' => '200',
-        'message' => 'Ok',
+        'message' => 'Cities retrieved successfully.',
         'result' => [
-                    'data' =>$distinctCities
+            'data' => $distinctCities
         ]
-    ]);
+    ], 200)
+    ->header('Access-Control-Allow-Origin', '*')
+    ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
+
 
 
 public function getEmployee($warehouse_id)
