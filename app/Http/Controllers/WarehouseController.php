@@ -73,19 +73,36 @@ public function country()
     ]);
 }
 
+
 public function getCountries()
 {
+    // Fetch distinct countries
     $distinctCountries = Country::selectRaw('MIN(id) as id, country as name')
         ->groupBy('country')
         ->get();
 
+    // Check if there are any countries
+    if ($distinctCountries->isEmpty()) {
+        return response()->json([
+            'status' => '404',
+            'message' => 'No countries found.'
+        ], 404)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    }
+
+    // Return countries if found
     return response()->json([
         'status' => '200',
-        'message' => 'Ok',
+        'message' => 'Countries retrieved successfully.',
         'result' => [
             'data' => $distinctCountries
         ]
-    ]);
+    ], 200)
+    ->header('Access-Control-Allow-Origin', '*')
+    ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
 
