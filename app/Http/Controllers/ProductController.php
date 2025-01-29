@@ -269,10 +269,10 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            // Find the product by ID
+            // Find the product or return a 404 error
             $product = Product::findOrFail($id);
 
-            // Validate the request (including optional fields)
+            // Validate incoming request
             $validatedData = $request->validate([
                 'p_sku_no' => 'nullable|string|max:50',
                 'p_long_name' => 'nullable|string|max:255',
@@ -288,72 +288,62 @@ class ProductController extends Controller
                 'product_cert3' => 'nullable|string|max:255',
                 'product_upc' => 'nullable|string|max:50',
                 'default_warehouse' => 'nullable|string|max:100',
-                 'country' => 'nullable|string|max:100',
+                'country' => 'nullable|string|max:100',
                 'state' => 'nullable|string|max:100',
                 'city' => 'nullable|string|max:100',   
                 'product_manager' => 'nullable|string|max:100',
-                'eff_date' => 'nullable|string',
-                'end_date' => 'nullable|string',
+                'eff_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
                 'status' => 'nullable|string|max:50',
-                'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
-                'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', // Added image validation
+                'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+                'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
-            // Update the product with the validated data
+            // Handle file uploads using a helper function
+            if ($request->hasFile('img1')) {
+                $validatedData['img1'] = $this->uploadFile($request->file('img1'), 'uploads/products');
+            }
+
+            if ($request->hasFile('upc_barcode')) {
+                $validatedData['upc_barcode'] = $this->uploadFile($request->file('upc_barcode'), 'uploads/barcodes');
+            }
+
+            // Update only the fields provided in the request
             $product->update($validatedData);
 
-            // Handle image file (img1)
-            if ($request->hasFile('img1')) {
-                $file = $request->file('img1');
-                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
-                $path = "uploads/products/{$fileName}";
-                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-
-                if ($uploaded) {
-                    // Update image path in the database
-                    $product->img1 = $path;
-                } else {
-                    throw new \Exception('Failed to upload image to DigitalOcean Spaces.');
-                }
-            }
-
-            // Handle barcode file (upc_barcode)
-            if ($request->hasFile('upc_barcode')) {
-                $file = $request->file('upc_barcode');
-                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
-                $path = "uploads/products/{$fileName}";
-                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-
-                if ($uploaded) {
-                    // Update barcode path in the database
-                    $product->upc_barcode = $path; // Assuming you want to store it in a different field
-                } else {
-                    throw new \Exception('Failed to upload barcode to DigitalOcean Spaces.');
-                }
-            }
-
-            // Save the product with the updated file paths if uploaded
-            $product->save();
-
-            // Return a success response
             return response()->json([
                 'status' => 200,
                 'message' => 'Product updated successfully.',
                 'data' => $product,
             ]);
+
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Handle the case where the product is not found
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found.',
             ], 404);
         } catch (\Exception $e) {
-            // Catch any other exceptions and return an error response
             return response()->json([
                 'status' => 500,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Helper function to upload files to DigitalOcean Spaces.
+     */
+    private function uploadFile($file, $folder)
+    {
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $path = "{$folder}/{$fileName}";
+        $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), 'public');
+
+        if ($uploaded) {
+            return $path;
+        }
+
+        throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
     }
 
 

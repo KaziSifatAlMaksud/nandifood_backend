@@ -70,11 +70,17 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 //download PDF route
 // route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
 route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_excel']);
+
+
+
+
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 //csv file export 
 
 Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
+Route::get('/hu/excel/export', [HupuController::class, 'hu_export']);
+
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 
 
