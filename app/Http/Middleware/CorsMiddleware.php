@@ -7,29 +7,23 @@ use Illuminate\Http\Request;
 
 class CorsMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next)
     {
-        // Allow all origins (use specific domains for production if needed)
-        $response = $next($request);
+        // Add the necessary CORS headers
+        $headers = [
+            'Access-Control-Allow-Origin' => '*', // Or set a specific domain
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With',
+            'Access-Control-Allow-Credentials' => 'true',
+        ];
 
-        // Set CORS headers
-        $response->headers->set('Access-Control-Allow-Origin', '*'); // Allow all origins, or specify your domain
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-
-        // Handle preflight OPTIONS request
-        if ($request->getMethod() == "OPTIONS") {
-            return response()->json('OK', 200);
+        // Handle preflight requests
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('', 200, $headers);
         }
 
-        return $response;
+        // Continue with the request and add CORS headers
+        $response = $next($request);
+        return $response->withHeaders($headers);
     }
 }
