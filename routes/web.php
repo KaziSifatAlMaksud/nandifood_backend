@@ -41,17 +41,25 @@ Route::get('/uom-list-view', function () {
             $pu_list->hu_pu_type_name = Uom_type::where('id', $pu_list->hu_pu_type)->value('uom_name');
 
             // Add dimensions and weights in both units (cm and inches)
-            $is_cm = $pu_list->unit == 0; // 0 for cm, 1 for inches
-            $pu_list->length_cm = $is_cm ? $pu_list->length : null;
-            $pu_list->width_cm = $is_cm ? $pu_list->width : null;
-            $pu_list->height_cm = $is_cm ? $pu_list->height : null;
-            $pu_list->min_weight_kg = $is_cm ? $pu_list->min_weight : null;
-            $pu_list->max_weight_kg = $is_cm ? $pu_list->max_weight : null;
-            $pu_list->length_in = !$is_cm ? $pu_list->length : null;
-            $pu_list->width_in = !$is_cm ? $pu_list->width : null;
-            $pu_list->height_in = !$is_cm ? $pu_list->height : null;
-            $pu_list->min_weight_lb = !$is_cm ? $pu_list->min_weight : null;
-            $pu_list->max_weight_lb = !$is_cm ? $pu_list->max_weight : null;
+          $is_cm = $pu_list->unit == 0; // 0 for cm/kg, 1 for inches/lb
+
+        // Metric values (if unit is cm/kg)
+          $pu_list->length_cm = $is_cm ? $pu_list->length : round($pu_list->length * 2.54, 2);
+          $pu_list->width_cm = $is_cm ? $pu_list->width : round($pu_list->width * 2.54, 2);
+          $pu_list->height_cm = $is_cm ? $pu_list->height : round($pu_list->height * 2.54, 2);
+          $pu_list->min_weight_kg = $is_cm ? $pu_list->min_weight : round($pu_list->min_weight * 0.453592, 2);
+          $pu_list->max_weight_kg = $is_cm ? $pu_list->max_weight : round($pu_list->max_weight * 0.453592, 2);
+
+        // Imperial values (if unit is inches/lb)
+          $pu_list->length_in = !$is_cm ? $pu_list->length : round($pu_list->length / 2.54, 2);
+          $pu_list->width_in = !$is_cm ? $pu_list->width : round($pu_list->width / 2.54, 2);
+          $pu_list->height_in = !$is_cm ? $pu_list->height : round($pu_list->height / 2.54, 2);
+          $pu_list->min_weight_lb = !$is_cm ? $pu_list->min_weight : round($pu_list->min_weight / 0.453592, 2);
+          $pu_list->max_weight_lb = !$is_cm ? $pu_list->max_weight : round($pu_list->max_weight / 0.453592, 2);
+
+        // Volume Calculation (Cubic Feet)
+        $volume_cm3 = $pu_list->length_cm * $pu_list->width_cm * $pu_list->height_cm;
+        $pu_list->volume_ft3 = round($volume_cm3 / 28316.8466, 2); // Convert cm³ to ft³
 
             // Add additional details (assuming fullName is a method in your Hupu model)
             $result = Hupu::fullName($pu_list->id);
@@ -65,6 +73,9 @@ Route::get('/uom-list-view', function () {
         return view('pdf.hu_list', ['pu_lists' => $pu_lists]);
 
 });
+
+
+
 
 Route::get('/employee-list-view', function () {
    

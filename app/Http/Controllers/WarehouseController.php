@@ -459,10 +459,7 @@ public function store(Request $request)
             'errors' => $e->errors(),
         ], 422);
     } catch (\Exception $e) {
-        // Rollback the transaction in case of any error
         DB::rollBack();
-
-        // Return a response with the exception message
         return response()->json([
             'status' => 500,
             'error' => $e->getMessage(),

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nandi Foods - HU List</title>
+    <title>Nandi Foods - PU List</title>
     <style>
         body {
             font-family: "Times New Roman", sans-serif;
@@ -121,12 +121,13 @@
         <table style="border: none; width: 100%; border-collapse: collapse;">
             <tr style="border: none;">
                 <td style="border: none; text-align:start;">
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
-                </td>
+                        <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
+                    </td>
+
                 <td style="border: none; " colspan="5">
                     <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
                     <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;"> Handling Unit (HU) List </h1>
+                    <h1 style="font-size: 18px; line-height: 2;"> Purchase Unit (PU) List </h1>
                 </td>                
             </tr>
         </table>
@@ -164,7 +165,7 @@
              @php
                     $i = 0;
             @endphp
-            @foreach ($hu_lists as $pu_list)
+            @foreach ($pu_lists as $pu_list)
            
             <tr>
                 <td>{{ ++$i }}</td>
