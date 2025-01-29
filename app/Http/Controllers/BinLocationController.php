@@ -212,7 +212,9 @@ public function edit($id)
 public function update(Request $request, $id)
 {
     DB::beginTransaction(); // Start the transaction
-
+    return response()->json([
+        'request_data' => $request->img1,
+    ]);
     try {
         // Find the BinLocation record
         $binlocation = BinLocation::find($id);
