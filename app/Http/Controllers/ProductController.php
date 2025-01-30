@@ -267,58 +267,65 @@ class ProductController extends Controller
     }
 
 
- 
     public function update2(Request $request, $id)
 {
-     return response()->json([
-        'request_data' => $request,
-    ]);
+    try {
+        // Find the product or return a 404 error
+        $product = Product::findOrFail($id);
+        $product->fill($request->except(['img1', 'upc_barcode']));
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = $file->getClientOriginalName();
+            $path = "uploads/products/{$fileName}";
+            if (!empty($product->img1)) {
+                Storage::disk('spaces')->delete($product->img1);
+            }
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+            if ($uploaded) {
+                $product->img1 = $path;
+            } else {
+                throw new \Exception('Failed to upload img1 to DigitalOcean Spaces.');
+            }
+        }
+        if ($request->hasFile('upc_barcode')) {
+            $file = $request->file('upc_barcode');
+            $fileName = $file->getClientOriginalName();
+            $path = "uploads/barcodes/{$fileName}";
 
-    // try {
-    //     // Find the product or return a 404 error
-    //     $product = Product::findOrFail($id);
-    //     echo $product; die();
+            // Delete old barcode if exists
+            if (!empty($product->upc_barcode)) {
+                Storage::disk('spaces')->delete($product->upc_barcode);
+            }
 
-    //     $product->fill($validatedData);
+            // Upload new barcode to DigitalOcean Spaces
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+            if ($uploaded) {
+                $product->upc_barcode = $path;
+            } else {
+                throw new \Exception('Failed to upload upc_barcode to DigitalOcean Spaces.');
+            }
+        }
+        $product->save();
 
-    //     if ($request->hasFile('img1')) {
-    //         if ($product->img1) {
-    //             Storage::disk('spaces')->delete($product->img1);
-    //         }
-    //         // Upload new image
-    //         $product->img1 = $this->uploadFile($request->file('img1'), 'uploads/products');
-    //     }
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product updated successfully.',
+            'data' => $product,
+        ]);
 
-    //     // Handle image upload for 'upc_barcode'
-    //     if ($request->hasFile('upc_barcode')) {
-    //         // Delete old barcode if exists
-    //         if ($product->upc_barcode) {
-    //             Storage::disk('spaces')->delete($product->upc_barcode);
-    //         }
-    //         // Upload new barcode
-    //         $product->upc_barcode = $this->uploadFile($request->file('upc_barcode'), 'uploads/barcodes');
-    //     }
-
-    //     $product->save();
-
-    //     return response()->json([
-    //         'status' => 200,
-    //         'message' => 'Product updated.',
-    //         'data' => $product,
-    //     ]);
-
-    // } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-    //     return response()->json([
-    //         'status' => 404,
-    //         'message' => 'Product not found.',
-    //     ], 404);
-    // } catch (\Exception $e) {
-    //     return response()->json([
-    //         'status' => 500,
-    //         'message' => 'An error occurred: ' . $e->getMessage(),
-    //     ], 500);
-    // }
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'status' => 404,
+            'message' => 'Product not found.',
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'message' => 'An error occurred: ' . $e->getMessage(),
+        ], 500);
+    }
 }
+
 
     
     public function show($id)

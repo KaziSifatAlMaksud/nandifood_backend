@@ -234,6 +234,7 @@ public function index(Request $request)
             }
             return $note;
         });
+        
 
 
         // Return the employee details
@@ -247,8 +248,10 @@ public function index(Request $request)
     }
 
 
+
     public function update(Request $request, $id)
     {
+        // Find the employee by ID
         $employee = Employee::find($id);
         if (!$employee) {
             return response()->json([
@@ -258,55 +261,42 @@ public function index(Request $request)
             ]);
         }
 
-        // Update employee's fields
-        $employee->id = $request->id;
-        $employee->first_name = $request->first_name;
-        $employee->country = $request->country;
-        $employee->position_id = $request->position;
-        $employee->warehouse_id = $request->warehouse_id;
-        $employee->middle_name = $request->middle_name;
-        $employee->last_name = $request->last_name;
-        $employee->email = $request->email;
-        $employee->off_phone = $request->off_phone;
-        $employee->phone = $request->phone;
-        $employee->status = $request->status;
-        $employee->address1 = $request->address1;
-        $employee->address2 = $request->address2;
-        $employee->city = $request->city;
-        $employee->state = $request->state;
-        $employee->zip_code = $request->zip_code;
-        $employee->certificates1 = $request->certificates1;
-        $employee->certificates2 = $request->certificates2;
-        $employee->certificates3 = $request->certificates3;
-        $employee->certificates4 = $request->certificates4;
-        $employee->eff_date = $request->eff_date;
-        $employee->end_date = $request->end_date;
-        $employee->start_date = $request->start_date;
-        $employee->last_update = now()->format('Y-m-d H:i:s');
-        $employee->update_by = $request->update_by;
+        // Update all fields except img1
+          $employee->fill($request->except('img1'));
+        // $employee->update($request->except('img1'));
 
-        // Handle image updates
-        $imageFields = ['img1', 'img2', 'img3'];
-        foreach ($imageFields as $imageField) {
-            if ($request->hasFile($imageField)) {
-                $uploadedPath = $this->handleImageUpload($request->file($imageField), $employee->$imageField);
-                if ($uploadedPath) {
-                    $employee->$imageField = $uploadedPath;
-                } else {
-                    return response()->json([
-                        'status' => 500,
-                        'error' => "Failed to upload $imageField to DigitalOcean Spaces",
-                    ], 500);
-                }
+        // Handle image upload only for 'img1'
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = $file->getClientOriginalName();
+            $path = "uploads/barcodes/{$fileName}";
+
+            // Delete old image if exists
+            if (!empty($employee->img1)) {
+                Storage::disk('spaces')->delete($employee->img1);
+            }
+
+            // Upload new image to DigitalOcean Spaces
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $employee->img1 = $path;
+                $employee->save(); // Save only if img1 is updated
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'message' => 'Failed to upload img1 to DigitalOcean Spaces.',
+                ], 500);
             }
         }
-        $employee->save();
+
         return response()->json([
             'status' => 200,
             'message' => 'Employee updated successfully.',
             'result' => ['data' => $employee],
         ]);
     }
+
 
 
     public function employee_notes_store(Request $request)
@@ -385,7 +375,6 @@ public function index(Request $request)
     {
         $employee = Employee::find($id);
 
-        // Check if the employee exists
         if (!$employee) {
             return response()->json([
                 'status' => 404,

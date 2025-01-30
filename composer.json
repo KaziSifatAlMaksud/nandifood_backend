@@ -12,6 +12,7 @@
         "ext-gd": "*",
         "aws/aws-sdk-php": "^3.334",
         "barryvdh/laravel-dompdf": "^3.0",
+        "illuminatech/multipart-middleware": "^1.1",
         "laravel/fortify": "*",
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.3",

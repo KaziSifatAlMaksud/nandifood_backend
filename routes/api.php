@@ -24,14 +24,18 @@ Route::get('/user', function (Request $request) {
 //     return 'welcome';
 // });
 //warehouse route 
-route::resource('/warehouse', WarehouseController::class);
+// route::resource('/warehouse', WarehouseController::class);
+route::get('/warehouse', [WarehouseController::class, 'index']);
+route::post('/warehouse/create', [WarehouseController::class, 'store']);
+route::get('/warehouse/{id}', [WarehouseController::class, 'show']);
+route::post('/warehouse/{id}', [WarehouseController::class, 'update']);
 
 
 
 Route::get('/employee', [EmployeeController::class, 'index']);
 route::post('/employee/create', [EmployeeController::class, 'store']);
 route::get('/employee/{id}', [EmployeeController::class, 'show']);
-route::put('/employee/{id}', [EmployeeController::class, 'update']);
+route::post('/employee/{id}', [EmployeeController::class, 'update']);
 
 route::delete('/employee/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 
@@ -92,7 +96,7 @@ Route::get('/binlocation', [BinLocationController::class, 'index']);
 Route::post('/binlocation/create', [BinLocationController::class, 'store']);
 Route::get('/binlocation/{id}', [BinLocationController::class, 'show']);
 Route::get('/binlocation/{id}/edit', [BinLocationController::class, 'edit']);
-Route::put('/binlocation/{id}', [BinLocationController::class, 'update']);
+Route::post('/binlocation/{id}', [BinLocationController::class, 'update']);
 Route::delete('/binlocation/delete/{id}', [BinLocationController::class, 'destroy'])->name('bin-location.destroy');
 
 
@@ -138,7 +142,7 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 Route::get('/product', [ProductController::class, 'index']);
 Route::POST('/product/create', [ProductController::class, 'store']);
 Route::Get('/product/{id}',[ProductController::class, 'show']);
-Route::PUT('/product/{id}', [ProductController::class, 'update2']);
+Route::POST('/product/{id}', [ProductController::class, 'update2']);
 Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
 
 route::post('/product_attachment/create', [ProductController::class, 'product_notes_store']);

@@ -208,13 +208,10 @@ public function edit($id)
     ]);
 }
 
-
 public function update(Request $request, $id)
 {
     DB::beginTransaction(); // Start the transaction
-    return response()->json([
-        'request_data' => $request->img1,
-    ]);
+
     try {
         // Find the BinLocation record
         $binlocation = BinLocation::find($id);
@@ -229,49 +226,33 @@ public function update(Request $request, $id)
         // Update all request data except file fields
         $binlocation->fill($request->except(['file', 'bin_image', 'bin_barcode_img']));
 
-        // Handle file upload for 'file'
-        if ($request->hasFile('file')) {
-            // Delete old file if it exists
-            if ($binlocation->file && Storage::disk('spaces')->exists($binlocation->file)) {
-                Storage::disk('spaces')->delete($binlocation->file);
+        // Handle file uploads
+        $fileFields = ['file', 'bin_image', 'bin_barcode_img'];
+        foreach ($fileFields as $fileField) {
+            if ($request->hasFile($fileField)) {
+                $file = $request->file($fileField);
+
+                if ($file->isValid()) {
+                    // Delete old file if it exists
+                    if (!empty($binlocation->$fileField) && Storage::disk('spaces')->exists($binlocation->$fileField)) {
+                        Storage::disk('spaces')->delete($binlocation->$fileField);
+                    }
+
+                    // Upload new file
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $filePath = "uploads/warehouse_file/{$fileName}";
+                    Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
+
+                    // Update model attribute
+                    $binlocation->$fileField = $filePath;
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'success' => false,
+                        'message' => "Invalid file upload for {$fileField}!",
+                    ], 400);
+                }
             }
-
-            // Upload new file
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = "uploads/warehouse_file/{$fileName}";
-            Storage::disk('spaces')->put($filePath, file_get_contents($file), ['visibility' => 'public']);
-            $binlocation->file = $filePath;
-        }
-
-        // Handle file upload for 'bin_image'
-        if ($request->hasFile('bin_image')) {
-            // Delete old image if it exists
-            if ($binlocation->bin_image && Storage::disk('spaces')->exists($binlocation->bin_image)) {
-                Storage::disk('spaces')->delete($binlocation->bin_image);
-            }
-
-            // Upload new bin image
-            $binImage = $request->file('bin_image');
-            $binImageName = time() . '_' . $binImage->getClientOriginalName();
-            $binImagePath = "uploads/warehouse_file/{$binImageName}";
-            Storage::disk('spaces')->put($binImagePath, file_get_contents($binImage), ['visibility' => 'public']);
-            $binlocation->bin_image = $binImagePath;
-        }
-
-        // Handle file upload for 'bin_barcode_img'
-        if ($request->hasFile('bin_barcode_img')) {
-            // Delete old barcode image if it exists
-            if ($binlocation->bin_barcode_img && Storage::disk('spaces')->exists($binlocation->bin_barcode_img)) {
-                Storage::disk('spaces')->delete($binlocation->bin_barcode_img);
-            }
-
-            // Upload new barcode image
-            $barcodeImage = $request->file('bin_barcode_img');
-            $barcodeImageName = time() . '_' . $barcodeImage->getClientOriginalName();
-            $barcodeImagePath = "uploads/warehouse_file/{$barcodeImageName}";
-            Storage::disk('spaces')->put($barcodeImagePath, file_get_contents($barcodeImage), ['visibility' => 'public']);
-            $binlocation->bin_barcode_img = $barcodeImagePath;
         }
 
         // Save updated data
@@ -282,7 +263,7 @@ public function update(Request $request, $id)
         // Return a successful response
         return response()->json([
             'status' => 200,
-            'message' => 'Binlocation Update successful.',
+            'message' => 'Binlocation update successful.',
             'result' => $binlocation,
         ], 200);
     } catch (\Exception $e) {

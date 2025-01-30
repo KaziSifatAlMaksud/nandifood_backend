@@ -470,53 +470,55 @@ public function store(Request $request)
 
 public function update(Request $request, $warehouseId)
 {
-
     $warehouse = Warehouse::find($warehouseId);
+    $warehouse->fill($request->except('wh_image'));
     if (!$warehouse) {
         return response()->json([
-            'status' => '404',
+            'status' => 404,
             'message' => 'Error: Warehouse not found!',
         ], 404);
     }
-    $request->validate([
-        'wh_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg', 
-    ]);
-    $imagePath = $warehouse->wh_image; 
     if ($request->hasFile('wh_image')) {
         $file = $request->file('wh_image');
+
         if ($file->isValid()) {
-            if ($warehouse->wh_image) {
+            if (!empty($warehouse->wh_image)) {
                 Storage::disk('spaces')->delete($warehouse->wh_image);
             }
+
             $fileName = time() . '_' . $file->getClientOriginalName();
             $path = "uploads/warehouse_image/{$fileName}";
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
             if ($uploaded) {
-                $imagePath = $path; // Update the image path
+                // Set the new image path
+                $warehouse->wh_image = $path;
             } else {
                 return response()->json([
-                    'status' => '400',
+                    'status' => 400,
                     'message' => 'Error: File upload to DigitalOcean Spaces failed!',
                 ], 400);
             }
         } else {
             return response()->json([
-                'status' => '400',
-                'message' => 'Error: File upload is not valid!',
+                'status' => 400,
+                'message' => 'Error: Invalid file upload!',
             ], 400);
         }
     }
-    $warehouse->fill($request->all());
-    $warehouse->wh_image = $imagePath; 
+
     $warehouse->save();
+
     return response()->json([
-        'status' => '200',
+        'status' => 200,
         'message' => 'Warehouse updated successfully.',
         'result' => [
             'data' => $warehouse, // Return the updated warehouse data
         ],
     ]);
 }
+
+
 
 public function getCapacity($warehouse_id)
 {
