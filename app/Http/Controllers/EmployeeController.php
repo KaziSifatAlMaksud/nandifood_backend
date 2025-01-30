@@ -247,6 +247,7 @@ public function index(Request $request)
     }
 
 
+   
     public function update(Request $request, $id)
     {
         $employee = Employee::find($id);
@@ -258,32 +259,22 @@ public function index(Request $request)
             ]);
         }
 
-        // Update employee's fields
-        $employee->id = $request->id;
-        $employee->first_name = $request->first_name;
-        $employee->country = $request->country;
-        $employee->position_id = $request->position;
-        $employee->warehouse_id = $request->warehouse_id;
-        $employee->middle_name = $request->middle_name;
-        $employee->last_name = $request->last_name;
-        $employee->email = $request->email;
-        $employee->off_phone = $request->off_phone;
-        $employee->phone = $request->phone;
-        $employee->status = $request->status;
-        $employee->address1 = $request->address1;
-        $employee->address2 = $request->address2;
-        $employee->city = $request->city;
-        $employee->state = $request->state;
-        $employee->zip_code = $request->zip_code;
-        $employee->certificates1 = $request->certificates1;
-        $employee->certificates2 = $request->certificates2;
-        $employee->certificates3 = $request->certificates3;
-        $employee->certificates4 = $request->certificates4;
-        $employee->eff_date = $request->eff_date;
-        $employee->end_date = $request->end_date;
-        $employee->start_date = $request->start_date;
+        // List of fields that can be updated
+        $fields = [
+            'id', 'first_name', 'country', 'position_id', 'warehouse_id', 'middle_name', 
+            'last_name', 'email', 'off_phone', 'phone', 'status', 'address1', 'address2', 
+            'city', 'state', 'zip_code', 'certificates1', 'certificates2', 'certificates3', 
+            'certificates4', 'eff_date', 'end_date', 'start_date', 'update_by'
+        ];
+
+        // Update fields only if they are present in the request (even if null)
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $employee->$field = $request->$field; // Allows setting null explicitly
+            }
+        }
+
         $employee->last_update = now()->format('Y-m-d H:i:s');
-        $employee->update_by = $request->update_by;
 
         // Handle image updates
         $imageFields = ['img1', 'img2', 'img3'];
@@ -300,13 +291,16 @@ public function index(Request $request)
                 }
             }
         }
+
         $employee->save();
+
         return response()->json([
             'status' => 200,
             'message' => 'Employee updated successfully.',
             'result' => ['data' => $employee],
         ]);
     }
+
 
 
     public function employee_notes_store(Request $request)

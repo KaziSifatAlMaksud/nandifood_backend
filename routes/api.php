@@ -138,7 +138,7 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 Route::get('/product', [ProductController::class, 'index']);
 Route::POST('/product/create', [ProductController::class, 'store']);
 Route::Get('/product/{id}',[ProductController::class, 'show']);
-Route::PUT('/product/{id}', [ProductController::class, 'update2']);
+Route::PUT('/product/{id}', [ProductController::class, 'update']);
 Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
 
 route::post('/product_attachment/create', [ProductController::class, 'product_notes_store']);

@@ -268,57 +268,90 @@ class ProductController extends Controller
 
 
  
-    public function update2(Request $request, $id)
-{
-     return response()->json([
-        'request_data' => $request,
-    ]);
 
-    // try {
-    //     // Find the product or return a 404 error
-    //     $product = Product::findOrFail($id);
-    //     echo $product; die();
+    public function update(Request $request, $id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Product not found.',
+                'result' => ['data' => []],
+            ]);
+        }
 
-    //     $product->fill($validatedData);
+        // Validate the request
+        $validatedData = $request->validate([
+            'p_sku_no' => 'nullable|string|max:50',
+            'p_long_name' => 'nullable|string|max:255',
+            'product_short_name' => 'nullable|string|max:100',
+            'product_category' => 'nullable|string|max:100',
+            'sub_category1' => 'nullable|string|max:100',
+            'sub_category2' => 'nullable|string|max:100',
+            'size' => 'nullable|string|max:50',
+            'default_sales_uom' => 'nullable|string|max:50',
+            'inventory_uom' => 'nullable|string|max:50',
+            'product_cert1' => 'nullable|string|max:255',
+            'product_cert2' => 'nullable|string|max:255',
+            'product_cert3' => 'nullable|string|max:255',
+            'product_upc' => 'nullable|string|max:50',
+            'default_warehouse' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',      
+            'product_manager' => 'nullable|string|max:100',
+            'eff_date' => 'nullable|string',
+            'end_date' => 'nullable|string',
+            'status' => 'nullable|string|max:50',
+            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Image validation
+            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Image validation
+        ]);
 
-    //     if ($request->hasFile('img1')) {
-    //         if ($product->img1) {
-    //             Storage::disk('spaces')->delete($product->img1);
-    //         }
-    //         // Upload new image
-    //         $product->img1 = $this->uploadFile($request->file('img1'), 'uploads/products');
-    //     }
+        // Update only provided fields
+        foreach ($validatedData as $key => $value) {
+            if ($request->has($key)) {
+                $product->$key = $value;
+            }
+        }
 
-    //     // Handle image upload for 'upc_barcode'
-    //     if ($request->hasFile('upc_barcode')) {
-    //         // Delete old barcode if exists
-    //         if ($product->upc_barcode) {
-    //             Storage::disk('spaces')->delete($product->upc_barcode);
-    //         }
-    //         // Upload new barcode
-    //         $product->upc_barcode = $this->uploadFile($request->file('upc_barcode'), 'uploads/barcodes');
-    //     }
+        // Handle image update (img1)
+        if ($request->hasFile('img1')) {
+            $file = $request->file('img1');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
-    //     $product->save();
+            if ($uploaded) {
+                $product->img1 = $path;
+            } else {
+                return response()->json(['status' => 500, 'error' => 'Failed to upload img1 to DigitalOcean Spaces.'], 500);
+            }
+        }
 
-    //     return response()->json([
-    //         'status' => 200,
-    //         'message' => 'Product updated.',
-    //         'data' => $product,
-    //     ]);
+        // Handle barcode update (upc_barcode)
+        if ($request->hasFile('upc_barcode')) {
+            $file = $request->file('upc_barcode');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/products/{$fileName}";
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
-    // } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-    //     return response()->json([
-    //         'status' => 404,
-    //         'message' => 'Product not found.',
-    //     ], 404);
-    // } catch (\Exception $e) {
-    //     return response()->json([
-    //         'status' => 500,
-    //         'message' => 'An error occurred: ' . $e->getMessage(),
-    //     ], 500);
-    // }
-}
+            if ($uploaded) {
+                $product->upc_barcode = $path;
+            } else {
+                return response()->json(['status' => 500, 'error' => 'Failed to upload barcode to DigitalOcean Spaces.'], 500);
+            }
+        }
+
+        // Save the updated product
+        $product->save();
+
+        // Return response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Product updated successfully.',
+            'data' => $product,
+        ]);
+    }
 
     
     public function show($id)
