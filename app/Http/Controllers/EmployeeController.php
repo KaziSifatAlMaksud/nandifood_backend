@@ -16,6 +16,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\EmployeeExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class EmployeeController extends Controller
 
 {
@@ -248,7 +251,6 @@ public function index(Request $request)
     }
 
 
-
     public function update(Request $request, $id)
     {
         // Find the employee by ID
@@ -444,6 +446,13 @@ public function index(Request $request)
 
 
 
+        public function employee_export()
+        {
+            $slugDate = Str::slug(date('Y-m-d')); 
+            $fileName = "{$slugDate}_EmployeeList.xlsx";
+            return Excel::download(new EmployeeExport, 'employee.xlsx');
+        }
+    
 
     
 

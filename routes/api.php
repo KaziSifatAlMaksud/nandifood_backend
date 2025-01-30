@@ -84,6 +84,7 @@ Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
 Route::get('/hu/excel/export', [HupuController::class, 'hu_export']);
+Route::get('/employee/excel/export', [EmployeeController::class, 'employee_export']);
 
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 

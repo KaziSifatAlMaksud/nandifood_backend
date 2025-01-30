@@ -18,10 +18,10 @@ class CorsMiddleware
     {
         // Define the CORS headers
         $headers = [
-            'Access-Control-Allow-Origin' => '*',  // Allow all origins, can replace '*' with specific domains (e.g., 'https://example.com')
-            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS', // Allowed methods
-            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With', // Allowed headers
-            'Access-Control-Allow-Credentials' => 'true', // Allow credentials like cookies
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With', 
+            'Access-Control-Allow-Credentials' => 'true',
         ];
 
         // Handle preflight OPTIONS requests
