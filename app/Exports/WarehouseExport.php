@@ -20,12 +20,12 @@ class WarehouseExport implements FromCollection, withHeadings
     public function headings(): array
     {
         return [
-            'ID',
-            'Warehouse Name',
-            'Country',
-            'State',
-            'City',
-            'Zip Code',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+            'off_phone',
+            'phone',
             'Address1',
             'Address2',
             'Email',

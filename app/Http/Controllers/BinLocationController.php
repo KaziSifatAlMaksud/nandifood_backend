@@ -213,7 +213,7 @@ public function update(Request $request, $id)
 {
     DB::beginTransaction(); // Start the transaction
     return response()->json([
-        'request_data' => $request->img1,
+        'request_data' => $request->all(),
     ]);
     try {
         // Find the BinLocation record

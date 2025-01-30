@@ -16,6 +16,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\EmployeeExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class EmployeeController extends Controller
 
 {
@@ -264,7 +267,7 @@ public function index(Request $request)
             'id', 'first_name', 'country', 'position_id', 'warehouse_id', 'middle_name', 
             'last_name', 'email', 'off_phone', 'phone', 'status', 'address1', 'address2', 
             'city', 'state', 'zip_code', 'certificates1', 'certificates2', 'certificates3', 
-            'certificates4', 'eff_date', 'end_date', 'start_date', 'update_by'
+            'certificates4', 'eff_date', 'end_date', 'start_date', 'update_by','last_update'
         ];
 
         // Update fields only if they are present in the request (even if null)
@@ -449,6 +452,13 @@ public function index(Request $request)
 
 
 
+        public function employee_export()
+        {
+            $slugDate = Str::slug(date('Y-m-d')); 
+            $fileName = "{$slugDate}_EmployeeList.xlsx";
+            return Excel::download(new EmployeeExport, 'employee.xlsx');
+        }
+    
 
     
 
