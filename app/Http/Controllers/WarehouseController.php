@@ -525,8 +525,9 @@ public function getCapacity($warehouse_id)
     $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
     $totalCapacity = new \stdClass();
     $totalCapacity->totalCapacity_spl = 0;
-    $totalCapacity->storage_used = '0%'; 
-    $totalCapacity->storage_available = '100%'; 
+    $totalCapacity->storage_used = '0'; 
+    $totalCapacity->storage_available = '100'; 
+    
 
     foreach ($binLocations as $binLocation) {
         $totalCapacity->totalCapacity_spl += $binLocation->storage_capacity_slp;
