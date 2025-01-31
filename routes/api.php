@@ -16,6 +16,7 @@ use App\Http\Controllers\ProductPriceController;
 
 
 
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -73,7 +74,7 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 
 //download PDF route
 // route::get('/warehouse/download', [PdfController::class, 'warehouse_pdf']);
-route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_excel']);
+// route::post('/warehouse/excel/create', [WarehouseController::class, 'warehouse_excel']);
 
 
 
@@ -84,7 +85,7 @@ Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
 Route::get('/hu/excel/export', [HupuController::class, 'hu_export']);
-Route::get('/employee/excel/export', [EmployeeController::class, 'employee_export']);
+Route::get('/employee/excel/export', [EmployeeController::class, 'employeeExport']);
 
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 

@@ -446,14 +446,23 @@ public function index(Request $request)
 
 
 
-        public function employee_export()
-        {
-            $slugDate = Str::slug(date('Y-m-d')); 
-            $fileName = "{$slugDate}_EmployeeList.xlsx";
-            return Excel::download(new EmployeeExport, 'employee.xlsx');
-        }
-    
+//    public function employeeExport()
+//     {
+//         $slugDate = Str::slug(date('Y-m-d')); 
+//         $fileName = "{$slugDate}_EmployeeList.xlsx";
 
-    
+//         return response()->streamDownload(function () use ($fileName) {
+//             Excel::download(new EmployeeExport, $fileName)->send();
+//         }, $fileName, [
+//             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+//         ]);
+//     }
+  public function employeeExport()
+    {
+        $fileName = now()->format('Y-m-d') . '_EmployeeList.xlsx';
+
+        return Excel::download(new EmployeeExport, $fileName);
+    }
 
 }
