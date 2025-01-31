@@ -15,6 +15,12 @@ use App\Models\BinStorageType;
 use App\Models\Uom_type;
 use App\Models\Country;
 use App\Models\Employee;
+use App\Models\BinZones;
+use App\Models\BinBin;
+use App\Models\BinSection;
+use App\Models\BinAisle;
+use App\Models\BinRack;
+use App\Models\BinShelf;
   use Illuminate\Support\Facades\Storage;
 
 class WarehouseController extends Controller
@@ -558,7 +564,7 @@ public function getCapacity($warehouse_id)
         if ($binLocation->metric_unit == 0) {
             // Convert to cubic feet if the metric unit is 0
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height) / 35.315;
-            
+
         } elseif ($binLocation->metric_unit == 1) {
             // Already in cubic feet, add directly
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height);
@@ -720,6 +726,78 @@ public function warehouse_attachment_store(Request $request)
         $uom_type = Uom_type::all();
         return response()->json($uom_type);
     }
+
+    public function get_binzones() {
+        $binzones = BinZones::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binzones
+            ]
+        ]);
+    }
+       public function get_binbin() {
+        $binbin = BinBin::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binbin
+            ]
+        ]);
+    }
+    public function get_binsection() {
+        $binsection = BinSection::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binsection
+            ]
+        ]);
+    }
+
+    public function get_binaisle() {
+        $binaisle = BinAisle::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binaisle
+            ]
+        ]);
+    }
+
+       public function get_binrack() {
+        $binrack = BinRack::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binrack
+            ]
+        ]);
+    }
+
+    public function get_binshelf() {
+        $binshelf = BinShelf::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $binshelf
+            ]
+        ]);
+    }
+
+
 
 
     //import excel file

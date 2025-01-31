@@ -29,6 +29,13 @@ route::get('/warehouse/{id}', [WarehouseController::class, 'show']);
 route::post('/warehouse/{id}', [WarehouseController::class, 'update']);
 route::Delete('/warehouse/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.destroy');
 
+//Warehouse Name route
+route::get('/binzones', [WarehouseController::class, 'get_binzones']);
+route::get('/binbin', [WarehouseController::class, 'get_binbin']);
+route::get('/binsection', [WarehouseController::class, 'get_binsection']);
+route::get('/binaisle', [WarehouseController::class, 'get_binaisle']);
+route::get('/binrack', [WarehouseController::class, 'get_binrack']);
+route::get('/binshelf', [WarehouseController::class, 'get_binshelf']);
 
 
 Route::get('/employee', [EmployeeController::class, 'index']);
