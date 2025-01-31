@@ -254,8 +254,6 @@ public function update(Request $request, $id)
                 }
             }
         }
-
-        // Save updated data
         $binlocation->save();
 
         DB::commit(); // Commit the transaction
