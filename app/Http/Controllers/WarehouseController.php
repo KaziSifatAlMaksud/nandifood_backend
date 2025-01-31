@@ -558,6 +558,7 @@ public function getCapacity($warehouse_id)
         if ($binLocation->metric_unit == 0) {
             // Convert to cubic feet if the metric unit is 0
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height) / 35.315;
+            
         } elseif ($binLocation->metric_unit == 1) {
             // Already in cubic feet, add directly
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height);
