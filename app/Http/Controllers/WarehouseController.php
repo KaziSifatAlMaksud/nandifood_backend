@@ -519,37 +519,59 @@ public function update(Request $request, $warehouseId)
 }
 
 
+
 public function getCapacity($warehouse_id)
 {
     $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
     
+    // Initialize total capacity object
     $totalCapacity = new \stdClass();
-    $totalCapacity->totalCapacity_spl = 0;
+    $totalCapacity->totalCapacity_slp = 0;
     $totalCapacity->totalCapacity_ft3 = 0;
+
+    $totalCapacity->usedCapacity_total = 0;
+    $totalCapacity->usedCapacity_slp = 0;
+
+
+    $totalCapacity->availableCapacity_total = 0;
+    $totalCapacity->availableCapacity_slp = 0;
+
+
     $totalCapacity->storage_used = 0;  
     $totalCapacity->storage_available = 100;
 
+    // Ensure values are set before adding from binLocations
+    if ($binLocations->isEmpty()) {
+        // If no bin locations found, return with default values
+        return response()->json([
+            'status' => 200,
+            'message' => 'No bin locations found for this warehouse.',
+            'result' => ['data' => $totalCapacity]
+        ]);
+    }
+
     foreach ($binLocations as $binLocation) {
-        $totalCapacity->totalCapacity_spl += $binLocation->storage_capacity_slp;
+        // Update total capacity values by adding bin location values
+        $totalCapacity->totalCapacity_slp += $binLocation->storage_capacity_slp;
+        $totalCapacity->availableCapacity_slp += $binLocation->storage_capacity_slp;
         
         if ($binLocation->metric_unit == 0) {
+            // Convert to cubic feet if the metric unit is 0
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height) / 35.315;
         } elseif ($binLocation->metric_unit == 1) {
-            // Already in cubic feet
+            // Already in cubic feet, add directly
             $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height);
         }
 
-        // Uncomment these lines if storage_used and storage_available need to be updated
+        // Uncomment if you want to add the used and available storage values
         // $totalCapacity->storage_used += $binLocation->storage_used;
         // $totalCapacity->storage_available += $binLocation->storage_available;
     }
 
     return response()->json([
         'status' => 200,
-        'message' => 'Ok',
-        'result' => [
-            'data' => $totalCapacity,
-        ]
+        'message' => 'Capacity fetched successfully.',
+        'result' => ['data' => $totalCapacity]
     ]);
 }
 
