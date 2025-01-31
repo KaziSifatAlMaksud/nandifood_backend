@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(CorsMiddleware::class);
-        $middleware->append(MultipartFormDataParser::class); // Ensure this line is correct
+        // $middleware->append(MultipartFormDataParser::class); 
         // $middleware->append(\App\Http\Middleware\CheckForMaintenanceMode::class);
         // $middleware->append(\Illuminate\Foundation\Http\Middleware\ValidatePostSize::class);
         // $middleware->append(\App\Http\Middleware\TrimStrings::class);
