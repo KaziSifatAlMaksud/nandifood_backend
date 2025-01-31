@@ -523,23 +523,31 @@ public function update(Request $request, $warehouseId)
 public function getCapacity($warehouse_id)
 {
     $binLocations = BinLocation::where('warehouse_id', $warehouse_id)->get();
+    
     $totalCapacity = new \stdClass();
     $totalCapacity->totalCapacity_spl = 0;
-    $totalCapacity->storage_used = '0'; 
-    $totalCapacity->storage_available = '100'; 
-    
+    $totalCapacity->totalCapacity_ft3 = 0; // Initialize to avoid undefined property error
+    $totalCapacity->storage_used = 0;  // Ensure numerical value
+    $totalCapacity->storage_available = 100; // Ensure numerical value
 
     foreach ($binLocations as $binLocation) {
         $totalCapacity->totalCapacity_spl += $binLocation->storage_capacity_slp;
+        
+        if ($binLocation->metric_unit == 0) {
+            // Convert cubic meters to cubic feet (1 m³ = 35.315 ft³)
+            $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length ** 3) / 35.315;
+        } elseif ($binLocation->metric_unit == 1) {
+            // Already in cubic feet
+            $totalCapacity->totalCapacity_ft3 += $binLocation->bin_length ** 3;
+        }
 
-        // You can calculate storage_used and storage_available if needed
-        // For example, if you have the values for storage used and storage available, add them:
+        // Uncomment these lines if storage_used and storage_available need to be updated
         // $totalCapacity->storage_used += $binLocation->storage_used;
         // $totalCapacity->storage_available += $binLocation->storage_available;
     }
 
     return response()->json([
-        'status' => '200',
+        'status' => 200,
         'message' => 'Ok',
         'result' => [
             'data' => $totalCapacity,

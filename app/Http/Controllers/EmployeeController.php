@@ -217,7 +217,7 @@ public function index(Request $request)
                 ]
             ]);
         }
-        $employee->position_name = Positions::find($employee->position_id)->position_name;
+       $employee->position_name = Positions::find($employee->position_id)->position_name ?? null;
         $warehouse = Warehouse::find($employee->warehouse_id);
         $employee->warehouse_name = $warehouse ? $warehouse->warehouse_name : null;
         $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
@@ -444,20 +444,6 @@ public function index(Request $request)
         ]);
     }
 
-
-
-//    public function employeeExport()
-//     {
-//         $slugDate = Str::slug(date('Y-m-d')); 
-//         $fileName = "{$slugDate}_EmployeeList.xlsx";
-
-//         return response()->streamDownload(function () use ($fileName) {
-//             Excel::download(new EmployeeExport, $fileName)->send();
-//         }, $fileName, [
-//             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-//             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-//         ]);
-//     }
   public function employeeExport()
     {
         $fileName = now()->format('Y-m-d') . '_EmployeeList.xlsx';

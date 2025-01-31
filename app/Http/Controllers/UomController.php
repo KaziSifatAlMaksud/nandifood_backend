@@ -272,7 +272,12 @@ public function uom_export()
     return Excel::download(new UomExport, $fileName);
 }
 
-    // Show a single warehouse record
+public function product_export() 
+{
+    $slugDate = Str::slug(date('Y-m-d')); 
+    $fileName = "{$slugDate}_Product_List.xlsx";
+    return Excel::download(new UomExport, $fileName);
+}
 
 
     public function show($id)

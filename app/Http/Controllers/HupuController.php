@@ -796,6 +796,21 @@ class HupuController extends Controller
             ], 500);
         }
     }
+
+
+    public function Hu_Export()
+    {
+        $fileName = now()->format('Y-m-d') . '_HuList.xlsx';
+
+        return Excel::download(new HuExport, $fileName);
+    }
+    
+    public function Pu_Export()
+    {
+        $fileName = now()->format('Y-m-d') . '_PU_List.xlsx';
+
+        return Excel::download(new PuExport, $fileName);
+    }
             
 
     public function destroy($id)
