@@ -361,25 +361,24 @@ class ProductController extends Controller
 
     
 
-    public function destroy($id)
+ public function destroy($id)
     {
         try {
             $product = Product::findOrFail($id);
+            ProductNote::where('product_id', $id)->delete();
+
+            // Delete the product
             $product->delete();
+
             return response()->json([
                 'status' => 200,
-                'message' => 'Product deleted successfully',
-            ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'status' => 404,
-                'error' => 'Product not found',
-            ], 404);
+                'message' => 'Product Deleted Successfully',
+            ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
                 'error' => 'An error occurred while deleting the product',
-                'details' => $e->getMessage(),
             ], 500);
         }
     }

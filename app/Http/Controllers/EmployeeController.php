@@ -381,11 +381,12 @@ public function index(Request $request)
             return response()->json([
                 'status' => 404,
                 'message' => 'Employee not found.',
-                'result' => [
-                    'data' => []
-                ]
+                'result' => ['data' => []]
             ]);
         }
+
+        // Delete related Employee Notes first
+        EmployeeNotes::where('employee_id', $id)->delete();
 
         // Delete the employee
         $employee->delete();
@@ -394,11 +395,10 @@ public function index(Request $request)
         return response()->json([
             'status' => 200,
             'message' => 'Employee deleted successfully.',
-            'result' => [
-                'data' => []
-            ]
+            'result' => ['data' => []]
         ]);
     }
+
 
     private function handleImageUpload($file, $oldPath = null)
     {
