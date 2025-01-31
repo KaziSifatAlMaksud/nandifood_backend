@@ -14,9 +14,6 @@ use App\Http\Controllers\ProductPriceController;
 
 
 
-
-
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -30,6 +27,7 @@ route::get('/warehouse', [WarehouseController::class, 'index']);
 route::post('/warehouse/create', [WarehouseController::class, 'store']);
 route::get('/warehouse/{id}', [WarehouseController::class, 'show']);
 route::post('/warehouse/{id}', [WarehouseController::class, 'update']);
+route::Delete('/warehouse/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.destroy');
 
 
 
