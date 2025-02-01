@@ -50,6 +50,7 @@ class BinLocation extends Model
         'bin_image',
         'bin_weight_kg',
         'eff_date',
+        'bin_display_name'
     ];
 
     // Optionally, define the data types of attributes (for casting)

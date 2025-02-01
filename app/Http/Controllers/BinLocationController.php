@@ -25,14 +25,16 @@ public function index(Request $request)
         ->select([
             'bin_location.id',
             'bin_location.warehouse_id',
-            DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
-            DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
-            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
-            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
-            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
-            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
-            'bin_location.bin_number',
-            DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location"),
+            'bin_display_name',
+            // ,
+            // DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
+            // DB::raw("CONCAT('Z', bin_location.zone_number) AS section_number"),
+            // DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number) AS full_section_number"),
+            // DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
+            // DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
+            // DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
+            // 'bin_location.bin_number',
+            // DB::raw("CONCAT('Z', bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location"),
             'bin_location.bin_length',
             'bin_location.bin_width',
             'bin_location.bin_height',
@@ -136,16 +138,17 @@ public function show($id)
             'bin_location.file',
             'bin_location.bin_barcode_img',         
             'bin_location.bin_weight_kg',
+            'bin_location.bin_display_name',
         
 
             // Warehouse-related and formatted values
-            DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
-            DB::raw("CONCAT( bin_location.zone_number) AS section_number"),
-            DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number) AS full_section_number"),
-            DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
-            DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
-            DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
-            DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location")
+            // DB::raw("CONCAT(warehouse.warehouse_name, ' - ', warehouse.city, ', ', warehouse.state) AS warehouse_full_name"),
+            // DB::raw("CONCAT( bin_location.zone_number) AS section_number"),
+            // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number) AS full_section_number"),
+            // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number) AS aisle_number"),
+            // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number) AS rack_number"),
+            // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number) AS shelf_number"),
+            // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location")
         ])
         ->where('bin_location.id', $id)
         ->firstOrFail(); // Retrieve the first result or fail if not found
