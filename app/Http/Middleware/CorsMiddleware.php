@@ -32,16 +32,14 @@ class CorsMiddleware
 
         // Continue with the request
         $response = $next($request);
-           return $response->withHeaders($headers);
+        //    return $response->withHeaders($headers);
+        if ($response instanceof Response) {
+            foreach ($headers as $key => $value) {
+                $response->headers->set($key, $value);
+            }
+        }
 
-        // Ensure the response is an instance of Response before adding headers
-        // if ($response instanceof Response) {
-        //     foreach ($headers as $key => $value) {
-        //         $response->headers->set($key, $value);
-        //     }
-        // }
-
-        // return $response; // Removed the duplicate return statement
+        return $response; // Removed the duplicate return statement
         
     }
 }

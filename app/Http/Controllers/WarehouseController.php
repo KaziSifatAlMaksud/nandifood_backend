@@ -532,19 +532,16 @@ public function getCapacity($warehouse_id)
     
     // Initialize total capacity object
     $totalCapacity = new \stdClass();
-    $totalCapacity->totalCapacity_slp = 0;
-    $totalCapacity->totalCapacity_ft3 = 0;
 
-    $totalCapacity->usedCapacity_total = 0;
-    $totalCapacity->usedCapacity_slp = 0;
-
-
-    $totalCapacity->availableCapacity_total = 0;
-    $totalCapacity->availableCapacity_slp = 0;
-
-
-    $totalCapacity->storage_used = 0;  
-    $totalCapacity->storage_available = 100;
+    // Initialize as floats
+    $totalCapacity->totalCapacity_slp = 0.0;
+    $totalCapacity->totalCapacity_ft3 = 0.0;
+    $totalCapacity->usedCapacity_total_ft3 = 0.0;
+    $totalCapacity->usedCapacity_slp = 0.0;
+    $totalCapacity->availableTotalCapacity_ft3 = 0.0;
+    $totalCapacity->availableCapacity_slp = 0.0;
+    // $totalCapacity->storage_used = 0.0;  
+    // $totalCapacity->storage_available = 100.0;
 
     // Ensure values are set before adding from binLocations
     if ($binLocations->isEmpty()) {
@@ -557,24 +554,43 @@ public function getCapacity($warehouse_id)
     }
 
     foreach ($binLocations as $binLocation) {
-        // Update total capacity values by adding bin location values
-        $totalCapacity->totalCapacity_slp += $binLocation->storage_capacity_slp;
-        $totalCapacity->availableCapacity_slp += $binLocation->storage_capacity_slp;
-        
+        $totalCapacity->totalCapacity_slp += (float) $binLocation->storage_capacity_slp;
         if ($binLocation->metric_unit == 0) {
-            // Convert to cubic feet if the metric unit is 0
-            $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height) / 35.315;
-
+            $totalCapacity->totalCapacity_ft3 += (float) (($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height) / 35.315);
         } elseif ($binLocation->metric_unit == 1) {
-            // Already in cubic feet, add directly
-            $totalCapacity->totalCapacity_ft3 += ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height);
+            $totalCapacity->totalCapacity_ft3 += (float) ($binLocation->bin_length * $binLocation->bin_width * $binLocation->bin_height);
         }
-
-        // Uncomment if you want to add the used and available storage values
-        // $totalCapacity->storage_used += $binLocation->storage_used;
-        // $totalCapacity->storage_available += $binLocation->storage_available;
     }
 
+    // Calculate available and used capacities
+    $totalCapacity->availableCapacity_slp = (float) ($totalCapacity->totalCapacity_slp - $totalCapacity->usedCapacity_slp);
+    $totalCapacity->availableTotalCapacity_ft3 = (float) ($totalCapacity->totalCapacity_ft3 - $totalCapacity->usedCapacity_total_ft3);
+
+    // Calculate percentages for used and available storage in SLP
+    $totalCapacity->usedStoragePercentage = 0.0;
+    $totalCapacity->availableStoragePercentage = 0.0;
+
+    if ($totalCapacity->totalCapacity_slp > 0) {
+        // Calculate used storage percentage for SLP
+        $totalCapacity->usedStoragePercentage = ($totalCapacity->usedCapacity_slp / $totalCapacity->totalCapacity_slp) * 100;
+
+        // Calculate available storage percentage for SLP
+        $totalCapacity->availableStoragePercentage = ($totalCapacity->availableCapacity_slp / $totalCapacity->totalCapacity_slp) * 100;
+    }
+
+    // Calculate percentages for used and available storage in cubic feet
+    // $totalCapacity->usedStoragePercentageFt3 = 0.0;
+    // $totalCapacity->availableStoragePercentageFt3 = 0.0;
+
+    // if ($totalCapacity->totalCapacity_ft3 > 0) {
+    //     // Calculate used storage percentage for cubic feet
+    //     $totalCapacity->usedStoragePercentageFt3 = ($totalCapacity->usedCapacity_total_ft3 / $totalCapacity->totalCapacity_ft3) * 100;
+
+    //     // Calculate available storage percentage for cubic feet
+    //     $totalCapacity->availableStoragePercentageFt3 = ($totalCapacity->availableTotalCapacity_ft3 / $totalCapacity->totalCapacity_ft3) * 100;
+    // }
+
+    // Return the result including the calculated percentages
     return response()->json([
         'status' => 200,
         'message' => 'Capacity fetched successfully.',

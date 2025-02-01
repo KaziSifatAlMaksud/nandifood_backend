@@ -79,43 +79,45 @@ class BinLocation extends Model
      * @param int $warehouseId
      * @return float
      */
+
      public static function calculateTotalVolumeForWarehouse($warehouseId)
-     {
-         return self::where('warehouse_id', $warehouseId)
-             ->get()
-             ->reduce(function ($totals, $bin) {
-                 // Calculate volume based on metric_unit
-                 if ($bin->metric_unit == '0') { // Metric: centimeters
-                     $volume_m3 = ($bin->bin_length * $bin->bin_width * $bin->bin_height) / 1000000;
-                     $capacity_kg = $bin->bin_weight_kg;
-                     $capacity_lb = $capacity_kg * 2.20462;
-                 } elseif ($bin->metric_unit == '1') { // Imperial: inches
-                     $bin_length_cm = $bin->bin_length * 2.54;
-                     $bin_width_cm = $bin->bin_width * 2.54;
-                     $bin_height_cm = $bin->bin_height * 2.54;
-                     $volume_m3 = ($bin_length_cm * $bin_width_cm * $bin_height_cm) / 1000000;
-                     $capacity_lb = $bin->bin_weight_lb;
-                     $capacity_kg = $capacity_lb / 2.20462;
-                 } else {
-                     $volume_m3 = 0;
-                     $capacity_kg = 0;
-                     $capacity_lb = 0;
-                 }
-     
-                 // Sum up the volume and storage capacity
-                 return [
-                     'total_volume' => $totals['total_volume'] + $volume_m3,
-                     'total_storage_capacity_slp' => $totals['total_storage_capacity_slp'] + $bin->storage_capacity_slp,
-                     'total_capacity_kg' => $totals['total_capacity_kg'] + $capacity_kg,
-                     'total_capacity_lb' => $totals['total_capacity_lb'] + $capacity_lb,
-                 ];
-             }, [
-                 'total_volume' => 0,
-                 'total_storage_capacity_slp' => 0,
-                 'total_capacity_kg' => 0,
-                 'total_capacity_lb' => 0
-             ]);
-     }
+    {
+        return self::where('warehouse_id', $warehouseId)
+            ->get()
+            ->reduce(function ($totals, $bin) {
+                $volume_m3 = 0;
+                $capacity_kg = 0;
+                $capacity_lb = 0;
+
+                // Ensure bin dimensions are numeric to prevent errors
+                if (is_numeric($bin->bin_length) && is_numeric($bin->bin_width) && is_numeric($bin->bin_height)) {
+                    if ($bin->metric_unit == '0') { // Metric: centimeters
+                        $volume_m3 = ($bin->bin_length * $bin->bin_width * $bin->bin_height) / 1_000_000;
+                        $capacity_kg = $bin->bin_weight_kg;
+                        $capacity_lb = $capacity_kg * 2.20462;
+                    } elseif ($bin->metric_unit == '1') { // Imperial: inches
+                        $bin_length_cm = $bin->bin_length * 2.54;
+                        $bin_width_cm = $bin->bin_width * 2.54;
+                        $bin_height_cm = $bin->bin_height * 2.54;
+                        $volume_m3 = ($bin_length_cm * $bin_width_cm * $bin_height_cm) / 1_000_000;
+                        $capacity_lb = $bin->bin_weight_kg;
+                        $capacity_kg = $capacity_lb / 2.20462;
+                    }
+                }
+
+                return [
+                    'total_volume' => $totals['total_volume'] + $volume_m3,
+                    'total_storage_capacity_slp' => $totals['total_storage_capacity_slp'] + ($bin->storage_capacity_slp ?? 0),
+                    'total_capacity_kg' => $totals['total_capacity_kg'] + $capacity_kg,
+                    'total_capacity_lb' => $totals['total_capacity_lb'] + $capacity_lb,
+                ];
+            }, [
+                'total_volume' => 0,
+                'total_storage_capacity_slp' => 0,
+                'total_capacity_kg' => 0,
+                'total_capacity_lb' => 0
+            ]);
+    }
 
 
     public static function calculateTotalVolume($id)
