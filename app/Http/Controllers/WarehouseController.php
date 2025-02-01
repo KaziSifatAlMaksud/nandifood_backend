@@ -413,6 +413,9 @@ public function store(Request $request)
             'bus_hours_close' => 'nullable|string|max:10',
             'status' => 'nullable|string|max:50',
             'wh_image' => 'nullable|mimes:jpg,jpeg,png,pdf',
+            'warehouse_notes' => 'nullable|string|max:255',
+            'warehouse_safety' => 'nullable|string|max:255',
+            'warehouse_compliance' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();  // Start transaction
