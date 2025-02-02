@@ -603,53 +603,79 @@ public function getCapacity($warehouse_id)
 
 
 
-public function warehouse_attachment_store(Request $request)
-{
-    try {
-        $validated = $request->validate([
-            'warehouse_id' => 'required|string|max:11',
-            'type' => 'required|integer',
-            'file' => 'required|file|mimes:pdf,png,jpg,jpeg',
-            'created_by' => 'nullable|string|max:11', 
-            'updated_by' => 'nullable|string|max:11',
-            'date_uploaded' => 'nullable|date', 
-            'description' => 'nullable|string|max:255',
-        ]);
-      
-        DB::beginTransaction();
-        
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName =  $file->getClientOriginalName(); 
-            $path = "uploads/warehouse_attachment/{$fileName}";
-            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-            if ($uploaded) {
-                $validated['file'] = $path; 
-            } else {
-                throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
-            }
-        }
 
-        $warehouse = WarehouseAttachment::create($validated);
-        DB::commit();
-        return response()->json([
-            'status' => 200,
-            'message' => 'Warehouse attachment created successfully.',
-            'result' => $warehouse,
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'status' => 422,
-            'errors' => $e->errors(),
-        ], 422);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => 500,
-            'error' => $e->getMessage(),
-        ], 500);
+    public function warehouse_attachment_store(Request $request)
+    {
+        try {
+            // Validate input
+            $validated = $request->validate([
+                'warehouse_id' => 'required|string|max:11',
+                'type' => 'required|integer',
+                'file' => 'nullable|file|mimes:pdf,png,jpg,jpeg', // File is optional
+                'created_by' => 'nullable|string|max:11', 
+                'updated_by' => 'nullable|string|max:11',
+                'date_uploaded' => 'nullable|date', 
+                'description' => 'nullable|string|max:255',
+            ]);
+
+            DB::beginTransaction();
+
+            // Check if description is a non-empty string
+            if (!empty($request->description)) {
+                $warehouseInfo = Warehouse::where('id', $request->warehouse_id)->first();
+
+                if ($warehouseInfo) {
+                    if ($request->type === 1) {
+                        $warehouseInfo->warehouse_notes = $request->description;
+                        $warehouseInfo->save();
+                    } elseif ($request->type === 2) {
+                        $warehouseInfo->warehouse_safety = $request->description;
+                        $warehouseInfo->save();
+                    } elseif ($request->type === 3) {
+                        $warehouseInfo->warehouse_compliance = $request->description;
+                        $warehouseInfo->save();
+                    }
+                
+                }
+            }
+
+            // Create a row only if a file is uploaded
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = "uploads/warehouse_attachment/{$fileName}";
+
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+                if ($uploaded) {
+                    $validated['file'] = $path;
+
+                    // Only create a row if there's an attachment
+                    $warehouse = WarehouseAttachment::create($validated);
+                } else {
+                    throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => $warehouse ? 'Warehouse Attachment created successfully.' : 'No attachment uploaded, no record created.',
+                'result' => $warehouse,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
 
  
