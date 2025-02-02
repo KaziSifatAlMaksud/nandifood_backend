@@ -249,7 +249,11 @@ public function getAttachment($warehouse_id)
 {
     // Fetch the attachments associated with the warehouse
     $attachments = WarehouseAttachment::where('warehouse_id', $warehouse_id)->get();
+    $warehouse_details = Warehouse::select('warehouse_notes', 'warehouse_safety', 'warehouse_compliance')
+        ->where('id', $warehouse_id)
+        ->first();
 
+    
     // Map through the attachments and add the file URL and file name
     $attachments->map(function ($attachment) {
         if ($attachment->file) {
@@ -267,6 +271,7 @@ public function getAttachment($warehouse_id)
         'message' => 'Ok',
         'result' => [
             'data' => $attachments,
+            'warehouse_details'=> $warehouse_details
         ],
     ]);
 }
@@ -602,80 +607,92 @@ public function getCapacity($warehouse_id)
 }
 
 
+public function warehouse_attachment_store(Request $request)
+{
+    try {
+        // Validate input
+        $validated = $request->validate([
+            'warehouse_id' => 'required|string', 
+            'type' => 'required|integer',
+            'file' => 'nullable|file|mimes:pdf,png,jpg,jpeg', // File is optional
+            'created_by' => 'nullable|string', 
+            'updated_by' => 'nullable|string',
+            'date_uploaded' => 'nullable|string', 
+            'description' => 'nullable|string|max:255',
+        ]);
 
+        DB::beginTransaction();
 
-    public function warehouse_attachment_store(Request $request)
-    {
-        try {
-            // Validate input
-            $validated = $request->validate([
-                'warehouse_id' => 'required|string|max:11',
-                'type' => 'required|integer',
-                'file' => 'nullable|file|mimes:pdf,png,jpg,jpeg', // File is optional
-                'created_by' => 'nullable|string|max:11', 
-                'updated_by' => 'nullable|string|max:11',
-                'date_uploaded' => 'nullable|date', 
-                'description' => 'nullable|string|max:255',
-            ]);
+        $warehouse = null; // Initialize to avoid undefined variable errors
+        $warehouseInfo = null;
 
-            DB::beginTransaction();
+        // Check if description is provided
+        if (!empty($request->description)) {
+            $warehouseInfo = Warehouse::where('id', $request->warehouse_id)->first();
 
-            // Check if description is a non-empty string
-            if (!empty($request->description)) {
-                $warehouseInfo = Warehouse::where('id', $request->warehouse_id)->first();
-
-                if ($warehouseInfo) {
-                    if ($request->type === 1) {
-                        $warehouseInfo->warehouse_notes = $request->description;
-                        $warehouseInfo->save();
-                    } elseif ($request->type === 2) {
-                        $warehouseInfo->warehouse_safety = $request->description;
-                        $warehouseInfo->save();
-                    } elseif ($request->type === 3) {
-                        $warehouseInfo->warehouse_compliance = $request->description;
-                        $warehouseInfo->save();
-                    }
-                
+            if ($warehouseInfo) {
+                if ($request->type == 1) {
+                    $warehouseInfo->warehouse_notes = $request->description;
+                } elseif ($request->type == 2) {
+                    $warehouseInfo->warehouse_safety = $request->description;
+                } elseif ($request->type == 3) {
+                    $warehouseInfo->warehouse_compliance = $request->description;
                 }
+                $warehouseInfo->save(); // Save only if it's not null
             }
-
-            // Create a row only if a file is uploaded
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $path = "uploads/warehouse_attachment/{$fileName}";
-
-                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-
-                if ($uploaded) {
-                    $validated['file'] = $path;
-
-                    // Only create a row if there's an attachment
-                    $warehouse = WarehouseAttachment::create($validated);
-                } else {
-                    throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
-                }
-            }
-
-            DB::commit();
-            return response()->json([
-                'status' => 200,
-                'message' => $warehouse ? 'Warehouse Attachment created successfully.' : 'No attachment uploaded, no record created.',
-                'result' => $warehouse,
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage(),
-            ], 500);
         }
+
+        // Handle file upload and create warehouse attachment
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/warehouse_attachment/{$fileName}";
+
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+
+            if ($uploaded) {
+                $validated['file'] = $path;
+                $warehouse = WarehouseAttachment::create($validated); // Create warehouse attachment
+            } else {
+                throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
+            }
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 200,
+            'message' => ($warehouse && $warehouseInfo) 
+                ? 'Warehouse Attachment and Notes updated successfully.'
+                : ($warehouse 
+                    ? 'Warehouse Attachment created successfully.' 
+                    : ($warehouseInfo 
+                        ? 'Notes updated successfully.' 
+                        : 'No changes were made.'
+                    )
+                ),
+            'result' => [
+                'data' => $warehouse, 
+                'warehouseInfo' => $warehouseInfo
+            ]
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        DB::rollBack(); // Rollback before returning error
+        return response()->json([
+            'status' => 422,
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
 
 
  
