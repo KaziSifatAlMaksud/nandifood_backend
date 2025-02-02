@@ -262,28 +262,25 @@ public function index(Request $request)
                 'result' => ['data' => []],
             ]);
         }
-
-        // Update all fields except img1
-          $employee->fill($request->except('img1'));
-        // $employee->update($request->except('img1'));
-
-        // Handle image upload only for 'img1'
+    
+        // Update employee details excluding img1
+        $employee->fill($request->except('img1'));
+    
         if ($request->hasFile('img1')) {
             $file = $request->file('img1');
             $fileName = $file->getClientOriginalName();
             $path = "uploads/barcodes/{$fileName}";
-
+    
             // Delete old image if exists
             if (!empty($employee->img1)) {
                 Storage::disk('spaces')->delete($employee->img1);
             }
-
+    
             // Upload new image to DigitalOcean Spaces
             $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-
+    
             if ($uploaded) {
                 $employee->img1 = $path;
-                $employee->save(); // Save only if img1 is updated
             } else {
                 return response()->json([
                     'status' => 500,
@@ -291,14 +288,15 @@ public function index(Request $request)
                 ], 500);
             }
         }
-
+        $employee->save();
+    
         return response()->json([
             'status' => 200,
             'message' => 'Employee updated successfully.',
             'result' => ['data' => $employee],
         ]);
     }
-
+    
 
 
     public function employee_notes_store(Request $request)
