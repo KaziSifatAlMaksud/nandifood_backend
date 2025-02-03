@@ -400,13 +400,14 @@ public function store(Request $request)
             'global_default_warehouse' => 'nullable|string|max:10',
             'warehouse_capacity_in_kg' => 'nullable|string|max:10',
             'address1' => 'nullable|string|max:255',
+             'address2' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:25',
             'state' => 'nullable|string|max:25',
             'city' => 'nullable|string|max:25',
             'zip_code' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:255',
-            'address2' => 'nullable|string|max:255',
+           
             'warehouse_contact' => 'nullable|string|max:255',
             'emergency_phone' => 'nullable|string|max:255',
             'eff_date' => 'nullable|string',
@@ -548,6 +549,8 @@ public function getCapacity($warehouse_id)
     $totalCapacity->usedCapacity_slp = 0.0;
     $totalCapacity->availableTotalCapacity_ft3 = 0.0;
     $totalCapacity->availableCapacity_slp = 0.0;
+    $totalCapacity->usedStoragePercentage = 0;
+    $totalCapacity->availableStoragePercentage = 100;
     // $totalCapacity->storage_used = 0.0;  
     // $totalCapacity->storage_available = 100.0;
 
@@ -575,8 +578,7 @@ public function getCapacity($warehouse_id)
     $totalCapacity->availableTotalCapacity_ft3 = (float) ($totalCapacity->totalCapacity_ft3 - $totalCapacity->usedCapacity_total_ft3);
 
     // Calculate percentages for used and available storage in SLP
-    $totalCapacity->usedStoragePercentage = 0.0;
-    $totalCapacity->availableStoragePercentage = 0.0;
+   
 
     if ($totalCapacity->totalCapacity_slp > 0) {
         // Calculate used storage percentage for SLP
@@ -627,7 +629,7 @@ public function warehouse_attachment_store(Request $request)
         $warehouseInfo = null;
 
         // Check if description is provided
-        if (!empty($request->description)) {
+        // if (!empty($request->description)) {
             $warehouseInfo = Warehouse::where('id', $request->warehouse_id)->first();
 
             if ($warehouseInfo) {
@@ -640,7 +642,7 @@ public function warehouse_attachment_store(Request $request)
                 }
                 $warehouseInfo->save(); // Save only if it's not null
             }
-        }
+        // }
 
         // Handle file upload and create warehouse attachment
         if ($request->hasFile('file')) {
