@@ -11,6 +11,7 @@ use App\Http\Controllers\HupuController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPriceController;
+use App\Http\Controllers\CustomerController;
 
 
 
@@ -127,6 +128,12 @@ Route::Get('hu_pu/{id}/edit',[HupuController::class, 'edit']);
 Route::put('hu_pu/{id}', [HupuController::class, 'update']);
 Route::delete('/hu_pu/delete/{id}', [HupuController::class, 'destroy'])->name('hu_pu.destroy');
 
+// Customer API Route
+Route::get('/customer', [CustomerController::class, 'customer_list']);
+Route::post('/customer/create', [CustomerController::class, 'customer_store']);
+Route::get('/customer/{id}', [CustomerController::class, 'customer_show']);
+Route::post('/customer/{id}', [CustomerController::class, 'customer_update']);
+Route::delete('/customer/delete/{id}', [CustomerController::class, 'customer_destroy'])->name('customer.destroy');
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
