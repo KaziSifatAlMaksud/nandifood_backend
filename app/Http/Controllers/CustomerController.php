@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Warehouse;
 use App\Models\EmployeeNotes;
+use App\Models\CustomerNote;
  use Illuminate\Support\Facades\DB;
 use App\Models\Positions;
 use Illuminate\Support\Str;
@@ -66,8 +67,6 @@ class CustomerController extends Controller
                         $data['img'] = $imgPath;  
                     }
                 }
-
-                // Create the customer record
                 $customer = Customer::create($data);
 
                 // Commit the transaction
@@ -111,7 +110,9 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         $customer->img = $customer->img ? Storage::disk('spaces')->url($customer->img) : null;
-
+        $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
+        $customer->account_manager_name = Employee::where('id', $customer->account_manager)->value('first_name','middle_name', 'last_name');
+        $customer->account_manager_name = Employee::where('id', $customer->category_manager)->value('first_name','middle_name', 'last_name');
         if (!$customer) {
             return response()->json([
                 'status' => 404,
@@ -183,6 +184,98 @@ class CustomerController extends Controller
         }
     }
 
+
+    public function get_customer_all_notes($id)
+    {
+        $customer_notes = CustomerNote::where('id', $id)->get();
+        $customer_notes->map(function ($note) {
+            if ($note->file_path) {
+                $note->file = Storage::disk('spaces')->url($note->file_path);
+                $note->file_name = basename($note->file_path);
+            } else {
+                $note->file = null;
+            }
+            return $note;
+        });
+        return response()->json([
+            'status' => 200,
+            'message' => 'Customer Notes retrieved successfully.',
+            'result' => [
+                'data' => $customer_notes
+            ],
+        ]);
+    }
+
+
+    public function customer_notes_store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'customer_id' => 'required|string|max:11',
+                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
+                'note_date' => 'nullable|string', 
+                'file_description' => 'nullable|string|max:255',
+            ]);
+        
+            DB::beginTransaction();
+            if ($request->hasFile('file_path')) {
+                $file = $request->file('file_path');
+                $fileName =  $file->getClientOriginalName(); 
+                $path = "uploads/customer_notes/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+                if ($uploaded) {
+                    $validated['file_path'] = $path; 
+                } else {
+                    throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
+                }
+            }
+
+            $customerNote  = CustomerNote::create($validated);
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Customer Notes created successfully.',
+                'result' => [
+                    'data' => $customerNote
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function customer_notes_delete($id)
+    {
+        try {
+            $customerNote = CustomerNote::findOrFail($id);
+            if ($customerNote->file_path) {
+                $filePath = $customerNote->file_path;
+                if (Storage::disk('spaces')->exists($filePath)) {
+                    Storage::disk('spaces')->delete($filePath);
+                }
+            }
+
+            $customerNote->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Customer Note deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     // Delete a customer
     public function customer_destroy($id)

@@ -135,6 +135,11 @@ Route::get('/customer/{id}', [CustomerController::class, 'customer_show']);
 Route::post('/customer/{id}', [CustomerController::class, 'customer_update']);
 Route::delete('/customer/delete/{id}', [CustomerController::class, 'customer_destroy'])->name('customer.destroy');
 
+
+route::get('/get_customer_all_notes/{id}',[CustomerController::class, 'get_customer_all_notes']);
+route::post('/customer_notes/create', [CustomerController::class, 'customer_notes_store']);
+route::delete('/customer_notes/delete/{id}', [CustomerController::class, 'customer_notes_delete']);
+
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);
 route::get('/all_pu',[HupuController::class, 'pu_all']);
