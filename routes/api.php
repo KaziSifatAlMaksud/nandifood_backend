@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPriceController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SupplierController;
 
 
 
@@ -134,6 +135,13 @@ Route::post('/customer/create', [CustomerController::class, 'customer_store']);
 Route::get('/customer/{id}', [CustomerController::class, 'customer_show']);
 Route::post('/customer/{id}', [CustomerController::class, 'customer_update']);
 Route::delete('/customer/delete/{id}', [CustomerController::class, 'customer_destroy'])->name('customer.destroy');
+
+// Supplier API Route
+Route::get('/supplier', [SupplierController::class, 'supplier_list']);
+Route::post('/supplier/create', [SupplierController::class, 'supplier_store']);
+Route::get('/supplier/{id}', [SupplierController::class, 'supplier_show']);
+Route::post('/supplier/{id}', [SupplierController::class, 'supplier_update']);
+Route::delete('/supplier/delete/{id}', [SupplierController::class, 'supplier_destroy'])->name('supplier.destroy');
 
 
 route::get('/get_customer_all_notes/{id}',[CustomerController::class, 'get_customer_all_notes']);
