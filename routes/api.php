@@ -136,6 +136,12 @@ Route::get('/customer/{id}', [CustomerController::class, 'customer_show']);
 Route::post('/customer/{id}', [CustomerController::class, 'customer_update']);
 Route::delete('/customer/delete/{id}', [CustomerController::class, 'customer_destroy'])->name('customer.destroy');
 
+
+route::get('/get_customer_all_notes/{id}',[CustomerController::class, 'get_customer_all_notes']);
+route::post('/customer_notes/create', [CustomerController::class, 'customer_notes_store']);
+route::delete('/customer_notes/delete/{id}', [CustomerController::class, 'customer_notes_delete']);
+
+
 // Supplier API Route
 Route::get('/supplier', [SupplierController::class, 'supplier_list']);
 Route::post('/supplier/create', [SupplierController::class, 'supplier_store']);
@@ -144,9 +150,12 @@ Route::post('/supplier/{id}', [SupplierController::class, 'supplier_update']);
 Route::delete('/supplier/delete/{id}', [SupplierController::class, 'supplier_destroy'])->name('supplier.destroy');
 
 
-route::get('/get_customer_all_notes/{id}',[CustomerController::class, 'get_customer_all_notes']);
-route::post('/customer_notes/create', [CustomerController::class, 'customer_notes_store']);
-route::delete('/customer_notes/delete/{id}', [CustomerController::class, 'customer_notes_delete']);
+Route::get('/get_supplier_all_notes/{id}', [SupplierController::class, 'get_supplier_all_notes']);
+Route::post('/supplier_notes/create', [SupplierController::class, 'supplier_notes_store']);
+Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'supplier_notes_delete']);
+
+
+
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);

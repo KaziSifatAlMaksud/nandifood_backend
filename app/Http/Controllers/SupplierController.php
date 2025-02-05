@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Supplier;
+use App\Models\SupplierNote;
 
 
 
@@ -227,6 +228,100 @@ class SupplierController extends Controller
             ], 500);
         }
     }
+
+    public function get_supplier_all_notes($id)
+    {
+        $supplier_notes = SupplierNote::where('id', $id)->get();
+        $supplier_notes->map(function ($note) {
+            if ($note->file_path) {
+                $note->file = Storage::disk('spaces')->url($note->file_path);
+                $note->file_name = basename($note->file_path);
+            } else {
+                $note->file = null;
+            }
+            return $note;
+        });
+        return response()->json([
+            'status' => 200,
+            'message' => 'Supplier Notes retrieved successfully.',
+            'result' => [
+                'data' => $supplier_notes
+            ],
+        ]);
+    }
+
+
+    public function supplier_notes_store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'supplier_id' => 'required|string|max:11',
+                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
+                'note_date' => 'nullable|string',
+                'file_description' => 'nullable|string|max:255',
+            ]);
+
+            DB::beginTransaction();
+            if ($request->hasFile('file_path')) {
+                $file = $request->file('file_path');
+                $fileName = $file->getClientOriginalName(); 
+                $path = "uploads/supplier_notes/{$fileName}";
+                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+                if ($uploaded) {
+                    $validated['file_path'] = $path;
+                } else {
+                    throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
+                }
+            }
+
+            $supplierNote = SupplierNote::create($validated);
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Supplier Notes created successfully.',
+                'result' => [
+                    'data' => $supplierNote
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function supplier_notes_delete($id)
+    {
+        try {
+            $supplierNote = SupplierNote::findOrFail($id);
+            if ($supplierNote->file_path) {
+                $filePath = $supplierNote->file_path;
+                if (Storage::disk('spaces')->exists($filePath)) {
+                    Storage::disk('spaces')->delete($filePath);
+                }
+            }
+
+            $supplierNote->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Supplier Note deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
 
 }
