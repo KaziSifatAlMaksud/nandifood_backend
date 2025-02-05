@@ -47,67 +47,6 @@ class SupplierController extends Controller
             'result' => $suppliers
         ]);
     }
-
-
- 
-      public function supplier_store(Request $request)
-    {
-
-        try {
-            // Begin database transaction
-            DB::beginTransaction();
-
-            try {
-                $data = $request->all();
-
-                // Handle file upload for 'img' field (supplier image)
-                if ($request->hasFile('img')) {
-                    $img = $request->file('img');
-                    $imgName = time() . '_' . $img->getClientOriginalName(); 
-                    $imgPath = "uploads/supplier/{$imgName}";
-                    $uploaded = Storage::disk('spaces')->put($imgPath, file_get_contents($img), ['visibility' => 'public']);
-                    if ($uploaded) {
-                        $data['img'] = $imgPath;  // Add the image path to the data array
-                    }
-                }
-
-                // Create the supplier using the validated data
-                $supplier = Supplier::create($data);
-
-                // Commit the transaction
-                DB::commit();
-
-                // Return a success response
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Supplier created successfully',
-                    'result' => $supplier
-                ]);
-
-            } catch (\Illuminate\Validation\ValidationException $e) {
-                // Handle validation exception
-                return response()->json([
-                    'status' => 422,
-                    'errors' => $e->errors()
-                ], 422);
-
-            } catch (\Exception $e) {
-                // Handle general exception, rollback transaction
-                DB::rollBack();
-                return response()->json([
-                    'status' => 500,
-                    'error' => $e->getMessage()
-                ], 500);
-            }
-        } catch (\Exception $e) {
-            // Handle outer try-catch for database transaction issues
-            return response()->json([
-                'status' => 500,
-                'error' => 'Transaction failed: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function supplier_show($id)
     {
         // Find the supplier by ID
