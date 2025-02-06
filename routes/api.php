@@ -154,7 +154,8 @@ Route::get('/get_supplier_all_notes/{id}', [SupplierController::class, 'get_supp
 Route::post('/supplier_notes/create', [SupplierController::class, 'supplier_notes_store']);
 Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'supplier_notes_delete']);
 
-
+//Supplier Helper API
+route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
 
 
 // Purchasing Unit List 

@@ -42,4 +42,10 @@ class Supplier extends Model
         'img',
         'notes'
     ];
+
+    public function notes()
+    {
+        return $this->hasMany(SupplierNote::class);
+    }
+
 }

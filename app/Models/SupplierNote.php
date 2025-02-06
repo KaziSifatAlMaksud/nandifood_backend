@@ -24,6 +24,6 @@ class SupplierNote extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'customer_id');
+       return $this->belongsTo(Supplier::class, 'supplier_no', 'id');
     }
 }

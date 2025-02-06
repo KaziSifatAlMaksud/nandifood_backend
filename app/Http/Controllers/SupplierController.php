@@ -19,35 +19,51 @@ use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Supplier;
 use App\Models\SupplierNote;
+use App\Models\SupplierCategories;
 
 
 
 class SupplierController extends Controller
 {
-   public function supplier_list(Request $request)
-    {
-        $id = $request->input('id');
-        $limit = (int) $request->input('limit', 5);
-        $page = (int) $request->input('page', 1);  
-        $query = Supplier::query();
-        if ($id) {
-            $query->where('id', $id);
-        }
-        $suppliers = $query->paginate($limit, ['*'], 'page', $page);
+  
 
-        // Transform the collection if needed
-        $suppliers->getCollection()->transform(function ($supplier) {
-            $supplier->img = $supplier->img ? Storage::disk('spaces')->url($supplier->img) : null;
-            return $supplier;
-        });
+    public function supplier_list(Request $request)
+{
+    $id = $request->input('id');
+    $limit = (int) $request->input('limit', 5);
+    $page = (int) $request->input('page', 1);  
 
-        // Return the response in JSON format
-        return response()->json([
-            'status' => 200,
-            'message' => 'Supplier list retrieved successfully',
-            'result' => $suppliers
-        ]);
+    $query = Supplier::query();
+
+    // Filter by ID if it's passed in the request
+    if ($id) {
+        $query->where('id', $id);
     }
+
+    // Paginate the query results
+    $suppliers = $query->paginate($limit, ['*'], 'page', $page);
+
+    // Map through the suppliers to add the category name
+    $suppliers->getCollection()->map(function ($supplier) {
+        $supplier->supplier_category_name = SupplierCategories::where('id', $supplier->supplier_category)->value('category_name');
+        return $supplier;
+    });
+
+    // Transform the collection to add the full image URL if available
+    $suppliers->getCollection()->transform(function ($supplier) {
+        $supplier->img = $supplier->img ? Storage::disk('spaces')->url($supplier->img) : null;
+        return $supplier;
+    });
+
+    // Return the response in JSON format
+    return response()->json([
+        'status' => 200,
+        'message' => 'Supplier list retrieved successfully',
+        'result' => $suppliers
+    ]);
+}
+
+
     public function supplier_show($id)
     {
         // Find the supplier by ID
@@ -357,6 +373,17 @@ class SupplierController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function supplier_category(){
+        $supplier_categories = SupplierCategories::all();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Supplier categories retrieved successfully.',
+            'result' => [
+                'data' => $supplier_categories
+            ],
+        ]);
     }
 
 

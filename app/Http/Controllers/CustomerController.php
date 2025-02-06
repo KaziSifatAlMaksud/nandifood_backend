@@ -56,24 +56,17 @@ class CustomerController extends Controller
             DB::beginTransaction();
 
             try {
-                // Get the highest customer ID and increment by 1
-                $maxId = Customer::max('id');  // Get the max ID from the customer table
-                $newCustomerId = $maxId + 1;  // Increment the ID by 1
-
-                // Generate customer_no by using the new customer ID
+                $maxId = Customer::max('id');  
+                $newCustomerId = $maxId + 1;  
                 $newCustomerNo = 'C' . str_pad($newCustomerId, 4, '0', STR_PAD_LEFT);
-
-                // Ensure that the customer_no is unique
                 while (Customer::where('customer_no', $newCustomerNo)->exists()) {
-                    $newCustomerId++;  // Increment customer ID if the generated customer_no already exists
-                    $newCustomerNo = 'C' . str_pad($newCustomerId, 4, '0', STR_PAD_LEFT);  // Generate new customer_no
+                    $newCustomerId++;  
+                    $newCustomerNo = 'C' . str_pad($newCustomerId, 4, '0', STR_PAD_LEFT); 
                 }
 
-                // Prepare the data to be inserted
                 $data = $request->all();
-                $data['customer_no'] = $newCustomerNo;  // Add the generated customer_no to the data
+                $data['customer_no'] = $newCustomerNo; 
 
-                // Handle image upload for 'img' field (customer image)
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
                     $imgName = time() . '_' . $img->getClientOriginalName();
