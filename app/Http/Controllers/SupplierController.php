@@ -96,12 +96,26 @@ class SupplierController extends Controller
             DB::beginTransaction();
 
             try {
-                $data = $request->all();
+                $maxId = Supplier::max('id'); 
+                $newSupplierId = $maxId + 1; 
 
-                // Handle file upload for 'img' field (supplier image)
+                // Generate supplier_no by using the new supplier ID
+                $newSupplierNo = 'C' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);
+
+                // Ensure that the supplier_no is unique
+                while (Supplier::where('supplier_no', $newSupplierNo)->exists()) {
+                    $newSupplierId++; 
+                    $newSupplierNo = 'S' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);  // Generate new supplier_no
+                }
+
+                // Prepare the data to be inserted
+                $data = $request->all();
+                $data['supplier_no'] = $newSupplierNo;  // Add the generated supplier_no to the data
+
+                // Handle image upload
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
-                    $imgName = time() . '_' . $img->getClientOriginalName(); 
+                    $imgName = time() . '_' . $img->getClientOriginalName();
                     $imgPath = "uploads/supplier/{$imgName}";
                     $uploaded = Storage::disk('spaces')->put($imgPath, file_get_contents($img), ['visibility' => 'public']);
                     if ($uploaded) {
@@ -109,7 +123,7 @@ class SupplierController extends Controller
                     }
                 }
 
-                // Create the supplier using the validated data
+                // Create the new supplier
                 $supplier = Supplier::create($data);
 
                 // Commit the transaction
@@ -130,7 +144,7 @@ class SupplierController extends Controller
                 ], 422);
 
             } catch (\Exception $e) {
-                
+                // Handle any other exceptions
                 DB::rollBack();
                 return response()->json([
                     'status' => 500,
@@ -251,6 +265,7 @@ class SupplierController extends Controller
     }
 
 
+
     public function supplier_notes_store(Request $request)
     {
         try {
@@ -262,27 +277,49 @@ class SupplierController extends Controller
             ]);
 
             DB::beginTransaction();
+            $supplierInfo = null;
+            $SupplierInfo = Supplier::where('id', $validated['supplier_id'])->first();
+
+            if ($SupplierInfo) {
+                $supplierInfo = $SupplierInfo;
+                $supplierInfo->notes = $request->file_description;
+                $supplierInfo->save();
+            }
+
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName = $file->getClientOriginalName(); 
+                $fileName = $file->getClientOriginalName();
                 $path = "uploads/supplier_notes/{$fileName}";
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
                 if ($uploaded) {
                     $validated['file_path'] = $path;
+                    $supplierNote = SupplierNote::create($validated);
+
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
             }
 
-            $supplierNote = SupplierNote::create($validated);
+          
             DB::commit();
+
             return response()->json([
                 'status' => 200,
-                'message' => 'Supplier Notes created successfully.',
+                'message' => ($supplierNote && $supplierInfo)
+                    ? 'Supplier Notes and Notes updated successfully.'
+                    : ($supplierNote
+                        ? 'Supplier Notes created successfully.'
+                        : ($supplierInfo
+                            ? 'Notes updated successfully.'
+                            : 'No changes were made.'
+                        )
+                    ),
                 'result' => [
-                    'data' => $supplierNote
-                ],
+                    'data' => $supplierNote,
+                    'supplierInfo' => $supplierInfo
+                ]
             ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => 422,

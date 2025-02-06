@@ -48,6 +48,7 @@ class CustomerController extends Controller
 }
 
 
+
     public function customer_store(Request $request)
     {
         try {
@@ -55,18 +56,35 @@ class CustomerController extends Controller
             DB::beginTransaction();
 
             try {
-                $data = $request->all();
+                // Get the highest customer ID and increment by 1
+                $maxId = Customer::max('id');  // Get the max ID from the customer table
+                $newCustomerId = $maxId + 1;  // Increment the ID by 1
 
-                // Handle file upload for 'img' field (customer image)
+                // Generate customer_no by using the new customer ID
+                $newCustomerNo = 'C' . str_pad($newCustomerId, 4, '0', STR_PAD_LEFT);
+
+                // Ensure that the customer_no is unique
+                while (Customer::where('customer_no', $newCustomerNo)->exists()) {
+                    $newCustomerId++;  // Increment customer ID if the generated customer_no already exists
+                    $newCustomerNo = 'C' . str_pad($newCustomerId, 4, '0', STR_PAD_LEFT);  // Generate new customer_no
+                }
+
+                // Prepare the data to be inserted
+                $data = $request->all();
+                $data['customer_no'] = $newCustomerNo;  // Add the generated customer_no to the data
+
+                // Handle image upload for 'img' field (customer image)
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
-                    $imgName = time() . '_' . $img->getClientOriginalName(); 
+                    $imgName = time() . '_' . $img->getClientOriginalName();
                     $imgPath = "uploads/customer/{$imgName}";
                     $uploaded = Storage::disk('spaces')->put($imgPath, file_get_contents($img), ['visibility' => 'public']);
                     if ($uploaded) {
-                        $data['img'] = $imgPath;  
+                        $data['img'] = $imgPath;  // Add the image path to the data array
                     }
                 }
+
+                // Create the new customer
                 $customer = Customer::create($data);
 
                 // Commit the transaction
@@ -86,7 +104,7 @@ class CustomerController extends Controller
                 ], 422);
 
             } catch (\Exception $e) {
-                // Handle general exception, rollback transaction
+                // Handle any other exceptions
                 DB::rollBack();
                 return response()->json([
                     'status' => 500,
@@ -213,31 +231,53 @@ class CustomerController extends Controller
             $validated = $request->validate([
                 'customer_id' => 'required|string|max:11',
                 'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
-                'note_date' => 'nullable|string', 
+                'note_date' => 'nullable|string',
                 'file_description' => 'nullable|string|max:255',
             ]);
-        
+
             DB::beginTransaction();
+            $customerInfo = null;
+            $CustomerInfo = Customer::where('id', $validated['customer_id'])->first();
+
+            if ($CustomerInfo) {
+                $customerInfo = $CustomerInfo;
+                $customerInfo->notes = $request->file_description;  // Optionally update customer notes
+                $customerInfo->save();
+            }
+
+            // Handle file upload if a file is provided
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName =  $file->getClientOriginalName(); 
+                $fileName = $file->getClientOriginalName();
                 $path = "uploads/customer_notes/{$fileName}";
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
                 if ($uploaded) {
-                    $validated['file_path'] = $path; 
+                    $validated['file_path'] = $path;
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
             }
 
-            $customerNote  = CustomerNote::create($validated);
+            // Create the customer note
+            $customerNote = CustomerNote::create($validated);
+
             DB::commit();
+
             return response()->json([
                 'status' => 200,
-                'message' => 'Customer Notes created successfully.',
+                'message' => ($customerNote && $customerInfo)
+                    ? 'Customer Notes and Customer updated successfully.'
+                    : ($customerNote
+                        ? 'Customer Notes created successfully.'
+                        : ($customerInfo
+                            ? 'Customer updated successfully.'
+                            : 'No changes were made.'
+                        )
+                    ),
                 'result' => [
-                    'data' => $customerNote
-                ],
+                    'data' => $customerNote,
+                    'customerInfo' => $customerInfo
+                ]
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -252,6 +292,7 @@ class CustomerController extends Controller
             ], 500);
         }
     }
+
 
     public function customer_notes_delete($id)
     {
