@@ -34,28 +34,18 @@ class SupplierController extends Controller
     $page = (int) $request->input('page', 1);  
 
     $query = Supplier::query();
-
-    // Filter by ID if it's passed in the request
     if ($id) {
         $query->where('id', $id);
     }
-
-    // Paginate the query results
     $suppliers = $query->paginate($limit, ['*'], 'page', $page);
-
-    // Map through the suppliers to add the category name
     $suppliers->getCollection()->map(function ($supplier) {
         $supplier->supplier_category_name = SupplierCategories::where('id', $supplier->supplier_category)->value('category_name');
         return $supplier;
     });
-
-    // Transform the collection to add the full image URL if available
     $suppliers->getCollection()->transform(function ($supplier) {
         $supplier->img = $supplier->img ? Storage::disk('spaces')->url($supplier->img) : null;
         return $supplier;
     });
-
-    // Return the response in JSON format
     return response()->json([
         'status' => 200,
         'message' => 'Supplier list retrieved successfully',
@@ -66,26 +56,15 @@ class SupplierController extends Controller
 
     public function supplier_show($id)
     {
-        // Find the supplier by ID
         $supplier = Supplier::findOrFail($id);
-
-        // Check if an image exists for the supplier, if so update the image URL
         $supplier->img = $supplier->img ? Storage::disk('spaces')->url($supplier->img) : null;
-
-        // Retrieve the position name for the supplier
         $supplier->position_name = Positions::where('id', $supplier->position)->value('position_name');
-        
-        // Get account manager full name
         $supplier->account_manager_name = Employee::where('id', $supplier->account_manager)
             ->selectRaw("CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name) as full_name")
             ->value('full_name');
-
-        // Get category manager full name
         $supplier->category_manager_name = Employee::where('id', $supplier->category_manager)
             ->selectRaw("CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name) as full_name")
             ->value('full_name');
-
-        // If supplier not found, return an error response
         if (!$supplier) {
             return response()->json([
                 'status' => 404,
@@ -93,8 +72,6 @@ class SupplierController extends Controller
                 'message' => 'Supplier not found.',
             ], 404);
         }
-
-        // Return the supplier with the updated image URL and other data
         return response()->json([
             'status' => 200,
             'message' => 'Supplier retrieved successfully.',
@@ -114,38 +91,24 @@ class SupplierController extends Controller
             try {
                 $maxId = Supplier::max('id'); 
                 $newSupplierId = $maxId + 1; 
-
-                // Generate supplier_no by using the new supplier ID
                 $newSupplierNo = 'C' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);
-
-                // Ensure that the supplier_no is unique
                 while (Supplier::where('supplier_no', $newSupplierNo)->exists()) {
                     $newSupplierId++; 
                     $newSupplierNo = 'S' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);  // Generate new supplier_no
                 }
-
-                // Prepare the data to be inserted
                 $data = $request->all();
-                $data['supplier_no'] = $newSupplierNo;  // Add the generated supplier_no to the data
-
-                // Handle image upload
+                $data['supplier_no'] = $newSupplierNo;  
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
                     $imgName = time() . '_' . $img->getClientOriginalName();
                     $imgPath = "uploads/supplier/{$imgName}";
                     $uploaded = Storage::disk('spaces')->put($imgPath, file_get_contents($img), ['visibility' => 'public']);
                     if ($uploaded) {
-                        $data['img'] = $imgPath;  // Add the image path to the data array
+                        $data['img'] = $imgPath; 
                     }
                 }
-
-                // Create the new supplier
                 $supplier = Supplier::create($data);
-
-                // Commit the transaction
                 DB::commit();
-
-                // Return a success response
                 return response()->json([
                     'status' => 200,
                     'message' => 'Supplier created successfully',
@@ -153,7 +116,6 @@ class SupplierController extends Controller
                 ]);
 
             } catch (\Illuminate\Validation\ValidationException $e) {
-                // Handle validation exception
                 return response()->json([
                     'status' => 422,
                     'errors' => $e->errors()
@@ -257,6 +219,18 @@ class SupplierController extends Controller
                 'error' => 'An error occurred while deleting the supplier: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function get_shipping_info($id)
+    {
+        $shipping_info = ShippingInfo::where('id', $id)->get();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Shipping Info retrieved successfully.',
+            'result' => [
+                'data' => $shipping_info
+            ],
+        ]);
     }
 
     public function get_supplier_all_notes($id)

@@ -200,6 +200,9 @@ route::get('/uom_name',[UomController::class, 'uom_name']);
 
 
 
+Route::get('/shipping_info', [SupplierController::class, 'get_shipping_info']);
+
+
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
 Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
