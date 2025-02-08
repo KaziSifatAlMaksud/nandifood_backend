@@ -22,30 +22,36 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerController extends Controller
 {
-   public function customer_list(Request $request)
-{
-    $id = $request->input('id');
-    $limit = (int) $request->input('limit', 5); // Default limit is 5
-    $page = (int) $request->input('page', 1);  
-    $query = Customer::query();
 
-    if ($id) {
-        $query->where('id', $id);
+    public function customer_list(Request $request)
+    {
+        $id = $request->input('id');
+        $limit = (int) $request->input('limit', 5); // Default limit is 5
+        $page = (int) $request->input('page', 1);  
+        $query = Customer::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+        $customers = $query->paginate($limit, ['*'], 'page', $page);
+
+        // Transform the collection for each customer
+        $customers->getCollection()->transform(function ($customer) {
+            // Get the position name for each customer
+            $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
+
+            // Add the image URL if it exists
+            $customer->img = $customer->img ? Storage::disk('spaces')->url($customer->img) : null;
+            
+            return $customer;
+        });
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Customer list retrieved successfully',
+            'result' => $customers
+        ]);
     }
-    $customers = $query->paginate($limit, ['*'], 'page', $page);
-
-    // Transform the collection
-    $customers->getCollection()->transform(function ($customer) {
-        $customer->img = $customer->img ? Storage::disk('spaces')->url($customer->img) : null;
-        return $customer;
-    });
-
-    return response()->json([
-        'status' => 200,
-        'message' => 'Customer list retrieved successfully',
-        'result' => $customers
-    ]);
-}
 
 
 
