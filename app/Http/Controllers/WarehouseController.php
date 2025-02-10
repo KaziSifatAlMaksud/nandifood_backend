@@ -391,7 +391,7 @@ public function warehouse_name(){
 }
 
 public function defult_warehouse_info(){
-    $warehouses = Warehouse::select('id', 'warehouse_name as name', 'address1', 'address2', 'country', 'state', 'city', 'zip_code')->get();
+    $warehouses = Warehouse::select('id', 'warehouse_name as name', 'address1', 'address2', 'country', 'state', 'city', 'zip_code','email','phone','warehouse_contact')->get();
 
     return response()->json([
         'status' => '200',
