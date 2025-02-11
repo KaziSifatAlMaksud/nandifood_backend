@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPriceController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ShippingInfoController;
 
 
 
@@ -171,6 +172,13 @@ route::get('/get_position',[EmployeeController::class, 'get_position']);
 route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 
 // route::get('/',[HupuController::class, 'pu_list']);
+
+
+Route::get('/shipping_info/{shipping_type}/cus_or_sup_id', [ShippingInfoController::class, 'index']);
+Route::POST('/shipping_info/create', [ShippingInfoController::class, 'store']);
+Route::Get('/shipping_info/{id}',[ShippingInfoController::class, 'show']);
+Route::POST('/shipping_info/{id}', [ShippingInfoController::class, 'update']);
+Route::delete('/shipping_info/delete/{id}', [ShippingInfoController::class, 'destroy']);
 
 
 

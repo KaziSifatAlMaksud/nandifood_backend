@@ -14,7 +14,7 @@ class ShippingInfo extends Model
     public $timestamps = false; 
     protected $fillable = [
         'select_shipping_location',
-        'address1',
+        'address1',     
         'address2',
         'city',
         'state',
@@ -26,7 +26,9 @@ class ShippingInfo extends Model
         'first_name',
         'middle_name',
         'last_name',
-        'position_id',
-        'type',
+        'position',
+        'status',
+        'shipping_type',
+        'cus_or_sup_id'
     ];
 }
