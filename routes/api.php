@@ -174,7 +174,7 @@ route::get('/get_all_notes/{id}',[EmployeeController::class, 'get_all_notes']);
 // route::get('/',[HupuController::class, 'pu_list']);
 
 
-Route::get('/shipping_info/{shipping_type}/cus_or_sup_id', [ShippingInfoController::class, 'index']);
+Route::get('/shipping_info/{shipping_type}/{cus_or_sup_id}', [ShippingInfoController::class, 'index']);
 Route::POST('/shipping_info/create', [ShippingInfoController::class, 'store']);
 Route::Get('/shipping_info/{id}',[ShippingInfoController::class, 'show']);
 Route::POST('/shipping_info/{id}', [ShippingInfoController::class, 'update']);

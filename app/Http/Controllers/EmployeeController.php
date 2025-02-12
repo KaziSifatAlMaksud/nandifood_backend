@@ -181,8 +181,6 @@ public function index(Request $request)
     {
         // Retrieve employee notes for the given employee ID
         $employee_notes = EmployeeNotes::where('employee_id', $id)->get();
-
-        // Map over the notes and handle attachments properly
         $employee_notes->map(function ($note) {
             if ($note->file_path) {
                 $note->file = Storage::disk('spaces')->url($note->file_path);
@@ -302,34 +300,58 @@ public function index(Request $request)
     public function employee_notes_store(Request $request)
     {
         try {
+            // Validate incoming request
             $validated = $request->validate([
                 'employee_id' => 'required|string|max:11',
                 'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
                 'note_date' => 'nullable|string', 
                 'file_description' => 'nullable|string|max:255',
             ]);
-        
+
             DB::beginTransaction();
-            
+
+            // Fetch employee information
+            $employeeInfo = null;
+            $EmployeeInfo = Employee::where('id', $validated['employee_id'])->first();
+
+            if ($EmployeeInfo) {
+                $employeeInfo = $EmployeeInfo;
+                $employeeInfo->notes = $request->file_description;  // Optionally update employee notes
+                $employeeInfo->save();
+            }
+
+            // Handle file upload if a file is provided
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName =  $file->getClientOriginalName(); 
+                $fileName = $file->getClientOriginalName();
                 $path = "uploads/employee_notes/{$fileName}";
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
                 if ($uploaded) {
-                    $validated['file_path'] = $path; 
+                    $validated['file_path'] = $path;
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
             }
 
-            $employeeNote  = EmployeeNotes::create($validated);
+            // Create the employee note
+            $employeeNote = EmployeeNotes::create($validated);
+
             DB::commit();
+
             return response()->json([
                 'status' => 200,
-                'message' => 'Employee Notes created successfully.',
+                'message' => ($employeeNote && $employeeInfo)
+                    ? 'Employee Notes and Employee updated successfully.'
+                    : ($employeeNote
+                        ? 'Employee Notes created successfully.'
+                        : ($employeeInfo
+                            ? 'Employee updated successfully.'
+                            : 'No changes were made.'
+                        )
+                    ),
                 'result' => [
-                    'data' => $employeeNote
+                    'data' => $employeeNote,
+                    'employeeInfo' => $employeeInfo
                 ],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
