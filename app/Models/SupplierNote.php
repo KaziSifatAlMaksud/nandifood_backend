@@ -24,8 +24,8 @@ class SupplierNote extends Model
         'uploaded_by',
     ];
 
-    // public function supplier()
-    // {
-    //    return $this->belongsTo(Supplier::class, 'supplier_no', 'id');
-    // }
+    public function supplier()
+    {
+       return $this->belongsTo(Supplier::class, 'supplier_no', 'id');
+    }
 }
