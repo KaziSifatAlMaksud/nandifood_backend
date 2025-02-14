@@ -14,6 +14,8 @@ class SupplierNote extends Model
     protected $primaryKey = 'id';
 
 
+    public $timestamps = false;
+
     protected $fillable = [
         'supplier_id',
         'file_description',
@@ -22,8 +24,8 @@ class SupplierNote extends Model
         'uploaded_by',
     ];
 
-    public function supplier()
-    {
-       return $this->belongsTo(Supplier::class, 'supplier_no', 'id');
-    }
+    // public function supplier()
+    // {
+    //    return $this->belongsTo(Supplier::class, 'supplier_no', 'id');
+    // }
 }
