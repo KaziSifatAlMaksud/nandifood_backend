@@ -22,6 +22,7 @@ class SupplierNote extends Model
         'note_date',
         'file_path',
         'uploaded_by',
+        'type',
     ];
 
     public function supplier()

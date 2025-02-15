@@ -23,6 +23,7 @@ class CreditTerm extends Model
         'credit_limit',
         'credit_status',
         'cus_sup_id',
+        'type',
     ];
 
 }

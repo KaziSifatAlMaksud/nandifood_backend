@@ -141,6 +141,8 @@ Route::delete('/customer/delete/{id}', [CustomerController::class, 'customer_des
 route::get('/get_customer_all_notes/{id}',[CustomerController::class, 'get_customer_all_notes']);
 route::post('/customer_notes/create', [CustomerController::class, 'customer_notes_store']);
 route::delete('/customer_notes/delete/{id}', [CustomerController::class, 'customer_notes_delete']);
+//Customer Helper API
+route::get('/customer_category', [CustomerController::class, 'customer_category']);
 
 
 // Supplier API Route
@@ -157,6 +159,8 @@ Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'suppli
 
 //Supplier Helper API
 route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
+
+route::post('/credit_terms/create', [SupplierController::class, 'credit_terms_store']);
 
 
 // Purchasing Unit List 

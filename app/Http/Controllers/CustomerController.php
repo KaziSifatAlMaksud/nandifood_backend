@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Warehouse;
 use App\Models\EmployeeNotes;
 use App\Models\CustomerNote;
+use App\Models\CustomerCategory;
  use Illuminate\Support\Facades\DB;
 use App\Models\Positions;
 use Illuminate\Support\Str;
@@ -232,13 +233,14 @@ class CustomerController extends Controller
                 'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
                 'note_date' => 'nullable|string',
                 'file_description' => 'nullable|string|max:255',
+                'type' => 'required|integer',
             ]);
 
             DB::beginTransaction();
             $customerInfo = null;
             $CustomerInfo = Customer::where('id', $validated['customer_id'])->first();
 
-            if ($CustomerInfo) {
+            if ($CustomerInfo && $request->type == 1) {
                 $customerInfo = $CustomerInfo;
                 $customerInfo->notes = $request->file_description;  // Optionally update customer notes
                 $customerInfo->save();
@@ -338,4 +340,15 @@ class CustomerController extends Controller
                 'message' => 'Customer deleted successfully'
             ], 200);
     }
+
+    public function customer_category()
+    {
+        $customerCategory = CustomerCategory::all();
+
+        return response()->json([
+            'status' => 200,
+            'result' => $customerCategory
+        ], 200);
+    }
+
 }

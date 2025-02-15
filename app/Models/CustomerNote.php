@@ -20,6 +20,7 @@ class CustomerNote extends Model
         'note_date',
         'file_path',
         'uploaded_by',
+        'type',
     ];
 
     public function customer()

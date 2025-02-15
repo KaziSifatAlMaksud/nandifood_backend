@@ -47,7 +47,7 @@ class ShippingInfoController extends Controller
             'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
             'position' => 'nullable|string|max:255',
-            'status' => 'required|string|max:20',
+            'status' => 'nullable|string|max:20',
             'shipping_type' => 'required|string|max:20',
             'cus_or_sup_id' => 'required|string|max:20'
         ]);
