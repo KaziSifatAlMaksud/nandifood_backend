@@ -362,63 +362,166 @@ class SupplierController extends Controller
     }
 
 
-    public function credit_terms_store(Request $request)
+    // public function credit_terms_store(Request $request)
+    // {
+    //     $q = $request->q;
+    //     switch ($q) {
+    //         case 'approved':
+    //             $temp_id = $request->temp_id;
+
+    //             if ($temp_id) {
+    //                 $supplier = CreditTerm::find($temp_id);  
+
+    //                 if (!$supplier) {
+    //                     return response()->json(['message' => 'Credit term not found!'], 404);
+    //                 }
+
+    //                 $supplier->credit_status = $request->credit_status;
+    //                 $supplier->cus_sup_id = $request->cus_sup_id;
+    //                 $supplier->credit_limit = $request->credit_limit;
+    //                 $supplier->credit_type = $request->credit_type;
+    //                 $supplier->save();
+
+    //                 // You need to define `credit_terms` before using it
+    //                 $credit_terms = $request->credit_terms;
+
+    //                 if ($credit_terms == 1) {
+    //                     $supplierModel = Supplier::find($request->cus_sup_id);
+    //                     if ($supplierModel) {
+    //                         $supplierModel->credit_terms = $request->credit_terms;
+    //                         $supplierModel->save(); // Save changes
+    //                     }
+    //                 } elseif ($credit_terms == 2) {
+    //                     // Handle logic for credit_terms == 2 if needed
+    //                 }
+
+    //                 return response()->json(['message' => 'Credit term updated successfully!', 'data' => $supplier]);
+    //             } else {
+    //                 $validated = $request->validate([
+    //                     'credit_terms' => 'required|string|max:11',
+    //                     'credit_type' => 'nullable|string|max:255',
+    //                     'credit_limit' => 'nullable|string|max:255',
+    //                     'credit_status' => 'nullable|string|max:255',
+    //                     'cus_sup_id' => 'required|integer',
+    //                 ]);
+
+    //                 $supplierNote = CreditTerm::create($validated);
+    //                 return response()->json(['message' => 'Credit term stored successfully!', 'data' => $supplierNote]);
+    //             }
+    //             break;
+
+    //         case 'save':
+    //             // Handle 'save' case logic here if needed
+    //             return response()->json(['message' => 'Save case logic is not implemented.']);
+    //             break;
+
+    //         default:
+    //             return response()->json(['message' => 'Invalid request type!'], 400);
+    //     }
+    // }
+
+    public function get_credit_terms($type, $cus_sup_id)
     {
-        $q = $request->q;
-        switch ($q) {
-            case 'approved':
-                $temp_id = $request->temp_id;
+        $creditTreamInfo = CreditTerm::where('type', $type)
+        ->where('cus_sup_id', $cus_sup_id)->get();
 
-                if ($temp_id) {
-                    $supplier = CreditTerm::find($temp_id);  
-
-                    if (!$supplier) {
-                        return response()->json(['message' => 'Credit term not found!'], 404);
-                    }
-
-                    $supplier->credit_status = $request->credit_status;
-                    $supplier->cus_sup_id = $request->cus_sup_id;
-                    $supplier->credit_limit = $request->credit_limit;
-                    $supplier->credit_type = $request->credit_type;
-                    $supplier->save();
-
-                    // You need to define `credit_terms` before using it
-                    $credit_terms = $request->credit_terms;
-
-                    if ($credit_terms == 1) {
-                        $supplierModel = Supplier::find($request->cus_sup_id);
-                        if ($supplierModel) {
-                            $supplierModel->credit_terms = $request->credit_terms;
-                            $supplierModel->save(); // Save changes
-                        }
-                    } elseif ($credit_terms == 2) {
-                        // Handle logic for credit_terms == 2 if needed
-                    }
-
-                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $supplier]);
-                } else {
-                    $validated = $request->validate([
-                        'credit_terms' => 'required|string|max:11',
-                        'credit_type' => 'nullable|string|max:255',
-                        'credit_limit' => 'nullable|string|max:255',
-                        'credit_status' => 'nullable|string|max:255',
-                        'cus_sup_id' => 'required|integer',
-                    ]);
-
-                    $supplierNote = CreditTerm::create($validated);
-                    return response()->json(['message' => 'Credit term stored successfully!', 'data' => $supplierNote]);
-                }
-                break;
-
-            case 'save':
-                // Handle 'save' case logic here if needed
-                return response()->json(['message' => 'Save case logic is not implemented.']);
-                break;
-
-            default:
-                return response()->json(['message' => 'Invalid request type!'], 400);
+        // Check if records were found
+        if ($creditTreamInfo->isEmpty()) {
+            return response()->json([
+                'message' => 'No Credit Terms info found for the given type and ID.'
+            ], 404);
         }
+
+        return response()->json([
+            'message' => 'Credit Terms Info retrieved successfully!',
+            'data' => $creditTreamInfo
+        ], 200);
     }
 
+  
+
+
+        public function credit_terms_store(Request $request)
+        {
+            $action = $request->action;
+            switch ($action) {
+                case 'approved':
+                        $validated = $request->validate([
+                            'credit_terms' => 'required|string|max:11',
+                            'credit_type' => 'nullable|string|max:255',
+                            'credit_limit' => 'nullable|string|max:255',
+                            'credit_status' => 'nullable|string|max:255',
+                            'cus_sup_id' => 'required|integer',
+                            'is_approve' => 'required|integer',
+                            'notes' => 'nullable|string',
+                            'type' => 'required|integer'
+                        ]);
+                    
+                        // Find the existing CreditTerm record
+                        $creditTerm = CreditTerm::where('cus_sup_id', $request->cus_sup_id)->first();
+                    
+                        if ($creditTerm) {
+                            // Update all values
+                            $creditTerm->update($validated);
+
+                            if ($request->type == 1) {
+                                $supplierinfo = Supplier::where('id', $request->cus_sup_id)->first();
+                                
+                                if ($supplierinfo) {
+                                    $supplierinfo->credit_terms = $request->credit_limit;
+                                    $supplierinfo->save();
+                                }
+                            }else if($request->type == 2){
+                                $customerinfo = Customer::where('id', $request->cus_sup_id)->first();
+                                
+                                if ($supplierinfo) {
+                                    $supplierinfo->credit_terms = $request->credit_limit;
+                                    $supplierinfo->save();
+                                }
+                            }
+                            
+
+                            return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
+                        } else {
+                             // Create a new record
+                             $newCreditTerm = CreditTerm::create($validated);
+                            return response()->json(['message' => 'Credit term Created successfully!', 'data' => $newCreditTerm]);
+                        }                  
+                    
+                    break;
+
+                    case 'save':
+                        $cus_sup_id = $request->cus_sup_id;
+                    
+                        $validated = $request->validate([
+                            'credit_terms' => 'required|string|max:11',
+                            'credit_type' => 'nullable|string|max:255',
+                            'credit_limit' => 'nullable|string|max:255',
+                            'credit_status' => 'nullable|string|max:255',
+                            'cus_sup_id' => 'required|integer',
+                            'is_approve' => 'required|integer',
+                            'notes' => 'nullable|string',
+                            'type' => 'required|integer'
+                        ]);
+                        $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
+                    
+                        if ($creditTerm) {
+                            // Update existing record
+                            $creditTerm->update($validated);
+                            return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
+                        } else {
+                            // Create a new record
+                            $newCreditTerm = CreditTerm::create($validated);
+                            return response()->json(['message' => 'Credit term created successfully!', 'data' => $newCreditTerm]);
+                        }
+                    
+                        break;
+                    
+
+                default:
+                    return response()->json(['message' => 'Invalid request type!'], 400);
+            
+        }
+    }
 
 }

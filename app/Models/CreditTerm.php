@@ -24,6 +24,8 @@ class CreditTerm extends Model
         'credit_status',
         'cus_sup_id',
         'type',
+        'is_approve',
+        'notes'
     ];
 
 }
