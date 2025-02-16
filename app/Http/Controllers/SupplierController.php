@@ -82,33 +82,47 @@ class SupplierController extends Controller
     }
 
     
+
     public function supplier_store(Request $request)
     {
         try {
             // Begin database transaction
             DB::beginTransaction();
 
+            $action = $request->action; 
+            $isApprove = ($action == 'approve') ? 2 : 1;
+
             try {
                 $maxId = Supplier::max('id'); 
                 $newSupplierId = $maxId + 1; 
-                $newSupplierNo = 'C' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);
+                $newSupplierNo = 'S' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);
+
+                // Ensure unique supplier_no
                 while (Supplier::where('supplier_no', $newSupplierNo)->exists()) {
                     $newSupplierId++; 
-                    $newSupplierNo = 'S' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);  // Generate new supplier_no
+                    $newSupplierNo = 'S' . str_pad($newSupplierId, 4, '0', STR_PAD_LEFT);
                 }
+
                 $data = $request->all();
-                $data['supplier_no'] = $newSupplierNo;  
+                $data['is_approved'] = $isApprove; // Assign is_approve based on action
+                $data['supplier_no'] = $newSupplierNo;
+            
+
+                // Handle image upload
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
                     $imgName = time() . '_' . $img->getClientOriginalName();
                     $imgPath = "uploads/supplier/{$imgName}";
                     $uploaded = Storage::disk('spaces')->put($imgPath, file_get_contents($img), ['visibility' => 'public']);
                     if ($uploaded) {
-                        $data['img'] = $imgPath; 
+                        $data['img'] = $imgPath;
                     }
                 }
+
+                // Create supplier
                 $supplier = Supplier::create($data);
                 DB::commit();
+
                 return response()->json([
                     'status' => 200,
                     'message' => 'Supplier created successfully',
@@ -116,13 +130,13 @@ class SupplierController extends Controller
                 ]);
 
             } catch (\Illuminate\Validation\ValidationException $e) {
+                DB::rollBack();
                 return response()->json([
                     'status' => 422,
                     'errors' => $e->errors()
                 ], 422);
 
             } catch (\Exception $e) {
-                // Handle any other exceptions
                 DB::rollBack();
                 return response()->json([
                     'status' => 500,
@@ -130,7 +144,6 @@ class SupplierController extends Controller
                 ], 500);
             }
         } catch (\Exception $e) {
-            // Handle outer try-catch for database transaction issues
             return response()->json([
                 'status' => 500,
                 'error' => 'Transaction failed: ' . $e->getMessage()
@@ -144,7 +157,11 @@ class SupplierController extends Controller
         DB::beginTransaction(); 
 
         try {
-            // Find the Supplier record by ID
+          
+           $action = $request->action; 
+           $isApprove = ($action == 'approve') ? 2 : 1;
+
+
             $supplier = Supplier::find($id);
             if (!$supplier) {
                 return response()->json([
@@ -153,6 +170,7 @@ class SupplierController extends Controller
                     'message' => 'Supplier not found.',
                 ], 404);
             }
+            
             $supplier->fill($request->except(['img']));
             if ($request->hasFile('img')) {
                 $img = $request->file('img');
@@ -177,7 +195,7 @@ class SupplierController extends Controller
                     ], 400);
                 }
             }
-
+            $supplier->is_approved = $isApprove;
             $supplier->save();
             DB::commit();
             return response()->json([
@@ -364,61 +382,67 @@ class SupplierController extends Controller
 
     public function credit_terms_store(Request $request)
     {
-        $q = $request->q;
-        switch ($q) {
+        // Get the action type from the request
+        $submit_action = $request->input('submit_action');
+
+        // Validate request data
+        $validated = $request->validate([
+            'credit_terms'  => 'required|integer',
+            'credit_type'   => 'nullable|string|max:255',
+            'credit_limit'  => 'nullable|string|max:255',
+            'credit_status' => 'nullable|string|max:255',
+            'cus_sup_id'    => 'required|integer',
+        ]);
+
+        switch ($submit_action) {
             case 'approved':
-                $temp_id = $request->temp_id;
-
-                if ($temp_id) {
-                    $supplier = CreditTerm::find($temp_id);  
-
-                    if (!$supplier) {
-                        return response()->json(['message' => 'Credit term not found!'], 404);
-                    }
-
-                    $supplier->credit_status = $request->credit_status;
-                    $supplier->cus_sup_id = $request->cus_sup_id;
-                    $supplier->credit_limit = $request->credit_limit;
-                    $supplier->credit_type = $request->credit_type;
-                    $supplier->save();
-
-                    // You need to define `credit_terms` before using it
-                    $credit_terms = $request->credit_terms;
-
-                    if ($credit_terms == 1) {
-                        $supplierModel = Supplier::find($request->cus_sup_id);
-                        if ($supplierModel) {
-                            $supplierModel->credit_terms = $request->credit_terms;
-                            $supplierModel->save(); // Save changes
-                        }
-                    } elseif ($credit_terms == 2) {
-                        // Handle logic for credit_terms == 2 if needed
-                    }
-
-                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $supplier]);
-                } else {
-                    $validated = $request->validate([
-                        'credit_terms' => 'required|string|max:11',
-                        'credit_type' => 'nullable|string|max:255',
-                        'credit_limit' => 'nullable|string|max:255',
-                        'credit_status' => 'nullable|string|max:255',
-                        'cus_sup_id' => 'required|integer',
-                    ]);
-
-                    $supplierNote = CreditTerm::create($validated);
-                    return response()->json(['message' => 'Credit term stored successfully!', 'data' => $supplierNote]);
+                $temp_id = $request->input('temp_id'); // Ensure temp_id is fetched from the request
+                
+                // Find existing Credit Term entry
+                $supplier = CreditTerm::find($temp_id);
+                if (!$supplier) {
+                    return response()->json(['message' => 'Credit term not found!'], 404);
                 }
-                break;
+
+                // Update credit term data
+                $supplier->update([
+                    'credit_status' => $request->credit_status,
+                    'cus_sup_id'    => $request->cus_sup_id,
+                    'credit_limit'  => $request->credit_limit,
+                    'credit_type'   => $request->credit_type,
+                ]);
+
+                // Update Supplier or Customer based on `credit_terms`
+                if ($request->credit_terms == 1) {
+                    $supplierModel = Supplier::find($request->cus_sup_id);
+                } elseif ($request->credit_terms == 2) {
+                    $supplierModel = Customer::find($request->cus_sup_id);
+                }
+
+                if (isset($supplierModel)) {
+                    $supplierModel->credit_terms = $request->credit_terms;
+                    $supplierModel->save();
+                }
+
+                return response()->json([
+                    'message' => 'Credit term updated successfully!',
+                    'data'    => $supplier
+                ]);
 
             case 'save':
-                // Handle 'save' case logic here if needed
-                return response()->json(['message' => 'Save case logic is not implemented.']);
-                break;
+                // Store new credit term data
+                $supplierNote = CreditTerm::create($validated);
+                return response()->json([
+                    'message' => 'Credit term stored successfully!',
+                    'data'    => $supplierNote
+                ]);
 
             default:
-                return response()->json(['message' => 'Invalid request type!'], 400);
+                return response()->json([
+                    'message' => 'Invalid request type!'
+                ], 400);
         }
     }
 
-
+  
 }

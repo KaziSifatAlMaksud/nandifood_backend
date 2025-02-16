@@ -434,14 +434,16 @@ public function store(Request $request)
             'warehouse_notes' => 'nullable|string|max:255',
             'warehouse_safety' => 'nullable|string|max:255',
             'warehouse_compliance' => 'nullable|string|max:255',
+            'action' => 'nullable|string|max:10',
         ]);
 
-        DB::beginTransaction();  // Start transaction
+        DB::beginTransaction(); 
 
-        // Initialize filePath variable
         $filePath = null;
 
-        // Check if the request has a file
+           $action = $request->action; 
+           $isApprove = ($action == 'approve') ? 2 : 1;
+
         if ($request->hasFile('wh_image')) {
             $file = $request->file('wh_image');
             $fileName = time() . '_' . $file->getClientOriginalName(); 
@@ -457,6 +459,7 @@ public function store(Request $request)
                 ], 500);
             }
         }
+        $warehouseData['is_approved'] = $isApprove;
         $warehouseData = $validated;
         if ($filePath) {
             $warehouseData['wh_image'] = $filePath;
@@ -505,6 +508,12 @@ public function update(Request $request, $warehouseId)
             'message' => 'Error: Warehouse not found!',
         ], 404);
     }
+    
+    $action = $request->action; 
+    $isApprove = ($action == 'approve') ? 2 : 1;
+    
+    $warehouse->is_approved = $isApprove;
+
     if ($request->hasFile('wh_image')) {
         $file = $request->file('wh_image');
 
