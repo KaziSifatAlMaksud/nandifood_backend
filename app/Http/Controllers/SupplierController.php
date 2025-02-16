@@ -438,70 +438,156 @@ class SupplierController extends Controller
     //     }
     // }
 
-    public function get_credit_terms($type, $cus_sup_id)
+   public function get_credit_terms(Request $request, $type, $cus_sup_id)
     {
-        // Get the action type from the request
-        $submit_action = $request->input('submit_action');
+        try {
+            // Get the action type from the request
+            $submit_action = $request->input('submit_action');
 
-        // Validate request data
-        $validated = $request->validate([
-            'credit_terms'  => 'required|integer',
-            'credit_type'   => 'nullable|string|max:255',
-            'credit_limit'  => 'nullable|string|max:255',
-            'credit_status' => 'nullable|string|max:255',
-            'cus_sup_id'    => 'required|integer',
-        ]);
+            // Validate request data
+            $validated = $request->validate([
+                'credit_terms'  => 'required|integer',
+                'credit_type'   => 'nullable|string|max:255',
+                'credit_limit'  => 'nullable|string|max:255',
+                'credit_status' => 'nullable|string|max:255',
+                'cus_sup_id'    => 'required|integer',
+            ]);
 
-        switch ($submit_action) {
+            switch ($submit_action) {
+                case 'approved':
+                    $temp_id = $request->input('temp_id'); // Ensure temp_id is fetched from the request
+                    
+                    // Find existing Credit Term entry
+                    $supplier = CreditTerm::find($temp_id);
+                    if (!$supplier) {
+                        return response()->json(['message' => 'Credit term not found!'], 404);
+                    }
+
+                    // Update credit term data
+                    $supplier->update([
+                        'credit_status' => $request->credit_status,
+                        'cus_sup_id'    => $request->cus_sup_id,
+                        'credit_limit'  => $request->credit_limit,
+                        'credit_type'   => $request->credit_type,
+                    ]);
+
+                    // Update Supplier or Customer based on `credit_terms`
+                    if ($request->credit_terms == 1) {
+                        $supplierModel = Supplier::find($request->cus_sup_id);
+                    } elseif ($request->credit_terms == 2) {
+                        $supplierModel = Customer::find($request->cus_sup_id);
+                    }
+
+                    if (isset($supplierModel)) {
+                        $supplierModel->credit_terms = $request->credit_terms;
+                        $supplierModel->save();
+                    }
+
+                    return response()->json([
+                        'message' => 'Credit term updated successfully!',
+                        'data'    => $supplier
+                    ]);
+
+                case 'save':
+                    // Store new credit term data
+                    $supplierNote = CreditTerm::create($validated);
+                    return response()->json([
+                        'message' => 'Credit term stored successfully!',
+                        'data'    => $supplierNote
+                    ]);
+
+                default:
+                    return response()->json([
+                        'message' => 'Invalid request type!'
+                    ], 400);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function credit_terms_store(Request $request)
+    {
+        $action = $request->action;
+        switch ($action) {
             case 'approved':
-                $temp_id = $request->input('temp_id'); // Ensure temp_id is fetched from the request
-                
-                // Find existing Credit Term entry
-                $supplier = CreditTerm::find($temp_id);
-                if (!$supplier) {
-                    return response()->json(['message' => 'Credit term not found!'], 404);
-                }
-
-                // Update credit term data
-                $supplier->update([
-                    'credit_status' => $request->credit_status,
-                    'cus_sup_id'    => $request->cus_sup_id,
-                    'credit_limit'  => $request->credit_limit,
-                    'credit_type'   => $request->credit_type,
+                $validated = $request->validate([
+                    'credit_terms' => 'required|string|max:11',
+                    'credit_type' => 'nullable|string|max:255',
+                    'credit_limit' => 'nullable|string|max:255',
+                    'credit_status' => 'nullable|string|max:255',
+                    'cus_sup_id' => 'required|integer',
+                    'is_approve' => 'required|integer',
+                    'notes' => 'nullable|string',
+                    'type' => 'required|integer'
                 ]);
 
-                // Update Supplier or Customer based on `credit_terms`
-                if ($request->credit_terms == 1) {
-                    $supplierModel = Supplier::find($request->cus_sup_id);
-                } elseif ($request->credit_terms == 2) {
-                    $supplierModel = Customer::find($request->cus_sup_id);
-                }
+                // Find the existing CreditTerm record
+                $creditTerm = CreditTerm::where('cus_sup_id', $request->cus_sup_id)->first();
 
-                if (isset($supplierModel)) {
-                    $supplierModel->credit_terms = $request->credit_terms;
-                    $supplierModel->save();
-                }
+                if ($creditTerm) {
+                    // Update all values
+                    $creditTerm->update($validated);
+                    if ($request->type == 1) {
+                        $supplierinfo = Supplier::where('id', $request->cus_sup_id)->first();
 
-                return response()->json([
-                    'message' => 'Credit term updated successfully!',
-                    'data'    => $supplier
-                ]);
+                        if ($supplierinfo) {
+                            $supplierinfo->credit_terms = $request->credit_limit;
+                            $supplierinfo->save();
+                        }
+                    } elseif ($request->type == 2) {
+                        $customerinfo = Customer::where('id', $request->cus_sup_id)->first();
+
+                        if ($customerinfo) {
+                            $customerinfo->credit_terms = $request->credit_limit;
+                            $customerinfo->save();
+                        }
+                    }
+
+                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
+                } else {
+                    // Create a new record
+                    $newCreditTerm = CreditTerm::create($validated);
+                    return response()->json(['message' => 'Credit term created successfully!', 'data' => $newCreditTerm]);
+                }
+                break;
 
             case 'save':
-                // Store new credit term data
-                $supplierNote = CreditTerm::create($validated);
-                return response()->json([
-                    'message' => 'Credit term stored successfully!',
-                    'data'    => $supplierNote
+                $cus_sup_id = $request->cus_sup_id;
+
+                $validated = $request->validate([
+                    'credit_terms' => 'required|string|max:11',
+                    'credit_type' => 'nullable|string|max:255',
+                    'credit_limit' => 'nullable|string|max:255',
+                    'credit_status' => 'nullable|string|max:255',
+                    'cus_sup_id' => 'required|integer',
+                    'is_approve' => 'required|integer',
+                    'notes' => 'nullable|string',
+                    'type' => 'required|integer'
                 ]);
+                $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
+
+                if ($creditTerm) {
+                    // Update existing record
+                    $creditTerm->update($validated);
+                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
+                } else {
+                    // Create a new record
+                    $newCreditTerm = CreditTerm::create($validated);
+                    return response()->json(['message' => 'Credit term created successfully!', 'data' => $newCreditTerm]);
+                }
+                break;
 
             default:
-                return response()->json([
-                    'message' => 'Invalid request type!'
-                ], 400);
-                default:
-                    return response()->json(['message' => 'Invalid request type!'], 400);
-            
+                return response()->json(['message' => 'Invalid request type!'], 400);
         }
     }
 
