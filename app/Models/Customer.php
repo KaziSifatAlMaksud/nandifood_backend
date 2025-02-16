@@ -41,6 +41,7 @@ class Customer extends Model
         'last_updated_by',
         'status',
         'img',
-        'notes'
+        'notes',
+        'is_approved'
     ];
 }
