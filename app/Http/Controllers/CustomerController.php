@@ -61,6 +61,9 @@ class CustomerController extends Controller
         try {
             // Begin database transaction
             DB::beginTransaction();
+            
+            $action = $request->action; 
+            $isApprove = ($action == 'approve') ? 2 : 1;
 
             try {
                 $maxId = Customer::max('id');  
@@ -73,6 +76,8 @@ class CustomerController extends Controller
 
                 $data = $request->all();
                 $data['customer_no'] = $newCustomerNo; 
+                $data['is_approved'] = $isApprove;
+              
 
                 if ($request->hasFile('img')) {
                     $img = $request->file('img');
@@ -152,7 +157,10 @@ class CustomerController extends Controller
 
     public function customer_update(Request $request, $id)
     {
-        DB::beginTransaction(); 
+        DB::beginTransaction();
+
+        $action = $request->action; 
+        $isApprove = ($action == 'approve') ? 2 : 1;
 
         try {
             // Find the Customer record by ID
@@ -184,6 +192,7 @@ class CustomerController extends Controller
                     ], 400);
                 }
             }
+            $customer->is_approved = $isApprove;
             $customer->save();
             DB::commit();
             return response()->json([

@@ -609,6 +609,10 @@ class HupuController extends Controller
         $hupu->height = $request->input('height');
         $hupu->status = $request->input('status');
 
+        $action = $request->input('action');
+        $isApprove = ($action == 'approve') ? 2 : 1;
+        $hupu->is_approved =  $isApprove;
+
         // Generate a new ID if hu_pu_type is updated
         $new_uom_type_id = $request->input('hu_pu_type');
         if ($new_uom_type_id && $new_uom_type_id !== $hupu->hu_pu_type) {
@@ -683,6 +687,10 @@ class HupuController extends Controller
             $bulk_code = $request->input('bulk_code');
             $status = $request->input('status');
             $link_uom = $request->input('link_uom');
+
+            $action = $request->input('action');
+            $isApprove = ($action == 'approve') ? 2 : 1;
+            $hupu->is_approved =  $isApprove;
 
             // Generate a unique hu_pu_id
             $max_hupu_id = Hupu::max('id');

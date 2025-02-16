@@ -95,8 +95,11 @@ public function index(Request $request)
         $employee->start_date = $request->start_date;
         $employee->last_update = now()->format('Y-m-d H:i:s');
         $employee->update_by = $request->update_by;
+        $action = $request->action; 
 
-        // Handle image uploads
+        $isApprove = ($action == 'approve') ? 2 : 1;
+
+        $employee->is_approved =  $isApprove;
         $uploadedImages = [];
 
         if ($request->hasFile('img1')) {
@@ -251,7 +254,7 @@ public function index(Request $request)
 
     public function update(Request $request, $id)
     {
-        // Find the employee by ID
+        
         $employee = Employee::find($id);
         if (!$employee) {
             return response()->json([
@@ -260,9 +263,13 @@ public function index(Request $request)
                 'result' => ['data' => []],
             ]);
         }
-    
-        // Update employee details excluding img1
+
         $employee->fill($request->except('img1'));
+
+        $action = $request->action; 
+        $isApprove = ($action == 'approve') ? 2 : 1;
+        $employee->is_approved =  $isApprove;
+    
     
         if ($request->hasFile('img1')) {
             $file = $request->file('img1');

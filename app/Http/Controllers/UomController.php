@@ -197,6 +197,12 @@ public function store(Request $request)
         $uom_height = $request->input('uom_height');
         $status = $request->input('status');
         $link_uom = $request->input('link_uom');
+
+        $action = $request->input('action');
+        $isApprove = ($action == 'approve') ? 2 : 1;
+        $uom->is_approved =  $isApprove;
+
+
         $max_uom_id = Uom::max('id');
         $new_uom_id = 'U' . $uom_type_id . str_pad(($max_uom_id + 1), 3, '0', STR_PAD_LEFT);
         $uom = new Uom();
@@ -429,8 +435,11 @@ public function product_export()
         $sales_uom = $request->input('sales_uom');
         $eff_date = $request->input('eff_date');
         $status = $request->input('status');
-
         $link_uom = $request->input('link_uom'); 
+
+        $action = $request->input('action');
+        $isApprove = ($action == 'approve') ? 2 : 1;
+        $uom->is_approved =  $isApprove;
 
         if ($new_uom_type_id && $new_uom_type_id != $uom->uom_type_id) {
             $numeric_part = substr($uom->uom_id, strlen($uom->uom_type_id) + 1);
