@@ -170,7 +170,7 @@ class SupplierController extends Controller
                     'message' => 'Supplier not found.',
                 ], 404);
             }
-            
+
             $supplier->fill($request->except(['img']));
             if ($request->hasFile('img')) {
                 $img = $request->file('img');
@@ -380,7 +380,65 @@ class SupplierController extends Controller
     }
 
 
-    public function credit_terms_store(Request $request)
+    // public function credit_terms_store(Request $request)
+    // {
+    //     $q = $request->q;
+    //     switch ($q) {
+    //         case 'approved':
+    //             $temp_id = $request->temp_id;
+
+    //             if ($temp_id) {
+    //                 $supplier = CreditTerm::find($temp_id);  
+
+    //                 if (!$supplier) {
+    //                     return response()->json(['message' => 'Credit term not found!'], 404);
+    //                 }
+
+    //                 $supplier->credit_status = $request->credit_status;
+    //                 $supplier->cus_sup_id = $request->cus_sup_id;
+    //                 $supplier->credit_limit = $request->credit_limit;
+    //                 $supplier->credit_type = $request->credit_type;
+    //                 $supplier->save();
+
+    //                 // You need to define `credit_terms` before using it
+    //                 $credit_terms = $request->credit_terms;
+
+    //                 if ($credit_terms == 1) {
+    //                     $supplierModel = Supplier::find($request->cus_sup_id);
+    //                     if ($supplierModel) {
+    //                         $supplierModel->credit_terms = $request->credit_terms;
+    //                         $supplierModel->save(); // Save changes
+    //                     }
+    //                 } elseif ($credit_terms == 2) {
+    //                     // Handle logic for credit_terms == 2 if needed
+    //                 }
+
+    //                 return response()->json(['message' => 'Credit term updated successfully!', 'data' => $supplier]);
+    //             } else {
+    //                 $validated = $request->validate([
+    //                     'credit_terms' => 'required|string|max:11',
+    //                     'credit_type' => 'nullable|string|max:255',
+    //                     'credit_limit' => 'nullable|string|max:255',
+    //                     'credit_status' => 'nullable|string|max:255',
+    //                     'cus_sup_id' => 'required|integer',
+    //                 ]);
+
+    //                 $supplierNote = CreditTerm::create($validated);
+    //                 return response()->json(['message' => 'Credit term stored successfully!', 'data' => $supplierNote]);
+    //             }
+    //             break;
+
+    //         case 'save':
+    //             // Handle 'save' case logic here if needed
+    //             return response()->json(['message' => 'Save case logic is not implemented.']);
+    //             break;
+
+    //         default:
+    //             return response()->json(['message' => 'Invalid request type!'], 400);
+    //     }
+    // }
+
+    public function get_credit_terms($type, $cus_sup_id)
     {
         // Get the action type from the request
         $submit_action = $request->input('submit_action');
@@ -441,6 +499,9 @@ class SupplierController extends Controller
                 return response()->json([
                     'message' => 'Invalid request type!'
                 ], 400);
+                default:
+                    return response()->json(['message' => 'Invalid request type!'], 400);
+            
         }
     }
 

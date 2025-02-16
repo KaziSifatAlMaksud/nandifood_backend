@@ -161,7 +161,7 @@ Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'suppli
 route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
 
 route::post('/credit_terms/create', [SupplierController::class, 'credit_terms_store']);
-
+Route::get('/credit_terms/{type}/{cus_sup_id}', [SupplierController::class, 'get_credit_terms']);
 
 // Purchasing Unit List 
 route::get('/pu',[HupuController::class, 'pu_list']);

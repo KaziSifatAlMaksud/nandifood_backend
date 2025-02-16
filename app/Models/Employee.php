@@ -40,6 +40,7 @@ class Employee extends Model
         'img1',
         'img2',
         'img3',
+        'is_approved'
 
     ];
     public $timestamps = false; 

@@ -26,7 +26,8 @@ class Uom extends Model
         'status',
         'created_at',
         'updated_at',
-        'eff_date'
+        'eff_date',
+        'is_approved'
     ];
     public function uomType()
     {
