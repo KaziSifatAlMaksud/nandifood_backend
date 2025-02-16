@@ -28,7 +28,8 @@ class Hupu extends Model
         'max_weight',
         'status',
         'bulk_code',
-        'eff_date'
+        'eff_date',
+        'is_approved'
     ];
 
     public function uomType()

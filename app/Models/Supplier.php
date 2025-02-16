@@ -40,7 +40,8 @@ class Supplier extends Model
         'last_updated_by',
         'status',
         'img',
-        'notes'
+        'notes',
+        'is_approved'
     ];
 
     public function notes()
