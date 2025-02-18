@@ -690,7 +690,7 @@ class HupuController extends Controller
 
             $action = $request->input('action');
             $isApprove = ($action == 'approve') ? 2 : 1;
-            $hupu->is_approved =  $isApprove;
+          
 
             // Generate a unique hu_pu_id
             $max_hupu_id = Hupu::max('id');
@@ -701,6 +701,7 @@ class HupuController extends Controller
             $hupu->hu_pu_id = $hu_pu_id;
             $hupu->hu_pu_code = $hu_pu_code;
             $hupu->hu_pu_type = $hu_pu_type;
+            $hupu->is_approved =  $isApprove;
             $hupu->flex = $flex;
             $hupu->pu_hu_name = $pu_hu_name;
             $hupu->description = $description;
