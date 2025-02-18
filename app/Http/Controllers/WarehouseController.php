@@ -412,7 +412,7 @@ public function store(Request $request)
             'global_default_warehouse' => 'nullable|string|max:10',
             'warehouse_capacity_in_kg' => 'nullable|string|max:10',
             'address1' => 'nullable|string|max:255',
-             'address2' => 'nullable|string|max:255',
+            'address2' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:25',
             'state' => 'nullable|string|max:25',
             'city' => 'nullable|string|max:25',

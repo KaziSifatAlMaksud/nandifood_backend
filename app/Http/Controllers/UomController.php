@@ -200,13 +200,14 @@ public function store(Request $request)
 
         $action = $request->input('action');
         $isApprove = ($action == 'approve') ? 2 : 1;
-        $uom->is_approved =  $isApprove;
+       
 
 
         $max_uom_id = Uom::max('id');
         $new_uom_id = 'U' . $uom_type_id . str_pad(($max_uom_id + 1), 3, '0', STR_PAD_LEFT);
         $uom = new Uom();
         $uom->uom_id = $new_uom_id;
+        $uom->is_approved =  $isApprove;
         $uom->uom_type_id = $uom_type_id;
         $uom->description = $description;
         $uom->eff_date = $eff_date;
