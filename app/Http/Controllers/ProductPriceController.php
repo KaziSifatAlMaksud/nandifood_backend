@@ -73,11 +73,11 @@ class ProductPriceController extends Controller
             $priceFile = PriceExcelFile::create([
                 'price_list_id' => null,
                 'price_list_name' => null,
-                'eff_date' => null,
-                'exp_date' => null,
+                'eff_date' => $request->eff_date,
+                'exp_date' => $request->eff_date,
                 'status' => 'uploaded',
                 'last_update' => now(),
-                'updated_by' => null,
+                'updated_by' => $request->updated_by,
                 'action' => 'upl',
                 'file' => $path,
             ]);
@@ -106,4 +106,17 @@ class ProductPriceController extends Controller
             ], 500);
         }
     }
+    public function GetExcelFile()
+    {
+        // Fetch data from the database
+        $productPrice = PriceExcelFile::get()->all();
+        // Return a JSON response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Price retrieved successfully.',
+            'result' => ['data' => $productPrice]
+        ]);
+    } 
+
+
 }

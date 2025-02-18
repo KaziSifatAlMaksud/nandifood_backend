@@ -98,7 +98,11 @@ Route::get('/employee/excel/export', [EmployeeController::class, 'employeeExport
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 
 
+//price API Start  
 Route::post('price/upload_excel', [ProductPriceController::class, 'validateAndUpload']);
+Route::get('price/get_price_file', [ProductPriceController::class, 'GetExcelFile']);
+Route::post('price/import_excel_from_database', [ProductPriceController::class, 'validateAndimport']);
+//price API End  
 
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
