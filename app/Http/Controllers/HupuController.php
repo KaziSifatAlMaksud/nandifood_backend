@@ -766,7 +766,7 @@ class HupuController extends Controller
                     'linked_id' => $LinkedHupu->id,
                     'conv_form_id' => $LinkedHupu->conv_form_id,
                     'conv_form_full_name' => $extra_conv_form['full_name'],
-                    'max_qty' => $LinkedHupu->max_qty,
+                  /*  'max_qty' => $LinkedHupu->max_qty, */
                     'min_qty' => $LinkedHupu->min_qty,
 
                     'conv_to_id' => [
@@ -778,7 +778,7 @@ class HupuController extends Controller
                         'width' => $linkedUom->width,
                         'height' => $linkedUom->height,
                         'min_weight' => $linkedUom->min_weight,
-                        'max_weight' => $linkedUom->max_weight,
+                      /*   'max_weight' => $linkedUom->max_weight, */
                         'bulk_code' => $linkedUom->bulk_code,
                         'hu_pu_id' => $linkedUom->hu_pu_id,
                         'full_name' => $extra_conv_to['full_name'],
