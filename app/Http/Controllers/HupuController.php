@@ -632,7 +632,7 @@ class HupuController extends Controller
                 $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
                 $uomLink->conv_form_id = $link['conv_form_id'];
                 $uomLink->conv_to_id = $link['conv_to_id'];
-                $uomLink->max_qty = $link['max_qty'];
+                // $uomLink->max_qty = $link['max_qty'];
                 $uomLink->min_qty = $link['min_qty'];
                 $uomLink->save();
             }
@@ -725,7 +725,7 @@ class HupuController extends Controller
                     $uomLink->uom_id = $hupu->id; // Link to the Hupu ID
                     $uomLink->conv_form_id = $link['conv_form_id'];
                     $uomLink->conv_to_id = $link['conv_to_id'];
-                    $uomLink->max_qty = $link['max_qty'];
+                    // $uomLink->max_qty = $link['max_qty'];
                     $uomLink->min_qty = $link['min_qty'];
                     $uomLink->save();
                 }
