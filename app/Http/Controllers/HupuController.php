@@ -504,7 +504,7 @@ class HupuController extends Controller
                 
                 'conv_to_id' => $linkedhupu->conv_to_id,
                 'min_qty' => $linkedhupu->min_qty,
-                'max_qty' => $linkedhupu->max_qty,
+                // 'max_qty' => $linkedhupu->max_qty,
                 'created_at' => $linkedhupu->created_at,
                 'updated_at' => $linkedhupu->updated_at,
             ];
@@ -514,7 +514,7 @@ class HupuController extends Controller
             'conv_form_id' =>  $linkedhupu->conv_to_id,
             'conv_to_id' => $linkedhupu->conv_to_id,
             'min_qty' => $linkedhupu->min_qty,
-            'max_qty' => $linkedhupu->max_qty,
+            // 'max_qty' => $linkedhupu->max_qty,
             'created_at' => $linkedhupu->created_at,
             'updated_at' => $linkedhupu->updated_at,
         ];
