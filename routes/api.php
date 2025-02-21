@@ -101,6 +101,9 @@ Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 //price API Start  
 Route::post('price/upload_excel', [ProductPriceController::class, 'validateAndUpload']);
 Route::get('price/get_price_file', [ProductPriceController::class, 'GetExcelFile']);
+Route::get('price/get_price', [ProductPriceController::class, 'getPrice']);
+Route::get('price/import-price-data/{id}', [ProductPriceController::class, 'importPriceData']);
+
 Route::post('price/import_excel_from_database', [ProductPriceController::class, 'validateAndimport']);
 //price API End  
 
