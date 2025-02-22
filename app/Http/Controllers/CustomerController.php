@@ -257,6 +257,11 @@ class CustomerController extends Controller
                 $customerInfo->notes = $request->file_description;  // Optionally update customer notes
                 $customerInfo->save();
             }
+            if ($CustomerInfo && $request->type == 2) {
+                $customerInfo = $CustomerInfo;
+                $customerInfo->notes2 = $request->file_description;  // Optionally update customer notes
+                $customerInfo->save();
+            }
 
             // Handle file upload if a file is provided
             if ($request->hasFile('file_path')) {

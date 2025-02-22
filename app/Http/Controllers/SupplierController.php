@@ -297,6 +297,11 @@ class SupplierController extends Controller
                 $supplierInfo->notes = $request->file_description;
                 $supplierInfo->save();
             }
+            if ($SupplierInfo && $request->type == 2) {
+                $supplierInfo = $SupplierInfo;
+                $supplierInfo->notes2 = $request->file_description;
+                $supplierInfo->save();
+            }
 
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
