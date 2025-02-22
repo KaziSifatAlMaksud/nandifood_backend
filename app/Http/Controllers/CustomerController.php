@@ -212,9 +212,12 @@ class CustomerController extends Controller
     }
 
 
-    public function get_customer_all_notes($id)
+    public function get_customer_all_notes($id, $type)
     {
-        $customer_notes = CustomerNote::where('customer_id', $id)->get();
+        $customer_notes = SupplierNote::where([
+            ['customer_id', $id],
+            ['type', $type]
+        ])->get();
         $customer_notes->map(function ($note) {
             if ($note->file_path) {
                 $note->file = Storage::disk('spaces')->url($note->file_path);

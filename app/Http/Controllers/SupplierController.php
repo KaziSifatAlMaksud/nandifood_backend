@@ -251,9 +251,12 @@ class SupplierController extends Controller
         ]);
     }
 
-    public function get_supplier_all_notes($id)
+    public function get_supplier_all_notes($id, $type)
     {
-        $supplier_notes = SupplierNote::where('supplier_id', $id)->get();
+        $supplier_notes = SupplierNote::where([
+            ['supplier_id', $id],
+            ['type', $type]
+        ])->get();
         $supplier_notes->map(function ($note) {
             if ($note->file_path) {
                 $note->file = Storage::disk('spaces')->url($note->file_path);
