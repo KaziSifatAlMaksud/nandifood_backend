@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
+use stdClass;
 
 
 
@@ -214,10 +215,18 @@ class CustomerController extends Controller
 
     public function get_customer_all_notes($id, $type)
     {
-        $customer_notes = SupplierNote::where([
+        $customer_notes = CustomerNote::where([
             ['customer_id', $id],
             ['type', $type]
         ])->get();
+      
+            $customer_notes_info = new stdClass(); // Initialize the object first (if needed)
+
+            // Fetch notes and notes2 from the database
+            $customer_notes_info->notes = Customer::where('id', $id)->value('notes') ?? null; 
+            $customer_notes_info->notes2 = Customer::where('id', $id)->value('notes2') ?? null; 
+
+
         $customer_notes->map(function ($note) {
             if ($note->file_path) {
                 $note->file = Storage::disk('spaces')->url($note->file_path);
@@ -231,7 +240,8 @@ class CustomerController extends Controller
             'status' => 200,
             'message' => 'Customer Notes retrieved successfully.',
             'result' => [
-                'data' => $customer_notes
+                'data' => $customer_notes,
+                'customer_notes_info' => $customer_notes_info
             ],
         ]);
     }

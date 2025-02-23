@@ -42,6 +42,7 @@ class Customer extends Model
         'status',
         'img',
         'notes',
+        'notes2',
         'is_approved',
     ];
 }

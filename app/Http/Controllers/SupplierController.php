@@ -253,10 +253,21 @@ class SupplierController extends Controller
 
     public function get_supplier_all_notes($id, $type)
     {
+        
         $supplier_notes = SupplierNote::where([
             ['supplier_id', $id],
             ['type', $type]
         ])->get();
+
+       $supplier_node_info = new \stdClass();
+        $notes = Supplier::where('id', $id)->value('notes');
+        $notes2 = Supplier::where('id', $id)->value('notes2');
+
+        $supplier_node_info->notes = $notes ?? '';  
+        $supplier_node_info->notes2 = $notes2 ?? ''; 
+
+
+
         $supplier_notes->map(function ($note) {
             if ($note->file_path) {
                 $note->file = Storage::disk('spaces')->url($note->file_path);
@@ -270,7 +281,8 @@ class SupplierController extends Controller
             'status' => 200,
             'message' => 'Supplier Notes retrieved successfully.',
             'result' => [
-                'data' => $supplier_notes
+                'data' => $supplier_notes,
+                'supplier_node_info' => $supplier_node_info
             ],
         ]);
     }
@@ -289,7 +301,8 @@ class SupplierController extends Controller
             ]);
 
             DB::beginTransaction();
-            $supplierInfo = null;
+            $supplierInfo = "";
+            $supplierNote = "";
             $SupplierInfo = Supplier::where('id', $validated['supplier_id'])->first();
 
             if ($SupplierInfo && $request->type == 1) {

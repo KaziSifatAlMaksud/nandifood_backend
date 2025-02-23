@@ -42,6 +42,7 @@ class Supplier extends Model
         'img',
         'notes',
         'is_approved',
+        'notes2',
     ];
 
     public function notes()
