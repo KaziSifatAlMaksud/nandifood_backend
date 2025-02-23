@@ -9,9 +9,12 @@ class Price extends Model
 {
     use HasFactory;
 
-    protected $table = 'price'; // Ensure this matches your database table name
-    public $timestamps = false; 
+    protected $table = 'price'; 
+    public $timestamps = false;
+    protected $primaryKey = 'id'; 
     protected $fillable = [
+        'id',
+        'excel_id',
         'price',
         'no',
         'country',

@@ -49,7 +49,14 @@ class ProductPriceController extends Controller
 
         // Validate file input
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|mimes:xlsx,xls|max:2048',
+            'price_list_id' => 'required|string',
+            'price_list_name' => 'required|string|max:255',
+            'eff_date' => 'nullable|string',
+            'exp_date' => 'nullable|string',
+            'status' => 'nullable|string',
+            'updated_by' => 'nullable|string|max:255',
+            'action' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -89,26 +96,29 @@ class ProductPriceController extends Controller
 
             // Save file data to the database
             $priceFile = PriceExcelFile::create([
-                'price_list_id' => null,
-                'price_list_name' => null,
+                'price_list_id' => $request->price_list_id,
+                'price_list_name' => $request->price_list_name,
                 'eff_date' => $request->eff_date,
-                'exp_date' => $request->eff_date,
-                'status' => 'uploaded',
+                'exp_date' => $request->exp_date,
+                'status' => $request->status,
                 'last_update' => now(),
                 'updated_by' => $request->updated_by,
-                'action' => 'upl',
+                'action' => $request->action,
                 'file' => $path,
             ]);
+
+       
 
             if (!$priceFile) {
                 throw new \Exception('Failed to save file details to the database.');
             }
+            $priceFile->file_url = Storage::disk('spaces')->url($path);
 
             DB::commit();
 
             return response()->json([
                 'success' => 'File is valid and uploaded successfully.',
-                'file_url' => Storage::disk('spaces')->url($path),
+                'result' => ['data' => $priceFile ]
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -139,7 +149,6 @@ class ProductPriceController extends Controller
 public function importPriceData($id)
 {
     try {
-        // Retrieve file path from the database
         $priceFile = PriceExcelFile::find($id);
 
         if (!$priceFile || empty($priceFile->file)) {
@@ -148,20 +157,17 @@ public function importPriceData($id)
 
         $filePath = $priceFile->file;
 
-        // Check if file exists in DigitalOcean Spaces
+
         if (!Storage::disk('spaces')->exists($filePath)) {
             return response()->json(['error' => 'File not found in storage.'], 404);
         }
 
-        // ✅ Download file content and create a temporary file
         $tempFile = tempnam(sys_get_temp_dir(), 'excel_');
         file_put_contents($tempFile, Storage::disk('spaces')->get($filePath));
 
-        // ✅ Read the Excel file from the temp file
         $import = new PriceExcelFileImport();
         $collection = Excel::toCollection($import, $tempFile);
 
-        // Check if the collection is empty
         if ($collection->isEmpty() || $collection->first()->isEmpty()) {
             unlink($tempFile); 
             return response()->json(['error' => 'Excel file is empty.'], 400);
@@ -170,6 +176,7 @@ public function importPriceData($id)
         DB::beginTransaction();
         foreach ($collection->first() as $row) {
             Price::create([
+                'excel_id'                  => $id,
                 'price'                     => $row['price'] ?? null,
                 'no'                        => $row['no'] ?? null,
                 'country'                   => $row['country'] ?? null,
@@ -197,7 +204,6 @@ public function importPriceData($id)
 
         DB::commit();
 
-        // ✅ Remove the temp file
         unlink($tempFile);
 
         return response()->json(['success' => 'Price data imported successfully.'], 200);

@@ -228,7 +228,3 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 
 
-// Route::middleware('cors')->get('/country_name',[WarehouseController::class, 'getCountries']);
-// Route::middleware('cors')->get('/states/{countryName}', [WarehouseController::class, 'getStates']);
-// Route::middleware('cors')->get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
-
