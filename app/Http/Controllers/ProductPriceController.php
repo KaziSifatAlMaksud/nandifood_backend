@@ -202,6 +202,8 @@ public function importPriceData($id)
             ]);
         }
 
+        PriceExcelFile::where('id', $id)->update(['action' => 2]);
+
         DB::commit();
 
         unlink($tempFile);
