@@ -225,8 +225,13 @@ public function importPriceData($id)
     public function GetExcelFile()
     {
         // Fetch data from the database
-       $productPrice = PriceExcelFile::where('action', 1)->get()->all();
-       $productPrice->file_name = Storage::disk('spaces')->url($productPrice->file);
+        $productPrice = PriceExcelFile::where('action', 1)->get();
+
+        // Loop through each product price and set the file_name property
+        foreach ($productPrice as $product) {
+            $product->file_name = Storage::disk('spaces')->url($product->file);
+        }
+
         // Return a JSON response
         return response()->json([
             'status' => 200,
@@ -240,7 +245,9 @@ public function importPriceData($id)
         // Fetch data from the database
        
         $productPrice = PriceExcelFile::where('action', 2)->get()->all();
-        $productPrice->file_name = Storage::disk('spaces')->url($productPrice->file);
+        foreach ($productPrice as $product) {
+            $product->file_name = Storage::disk('spaces')->url($product->file);
+        }
         // Return a JSON response
         return response()->json([
             'status' => 200,
