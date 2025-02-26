@@ -225,15 +225,30 @@ public function importPriceData($id)
     public function GetExcelFile()
     {
         // Fetch data from the database
-        $productPrice = PriceExcelFile::get()->all();
-
+       $productPrice = PriceExcelFile::where('action', 1)->get()->all();
+       $productPrice->file_name = Storage::disk('spaces')->url($productPrice->file);
         // Return a JSON response
         return response()->json([
             'status' => 200,
             'message' => 'Price retrieved successfully.',
             'result' => ['data' => $productPrice]
         ]);
-    } 
+    }
+
+    public function GetExcelFile1()
+    {
+        // Fetch data from the database
+       
+        $productPrice = PriceExcelFile::where('action', 2)->get()->all();
+        $productPrice->file_name = Storage::disk('spaces')->url($productPrice->file);
+        // Return a JSON response
+        return response()->json([
+            'status' => 200,
+            'message' => 'Price retrieved successfully.',
+            'result' => ['data' => $productPrice]
+        ]);
+    }
+     
 
     public function destroyExcel($id)
     {
