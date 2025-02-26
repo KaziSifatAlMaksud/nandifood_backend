@@ -105,6 +105,7 @@ Route::get('price/get_price', [ProductPriceController::class, 'getPrice']);
 Route::get('price/import-price-data/{id}', [ProductPriceController::class, 'importPriceData']);
 
 Route::post('price/import_excel_from_database', [ProductPriceController::class, 'validateAndimport']);
+Route::delete('price/delete_excel/{id}', [ProductPriceController::class, 'destroyExcel'])->name('price.destroyExcel');
 
 Route::delete('price/delete/{id}', [ProductPriceController::class, 'destroy'])->name('price.destroy');
 //price API End  

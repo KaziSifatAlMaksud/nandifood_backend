@@ -226,6 +226,7 @@ public function importPriceData($id)
     {
         // Fetch data from the database
         $productPrice = PriceExcelFile::get()->all();
+
         // Return a JSON response
         return response()->json([
             'status' => 200,
@@ -233,7 +234,24 @@ public function importPriceData($id)
             'result' => ['data' => $productPrice]
         ]);
     } 
-    
+
+    public function destroyExcel($id)
+    {
+        $priceFile = PriceExcelFile::find($id);
+
+        if (!$priceFile) {
+            return response()->json([
+                'message' => 'Price file not found'
+            ], 404);
+        }
+
+        $priceFile->delete();
+
+        return response()->json([
+            'message' => 'Price file deleted successfully!'
+        ], 200);
+    }
+
     public function destroy($id)
     {
         $priceInfo = Price::find($id);
