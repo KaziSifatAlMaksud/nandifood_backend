@@ -233,6 +233,23 @@ public function importPriceData($id)
             'result' => ['data' => $productPrice]
         ]);
     } 
+    
+    public function destroy($id)
+    {
+        $priceInfo = Price::find($id);
+
+        if (!$priceInfo) {
+            return response()->json([
+                'message' => 'Price info not found'
+            ], 404);
+        }
+
+        $priceInfo->delete();
+
+        return response()->json([
+            'message' => 'Price info deleted successfully!'
+        ], 200);
+    }
 
 
 }

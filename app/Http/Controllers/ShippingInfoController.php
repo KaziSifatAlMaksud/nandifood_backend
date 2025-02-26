@@ -121,22 +121,6 @@ class ShippingInfoController extends Controller
     }
 
 
-    public function destroy($id)
-    {
-        $priceInfo = Price::find($id);
-
-        if (!$priceInfo) {
-            return response()->json([
-                'message' => 'Price info not found'
-            ], 404);
-        }
-
-        $priceInfo->delete();
-
-        return response()->json([
-            'message' => 'Price info deleted successfully!'
-        ], 200);
-    }
 
     public function show($id)
     {
