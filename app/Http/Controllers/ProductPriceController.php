@@ -49,7 +49,7 @@ class ProductPriceController extends Controller
 
         // Validate file input
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls|max:2048',
+           // 'file' => 'required|mimes:xlsx,xls|max:2048',
             'price_list_id' => 'required|string',
             'price_list_name' => 'required|string|max:255',
             'eff_date' => 'nullable|string',
