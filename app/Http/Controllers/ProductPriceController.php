@@ -163,12 +163,16 @@ class ProductPriceController extends Controller
             }
 
             // Save the file to a temporary location
-            $tempFile = tempnam(sys_get_temp_dir(), 'excel_');
-            file_put_contents($tempFile, Storage::disk('spaces')->get($filePath));
+            // $tempFile = tempnam(sys_get_temp_dir(), 'excel_');
+            $tempFile = tempnam(sys_get_temp_dir(), 'excel_') . '.xlsx'; // Assuming the file is an Excel file
+
+            // file_put_contents($tempFile, Storage::disk('spaces')->get($filePath));
+            Storage::disk('spaces')->put($tempFile, Storage::disk('spaces')->get($filePath));
 
             // Import Excel file data into collection
             $import = new PriceExcelFileImport();
-            $collection = Excel::toCollection($import, $tempFile);
+            // $collection = Excel::toCollection($import, $tempFile);
+            $collection = Excel::toCollection($import, $tempFile, null, \Maatwebsite\Excel\Excel::XLSX);
 
             // Check if collection is empty
             if ($collection->isEmpty() || $collection->first()->isEmpty()) {
