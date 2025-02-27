@@ -13,7 +13,6 @@ class Price extends Model
     public $timestamps = false;
     protected $primaryKey = 'id'; 
     protected $fillable = [
-        'id',
         'excel_id',
         'price',
         'no',
