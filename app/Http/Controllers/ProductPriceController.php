@@ -145,107 +145,114 @@ class ProductPriceController extends Controller
     }
 
 
+  
     public function importPriceData($id)
-    {
-        try {
-            // Retrieve the price file from the database
-            $priceFile = PriceExcelFile::find($id);
+{
+    try {
+        // Ensure the ID is an integer
+        $id = (int) $id;
 
-            if (!$priceFile || empty($priceFile->file)) {
-                return response()->json(['error' => 'File not found in database.'], 404);
-            }
+        // Retrieve the price file from the database
+        $priceFile = PriceExcelFile::find($id);
 
-            $filePath = $priceFile->file;
-
-            // Check if the file exists in storage
-            if (!Storage::disk('spaces')->exists($filePath)) {
-                return response()->json(['error' => 'File not found in storage.'], 404);
-            }
-
-            // Save the file to a temporary location
-            // $tempFile = tempnam(sys_get_temp_dir(), 'excel_');
-            $tempFile = tempnam(sys_get_temp_dir(), 'excel_') . '.xlsx'; // Assuming the file is an Excel file
-
-            // file_put_contents($tempFile, Storage::disk('spaces')->get($filePath));
-            Storage::disk('spaces')->put($tempFile, Storage::disk('spaces')->get($filePath));
-
-            // Import Excel file data into collection
-            $import = new PriceExcelFileImport();
-            // $collection = Excel::toCollection($import, $tempFile);
-            $collection = Excel::toCollection($import, $tempFile, null, \Maatwebsite\Excel\Excel::XLSX);
-
-            // Check if collection is empty
-            if ($collection->isEmpty() || $collection->first()->isEmpty()) {
-                unlink($tempFile);
-                return response()->json(['error' => 'Excel file is empty.'], 400);
-            }
-
-            // Start a database transaction for data insertion
-            DB::beginTransaction();
-
-            // Gather data for batch insert
-            $priceData = [];
-
-            // Iterate over the imported rows and prepare data
-            foreach ($collection->first() as $row) {
-                $priceData[] = [
-                    'excel_id'                  => $id,
-                    'price'                     => $row['price'] ?? null,
-                    'no'                        => $row['no'] ?? null,
-                    'country'                   => $row['country'] ?? null,
-                    'state'                     => $row['state'] ?? null,
-                    'city'                      => $row['city'] ?? null,
-                    'warehouse'                 => $row['warehouse'] ?? null,
-                    'sku'                       => $row['sku'] ?? null,
-                    'product_name'              => $row['product_name'] ?? null,
-                    'category'                  => $row['category'] ?? null,
-                    'sub_category1'             => $row['sub_category1'] ?? null,
-                    'sub_category2'             => $row['sub_category2'] ?? null,
-                    'inventory_uom'             => $row['inventory_uom'] ?? null,
-                    'size'                      => $row['size'] ?? null,
-                    'product_weight_in_lb'      => $row['product_weight_in_lb'] ?? null,
-                    'product_weight_kg'         => $row['product_weight_kg'] ?? null,
-                    'on_hand_qty_inventory_uom' => $row['on_hand_qty_inventory_uom'] ?? null,
-                    'sales_uom1'                => $row['sales_uom1'] ?? null,
-                    'on_hand_qty_sales_uom1'    => $row['on_hand_qty_sales_uom1'] ?? null,
-                    'sales_uom2'                => $row['sales_uom2'] ?? null,
-                    'on_hand_qty_sales_uom2'    => $row['on_hand_qty_sales_uom2'] ?? null,
-                    'sales_uom3'                => $row['sales_uom3'] ?? null,
-                    'on_hand_qty_sales_uom3'    => $row['on_hand_qty_sales_uom3'] ?? null,
-                ];
-            }
-
-            // Insert data in batches for better performance
-            if (!empty($priceData)) {
-                Price::insert($priceData);
-            }
-
-            // Mark the file as processed
-            PriceExcelFile::where('id', $id)->update(['action' => 2]);
-
-            // Commit the database transaction
-            DB::commit();
-
-            // Clean up temporary file
-            unlink($tempFile);
-
-            // Return success response
-            return response()->json(['success' => 'Price data imported successfully.'], 200);
-
-        } catch (\Exception $e) {
-            // Rollback if an error occurs
-            DB::rollBack();
-
-            // Log the error for debugging
-            Log::error('Import error: ' . $e->getMessage(), ['exception' => $e]);
-
-            // Return error response with exception message
-            return response()->json([
-                'error' => 'An error occurred during import.',
-                'message' => $e->getMessage(),
-            ], 500);
+        if (!$priceFile) {
+            Log::error("Price file ID $id not found in database.");
+            return response()->json(['error' => 'File not found in database.'], 404);
         }
+
+        if (empty($priceFile->file)) {
+            Log::error("Price file ID $id exists, but file column is empty.");
+            return response()->json(['error' => 'File path is missing in database.'], 404);
+        }
+
+        $filePath = $priceFile->file;
+
+        // Check if the file exists in DigitalOcean Spaces
+        if (!Storage::disk('spaces')->exists($filePath)) {
+            Log::error("File not found in storage for ID $id: $filePath");
+            return response()->json(['error' => 'File not found in storage.'], 404);
+        }
+
+        // Generate a temporary URL (better than fetching & storing)
+        $tempUrl = Storage::disk('spaces')->temporaryUrl($filePath, now()->addMinutes(5));
+
+        // Download the file to a temporary location
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel_') . '.xlsx';
+        file_put_contents($tempFile, file_get_contents($tempUrl));
+
+        // Import Excel file data into collection
+        $import = new PriceExcelFileImport();
+        $collection = Excel::toCollection($import, $tempFile, null, \Maatwebsite\Excel\Excel::XLSX);
+
+        // Check if the collection is empty
+        if ($collection->isEmpty() || $collection->first()->isEmpty()) {
+            Log::error("Excel file is empty for ID $id.");
+            unlink($tempFile);
+            return response()->json(['error' => 'Excel file is empty.'], 400);
+        }
+
+        // Start a database transaction
+        DB::beginTransaction();
+
+        // Prepare data for bulk insert
+        $priceData = [];
+        foreach ($collection->first() as $row) {
+            $priceData[] = [
+                'excel_id'                  => $id,
+                'price'                     => $row['price'] ?? null,
+                'no'                        => $row['no'] ?? null,
+                'country'                   => $row['country'] ?? null,
+                'state'                     => $row['state'] ?? null,
+                'city'                      => $row['city'] ?? null,
+                'warehouse'                 => $row['warehouse'] ?? null,
+                'sku'                       => $row['sku'] ?? null,
+                'product_name'              => $row['product_name'] ?? null,
+                'category'                  => $row['category'] ?? null,
+                'sub_category1'             => $row['sub_category1'] ?? null,
+                'sub_category2'             => $row['sub_category2'] ?? null,
+                'inventory_uom'             => $row['inventory_uom'] ?? null,
+                'size'                      => $row['size'] ?? null,
+                'product_weight_in_lb'      => $row['product_weight_in_lb'] ?? null,
+                'product_weight_kg'         => $row['product_weight_kg'] ?? null,
+                'on_hand_qty_inventory_uom' => $row['on_hand_qty_inventory_uom'] ?? null,
+                'sales_uom1'                => $row['sales_uom1'] ?? null,
+                'on_hand_qty_sales_uom1'    => $row['on_hand_qty_sales_uom1'] ?? null,
+                'sales_uom2'                => $row['sales_uom2'] ?? null,
+                'on_hand_qty_sales_uom2'    => $row['on_hand_qty_sales_uom2'] ?? null,
+                'sales_uom3'                => $row['sales_uom3'] ?? null,
+                'on_hand_qty_sales_uom3'    => $row['on_hand_qty_sales_uom3'] ?? null,
+            ];
+        }
+
+        // Insert data in batches for performance
+        if (!empty($priceData)) {
+            Price::insert($priceData);
+        }
+
+        // Mark the file as processed
+        PriceExcelFile::where('id', $id)->update(['action' => 2]);
+
+        // Commit transaction
+        DB::commit();
+
+        // Delete temp file
+        unlink($tempFile);
+
+        return response()->json(['success' => 'Price data imported successfully.'], 200);
+
+    } catch (\Exception $e) {
+        // Rollback if error occurs
+        DB::rollBack();
+
+        // Log error for debugging
+        Log::error("Import error for ID $id: " . $e->getMessage(), ['exception' => $e]);
+
+        return response()->json([
+            'error'   => 'An error occurred during import.',
+            'message' => $e->getMessage(),
+        ], 500);
     }
+}
 
 
     public function GetExcelFile()
