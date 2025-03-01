@@ -109,7 +109,12 @@ Route::post('price/import_excel_from_database', [ProductPriceController::class, 
 Route::delete('price/delete_excel/{id}', [ProductPriceController::class, 'destroyExcel'])->name('price.destroyExcel');
 
 Route::delete('price/delete/{id}', [ProductPriceController::class, 'destroy'])->name('price.destroy');
+
+Route::get('price/get_excel_price/{id}', [ProductPriceController::class, 'getExcelById']);
+
+
 //price API End  
+
 
 
 Route::get('/binlocation', [BinLocationController::class, 'index']);
@@ -229,6 +234,9 @@ Route::get('/shipping_info', [SupplierController::class, 'get_shipping_info']);
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
 Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
+
+Route::get('price/get_excel_id/{id}', [ProductPriceController::class, 'getExcelId']);
+
 
 
 

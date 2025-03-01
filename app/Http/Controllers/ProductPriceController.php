@@ -145,9 +145,39 @@ class ProductPriceController extends Controller
     }
 
 
+    public function getExcelById($id)
+    {
+        $price = Price::where('excel_id', $id)->get();
+
+        if ($price->isEmpty()) {
+            return response()->json([
+                'message' => 'Price not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Price retrieved successfully.',
+            'result' => ['data' => $price]
+        ]);
+    }
+    
+    public function getExcelId()
+    {
+        $price = PriceExcelFile::select('id', 'price_list_id', 'price_list_name','status')->get();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Price retrieved successfully.',
+            'result' => ['data' => $price]
+        ]);
+    }
+
+
+
   
     public function importPriceData($id)
-{
+    {
     try {
         // Ensure the ID is an integer
         $id = (int) $id;
