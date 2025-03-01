@@ -235,7 +235,7 @@ route::get('/country_name',[WarehouseController::class, 'getCountries']);
 Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
-Route::get('price/get_excel_id/{id}', [ProductPriceController::class, 'getExcelId']);
+Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
 
 
 
