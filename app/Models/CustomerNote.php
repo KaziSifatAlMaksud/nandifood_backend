@@ -13,7 +13,7 @@ class CustomerNote extends Model
 
     protected $primaryKey = 'id';
 
-
+        public $timestamps = false; // to disable default timestamp 
     protected $fillable = [
         'customer_id',
         'file_description',
