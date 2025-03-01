@@ -535,81 +535,66 @@ class SupplierController extends Controller
         }
     }
 
+   
     public function credit_terms_store(Request $request)
     {
         $action = $request->action;
+
+        // Shared validation
+        $validated = $request->validate([
+            'credit_terms' => 'required|string|max:11',
+            'credit_type' => 'nullable|string|max:255',
+            'credit_limit' => 'nullable|string|max:255',
+            'credit_status' => 'nullable|string|max:255',
+            'cus_sup_id' => 'required|integer',
+            'notes' => 'nullable|string',
+            'type' => 'required|integer'
+        ]);
+
         switch ($action) {
             case 'approved':
-                $validated = $request->validate([
-                    'credit_terms' => 'required|string|max:11',
-                    'credit_type' => 'nullable|string|max:255',
-                    'credit_limit' => 'nullable|string|max:255',
-                    'credit_status' => 'nullable|string|max:255',
-                    'cus_sup_id' => 'required|integer',
-                    'is_approve' => 'required|integer',
-                    'notes' => 'nullable|string',
-                    'type' => 'required|integer'
-                ]);
-
-                // Find the existing CreditTerm record
-                $creditTerm = CreditTerm::where('cus_sup_id', $request->cus_sup_id)->first();
-
-                if ($creditTerm) {
-                    // Update all values
-                    $creditTerm->update($validated);
-                    if ($request->type == 1) {
-                        $supplierinfo = Supplier::where('id', $request->cus_sup_id)->first();
-
-                        if ($supplierinfo) {
-                            $supplierinfo->credit_terms = $request->credit_limit;
-                            $supplierinfo->save();
-                        }
-                    } elseif ($request->type == 2) {
-                        $customerinfo = Customer::where('id', $request->cus_sup_id)->first();
-
-                        if ($customerinfo) {
-                            $customerinfo->credit_terms = $request->credit_limit;
-                            $customerinfo->save();
-                        }
-                    }
-
-                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
-                } else {
-                    // Create a new record
-                    $newCreditTerm = CreditTerm::create($validated);
-                    return response()->json(['message' => 'Credit term created successfully!', 'data' => $newCreditTerm]);
-                }
+                $validated['is_approve'] = 2; 
+                return $this->handleCreditTerm($validated, $request);
                 break;
 
             case 'save':
-                $cus_sup_id = $request->cus_sup_id;
-
-                $validated = $request->validate([
-                    'credit_terms' => 'required|string|max:11',
-                    'credit_type' => 'nullable|string|max:255',
-                    'credit_limit' => 'nullable|string|max:255',
-                    'credit_status' => 'nullable|string|max:255',
-                    'cus_sup_id' => 'required|integer',
-                    'is_approve' => 'required|integer',
-                    'notes' => 'nullable|string',
-                    'type' => 'required|integer'
-                ]);
-                $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
-
-                if ($creditTerm) {
-                    // Update existing record
-                    $creditTerm->update($validated);
-                    return response()->json(['message' => 'Credit term updated successfully!', 'data' => $creditTerm]);
-                } else {
-                    // Create a new record
-                    $newCreditTerm = CreditTerm::create($validated);
-                    return response()->json(['message' => 'Credit term created successfully!', 'data' => $newCreditTerm]);
-                }
+                $validated['is_approve'] = 1; 
+                return $this->handleCreditTerm($validated, $request);
                 break;
 
             default:
                 return response()->json(['message' => 'Invalid request type!'], 400);
         }
+    }
+
+
+    private function handleCreditTerm($validated, $request)
+    {
+        $cus_sup_id = $request->cus_sup_id;
+        $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
+
+        if ($creditTerm) {
+            $creditTerm->update($validated);
+        } else {
+            $creditTerm = CreditTerm::create($validated);
+        }
+
+        if ($request->type == 2) {
+            $supplierInfo = Supplier::find($cus_sup_id);
+            if ($supplierInfo) {
+                $supplierInfo->credit_terms = $request->credit_limit;
+                $supplierInfo->save();
+            }
+        } elseif ($request->type == 1) {
+            $customerInfo = Customer::find($cus_sup_id);
+            if ($customerInfo) {
+                $customerInfo->credit_terms = $request->credit_limit;
+                $customerInfo->save();
+            }
+        }
+
+        // Return response
+        return response()->json(['message' => 'Credit term handled successfully!', 'data' => $creditTerm]);
     }
 
   
