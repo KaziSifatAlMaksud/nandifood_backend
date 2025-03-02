@@ -252,7 +252,7 @@ class CustomerController extends Controller
         try {
             $validated = $request->validate([
                 'customer_id' => 'required|string|max:11',
-                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
+                'file_path' => 'nullable|file|mimes:pdf,png,jpg,jpeg',
                 'note_date' => 'nullable|string',
                 'file_description' => 'nullable|string|max:255',
                 'type' => 'required|integer',
