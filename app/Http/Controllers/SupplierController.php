@@ -529,8 +529,8 @@ public function credit_terms_store(Request $request)
         if ($uploaded) {
             // Store the file path and note date in the $fileData array
             $fileData['file_path'] = $path;
-            $fileDate['file_name'] = $file->getClientOriginalName();
             $fileData['note_date'] = now(); // current date
+            $fileData['file_url'] = Storage::disk('spaces')->url($path);
         } else {
             return response()->json([
                 'status' => 500,
