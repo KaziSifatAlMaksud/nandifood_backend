@@ -543,6 +543,7 @@ public function credit_terms_store(Request $request)
     switch ($action) {
         case 'approved':
             $validated['is_approve'] = 2;
+            
             break;
 
         case 'save':
@@ -569,7 +570,8 @@ public function credit_terms_store(Request $request)
         $creditData = array_merge($validated, $fileData);
         SupplierNote::create($creditData);
     }
-
+    // Handle the credit term update or create
+    $this->handleCreditTerm($validated, $request);
     // Return a response with both the credit terms and file data
     return response()->json([
         'status' => 200,
