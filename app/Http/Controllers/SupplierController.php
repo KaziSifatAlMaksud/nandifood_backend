@@ -520,6 +520,8 @@ public function credit_terms_store(Request $request)
 
     // File upload logic
     if ($request->hasFile('file')) {
+
+    
         $file = $request->file('file');
         $fileName = time() . '_' . $file->getClientOriginalName();
         $path = "uploads/supplier_notes/{$fileName}";
@@ -556,21 +558,25 @@ public function credit_terms_store(Request $request)
 
     // Now we handle the credit terms and file upload together
     if ($request->type == 1) {
-        // Add the customer-related fields to the validated data and file data
-        $fileData['customer_id'] = $request->cus_sup_id;
-        $fileData['type'] = 2;  // Assuming type 2 is customer
-        // Merge the validated credit terms with file data
-        $creditData = array_merge($validated, $fileData);
-        CustomerNote::create($creditData);
+          $fileData['customer_id'] = $request->cus_sup_id;
+          $fileData['type'] = 2;   
+         $creditData = array_merge($validated, $fileData);
+    
+          
+        if ($request->hasFile('file')) {     
+            CustomerNote::create($creditData);
+        }
     } elseif ($request->type == 2) {
-        // Add the supplier-related fields to the validated data and file data
-        $fileData['supplier_id'] = $request->cus_sup_id;
-        $fileData['type'] = 2;  
-        // Merge the validated credit terms with file data
-        $creditData = array_merge($validated, $fileData);
-        SupplierNote::create($creditData);
+            $fileData['supplier_id'] = $request->cus_sup_id;
+            $fileData['type'] = 2;  
+            $creditData = array_merge($validated, $fileData);
+         
+          
+            if ($request->hasFile('file')) {
+            SupplierNote::create($creditData);
+          }
     }
-    // Handle the credit term update or create
+
     $this->handleCreditTerm($validated, $request);
     // Return a response with both the credit terms and file data
     return response()->json([
