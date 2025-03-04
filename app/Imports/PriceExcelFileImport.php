@@ -15,6 +15,7 @@ class PriceExcelFileImport implements ToCollection, WithValidation, WithHeadingR
      */
     public function collection(Collection $rows)
     {
+        // $rows = $rows->skip(1);
         foreach ($rows as $row) {
             Price::create([
                 'no'                        => $row['no'] ?? null,
