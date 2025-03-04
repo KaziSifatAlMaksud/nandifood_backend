@@ -14,13 +14,13 @@ class Price extends Model
     protected $primaryKey = 'id'; 
     protected $fillable = [
         'excel_id',
-        'price',
         'no',
         'country',
         'state',
         'city',
         'warehouse',
         'sku',
+        'upc',
         'product_name',
         'category',
         'sub_category1',
@@ -31,10 +31,11 @@ class Price extends Model
         'product_weight_kg',
         'on_hand_qty_inventory_uom',
         'sales_uom1',
-        'on_hand_qty_sales_uom1',
+        'currency',
+        'price_sales_uom1',
         'sales_uom2',
-        'on_hand_qty_sales_uom2',
+        'price_sales_uom2',
         'sales_uom3',
-        'on_hand_qty_sales_uom3',
+        'price_sales_uom3',
     ];
 }
