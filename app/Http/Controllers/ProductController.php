@@ -12,6 +12,7 @@ use App\Models\Product_sub_category1;
 use App\Models\Product_sub_category2;
 use App\Models\Sizes;
 use App\Models\Employee;
+use App\Models\Price;
 use App\Models\ProductNote;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -86,6 +87,120 @@ class ProductController extends Controller
             ]);
         }
     }
+
+    public function product_price_list($product_id)
+    {
+        try {
+            // Find the product by ID
+            $product = Product::where('id', $product_id)->first();
+
+            // Check if product is found
+            if (!$product) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+
+            // Get the price list for the product based on SKU
+            $price_list = Price::where('sku', $product->p_sku_no)->get();
+
+            // Return the price list successfully
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product price fetched successfully.',
+                'result' => [
+                    'data' => $price_list,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while fetching the product prices.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function product_quintity_list($product_id)
+    {
+        try {
+            // Find the product by ID
+            $product = Product::find($product_id);
+
+            // Check if product is found
+            if (!$product) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+
+            // Get the price list for the product based on SKU
+            $price_list = Price::where('sku', $product->p_sku_no)->get();
+
+            // Return the price list successfully
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product Quantity fetched successfully.',
+                'result' => [
+                    'data' => $price_list,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while fetching the product prices.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function product_uom($product_id)
+    {
+        try {
+            // Find the product by ID
+            $product = Product::find($product_id);
+
+            // Check if product is found
+            if (!$product) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+
+            // Get the price list for the product based on SKU (combining results)
+        $price_list = Uom::whereIn('id', [
+                    $product->default_sales_uom,
+                    $product->inventory_uom,
+                    $product->purchase_uom,
+                    $product->production_uom
+                ])->get();
+
+            // Return the price list successfully
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product Quantity fetched successfully.',
+                'result' => [
+                    'data' => $price_list,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while fetching the product prices.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    
+
+
+
 
     public function get_all_notes($productId)
     {

@@ -210,6 +210,11 @@ Route::Get('/product/{id}',[ProductController::class, 'show']);
 Route::POST('/product/{id}', [ProductController::class, 'update2']);
 Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
 
+Route::get('/product/price_list/{product_id}', [ProductController::class, 'product_price_list']);
+Route::get('/product/quintity_list/{product_id}', [ProductController::class, 'product_quintity_list']);
+Route::get('/product/uom/{product_id}', [ProductController::class, 'product_uom']);
+
+
 route::post('/product_attachment/create', [ProductController::class, 'product_notes_store']);
 route::get('/product_attachment/{id}', [ProductController::class, 'get_all_notes']);
 Route::delete('/product/notes/delete/{id}', [ProductController::class, 'product_notes_delete']);
