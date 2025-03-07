@@ -21,6 +21,7 @@ use App\Models\Supplier;
 use App\Models\SupplierNote;
 use App\Models\SupplierCategories;
 use App\Models\CreditTerm;
+use App\Models\CreditName;
 
 
 class SupplierController extends Controller
@@ -427,6 +428,17 @@ class SupplierController extends Controller
     }
 
 
+    public function get_credit_terms(){
+        $credit_terms = CreditName::all();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Credit terms name retrieved successfully.',
+            'result' => [
+                'data' => $credit_terms
+            ],
+        ]);
+    }
+    
    
 //   public function credit_terms_store(Request $request)
 // {
@@ -502,122 +514,123 @@ class SupplierController extends Controller
 
 public function credit_terms_store(Request $request)
 {
-    $action = $request->action;
+        $action = $request->action;
 
-    // Shared validation
-    $validated = $request->validate([
-        'credit_terms' => 'required|string|max:11',
-        'credit_type' => 'nullable|string|max:255',
-        'credit_limit' => 'nullable|string|max:255',
-        'credit_status' => 'nullable|string|max:255',
-        'cus_sup_id' => 'required|integer',
-        'notes' => 'nullable|string',
-        'type' => 'required|integer'
-    ]);
+        // Shared validation
+        $validated = $request->validate([
+            'credit_terms' => 'required|string|max:11',
+            'credit_type' => 'nullable|string|max:255',
+            'credit_limit' => 'nullable|string|max:255',
+            'credit_status' => 'nullable|string|max:255',
+            'cus_sup_id' => 'required|integer',
+            'notes' => 'nullable|string',
+            'type' => 'required|integer'
+        ]);
 
-    // Initialize the $fileData array to store file upload data
-    $fileData = [];
+        // Initialize the $fileData array to store file upload data
+        $fileData = [];
 
-    // File upload logic
-    if ($request->hasFile('file')) {
+        // File upload logic
+        if ($request->hasFile('file')) {
 
-    
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $path = "uploads/supplier_notes/{$fileName}";
+        
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = "uploads/supplier_notes/{$fileName}";
 
-        // Upload the file to the cloud storage
-        $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
-        if ($uploaded) {
-            // Store the file path and note date in the $fileData array
-            $fileData['file_path'] = $path;
-            $fileData['note_date'] = now(); // current date
-            $fileData['file_url'] = Storage::disk('spaces')->url($path);
-        } else {
-            return response()->json([
-                'status' => 500,
-                'message' => 'File upload failed.',
-            ], 500);
+            // Upload the file to the cloud storage
+            $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
+            if ($uploaded) {
+                // Store the file path and note date in the $fileData array
+                $fileData['file_path'] = $path;
+                $fileData['note_date'] = now(); // current date
+                $fileData['file_url'] = Storage::disk('spaces')->url($path);
+            } else {
+                return response()->json([
+                    'status' => 500,
+                    'message' => 'File upload failed.',
+                ], 500);
+            }
         }
-    }
 
-    // Handle the action regardless of whether the file was uploaded
-    switch ($action) {
-        case 'approved':
-            $validated['is_approve'] = 2;
-            
-            break;
+        // Handle the action regardless of whether the file was uploaded
+        switch ($action) {
+            case 'approved':
+                $validated['is_approve'] = 2;
+                
+                break;
 
-        case 'save':
-            $validated['is_approve'] = 1;
-            break;
+            case 'save':
+                $validated['is_approve'] = 1;
+                break;
 
-        default:
-            return response()->json(['message' => 'Invalid request type!'], 400);
-    }
-
-    // Now we handle the credit terms and file upload together
-    if ($request->type == 1) {
-          $fileData['customer_id'] = $request->cus_sup_id;
-          $fileData['type'] = 2;   
-         $creditData = array_merge($validated, $fileData);
-    
-          
-        if ($request->hasFile('file')) {     
-            CustomerNote::create($creditData);
+            default:
+                return response()->json(['message' => 'Invalid request type!'], 400);
         }
-    } elseif ($request->type == 2) {
-            $fileData['supplier_id'] = $request->cus_sup_id;
-            $fileData['type'] = 2;  
+
+        // Now we handle the credit terms and file upload together
+        if ($request->type == 1) {
+            $fileData['customer_id'] = $request->cus_sup_id;
+            $fileData['type'] = 2;   
             $creditData = array_merge($validated, $fileData);
-         
-          
-            if ($request->hasFile('file')) {
-            SupplierNote::create($creditData);
-          }
-    }
-
-    $this->handleCreditTerm($validated, $request);
-    // Return a response with both the credit terms and file data
-    return response()->json([
-        'status' => 200,
-        'message' => 'Credit terms and file uploaded successfully!',
-        'credit_terms' => $validated,
-        'file_data' => $fileData,
-    ]);
-}
-
-private function handleCreditTerm($validated, $request)
-{
-    $cus_sup_id = $request->cus_sup_id;
-    $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
-
-    if ($creditTerm) {
-        $creditTerm->update($validated);
-    } else {
-        $creditTerm = CreditTerm::create($validated);
-    }
-
-    if ($request->type == 2) {  // Supplier
-        $supplierInfo = Supplier::find($cus_sup_id);
-        if ($supplierInfo) {
-            $supplierInfo->credit_terms = $request->credit_limit;
-            $supplierInfo->save();
+        
+            
+            if ($request->hasFile('file')) {     
+                CustomerNote::create($creditData);
+            }
+        } elseif ($request->type == 2) {
+                $fileData['supplier_id'] = $request->cus_sup_id;
+                $fileData['type'] = 2;  
+                $creditData = array_merge($validated, $fileData);
+            
+            
+                if ($request->hasFile('file')) {
+                SupplierNote::create($creditData);
+            }
         }
-    } elseif ($request->type == 1) {  // Customer
-        $customerInfo = Customer::find($cus_sup_id);
-        if ($customerInfo) {
-            $customerInfo->credit_terms = $request->credit_limit;
-            $customerInfo->save();
-        }
+
+        $this->handleCreditTerm($validated, $request);
+        // Return a response with both the credit terms and file data
+        return response()->json([
+            'status' => 200,
+            'message' => 'Credit terms and file uploaded successfully!',
+            'credit_terms' => $validated,
+            'file_data' => $fileData,
+        ]);
     }
 
-    // Return response with credit term data
-    return response()->json([
-        'message' => 'Credit term handled successfully!',
-        'data' => $creditTerm
-    ]);
-}
-   
+    private function handleCreditTerm($validated, $request)
+    {
+        $cus_sup_id = $request->cus_sup_id;
+        $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
+
+        if ($creditTerm) {
+            $creditTerm->update($validated);
+        } else {
+            $creditTerm = CreditTerm::create($validated);
+        }
+
+        if ($request->type == 2) {  // Supplier
+            $supplierInfo = Supplier::find($cus_sup_id);
+            if ($supplierInfo) {
+                $supplierInfo->credit_terms = $request->credit_limit;
+                $supplierInfo->save();
+            }
+        } elseif ($request->type == 1) {  // Customer
+            $customerInfo = Customer::find($cus_sup_id);
+            if ($customerInfo) {
+                $customerInfo->credit_terms = $request->credit_limit;
+                $customerInfo->save();
+            }
+        }
+
+        // Return response with credit term data
+        return response()->json([
+            'message' => 'Credit term handled successfully!',
+            'data' => $creditTerm
+        ]);
+    }
+
+
   
 }

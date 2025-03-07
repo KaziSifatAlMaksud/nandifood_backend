@@ -231,6 +231,8 @@ route::get('/defult_warehouse_info', [WarehouseController::class,'defult_warehou
 route::get('/product_size', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
 
+route::get('/credit_terms_name', [SupplierController::class, 'get_credit_terms']);
+
 
 
 Route::get('/shipping_info', [SupplierController::class, 'get_shipping_info']);
