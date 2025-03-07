@@ -428,7 +428,7 @@ class SupplierController extends Controller
     }
 
 
-    public function get_credit_terms(){
+    public function get_credit_terms_name(){
         $credit_terms = CreditName::all();
         return response()->json([
             'status' => 200,

@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreditName extends Model
 {
-  use HasFactory;
-
-    protected $table = 'credit_name';
-    protected $primaryKey = 'id';
+    use HasFactory;
+    protected $table = 'credit_name'; 
+    protected $primaryKey = 'id'; 
+    
     public $timestamps = false;
 
-   protected $fillable = ['credit_term_name'];
+    protected $fillable = ['credit_term_name'];
+
 }
