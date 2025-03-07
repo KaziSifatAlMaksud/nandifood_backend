@@ -62,6 +62,17 @@ class ProductController extends Controller
                 ? Uom::find($product->inventory_uom)?->uom_id . ' ' . 
                 Uom_type::find(Uom::find($product->inventory_uom)?->uom_type_id)?->uom_name 
                 : '';
+
+                $product->purchase_uom_name = Uom::find($product->purchase_uom)?->uom_id 
+                ? Uom::find($product->purchase_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->purchase_uom)?->uom_type_id)?->uom_name 
+                : '';
+
+                $product->production_uom_name = Uom::find($product->production_uom)?->uom_id 
+                ? Uom::find($product->production_uom)?->uom_id . ' ' . 
+                Uom_type::find(Uom::find($product->production_uom)?->uom_type_id)?->uom_name 
+                : '';
+           
            
                 $product->size_kg = Sizes::find($product->size)?->size_kg ?? '';
                 $product->size_lb = Sizes::find($product->size)?->size_lb ?? '';
@@ -122,6 +133,8 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+
     public function product_quintity_list($product_id)
     {
         try {
@@ -196,11 +209,6 @@ class ProductController extends Controller
             ], 500);
         }
     }
-
-    
-
-
-
 
     public function get_all_notes($productId)
     {
@@ -323,6 +331,8 @@ class ProductController extends Controller
             'size' => 'nullable|string|max:50',
             'default_sales_uom' => 'nullable|string|max:50',
             'inventory_uom' => 'nullable|string|max:50',
+            'purchase_uom' => 'nullable|string|max:50',
+            'production_uom' => 'nullable|string|max:50',
             'product_cert1' => 'nullable|string|max:255',
             'product_cert2' => 'nullable|string|max:255',
             'product_cert3' => 'nullable|string|max:255',
@@ -453,6 +463,8 @@ class ProductController extends Controller
             $product->sub_category2_name = product_sub_category2::find($id)?->category_name ?? '';
             $product->default_sales_uom_name = Uom::find($id)?->uom_id ?? '';
             $product->inventory_uom_name = Uom::find($id)?->uom_id ?? '';
+            $product->purchase_uom = Uom::find($id)?->uom_id ?? '';
+            $product->production_uom = Uom::find($id)?->uom_id ?? '';
             $product->product_manager_name = Employee::find($id)?->first_name . ' ' . Employee::find($id)?->middle_name . ' ' . Employee::find($id)?->last_name ?? null;
             $product->img1 = $product->img1 ? Storage::disk('spaces')->url($product->img1) : null;
             $product->upc_barcode = $product->upc_barcode ? Storage::disk('spaces')->url($product->upc_barcode) : null;

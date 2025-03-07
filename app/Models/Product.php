@@ -23,6 +23,8 @@ class Product extends Model
         'size',
         'default_sales_uom',
         'inventory_uom',
+        'purchase_uom',
+        'production_uom',
         'product_cert1',
         'product_cert2',
         'product_cert3',
