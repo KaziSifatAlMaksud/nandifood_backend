@@ -175,7 +175,6 @@ class ProductController extends Controller
     public function product_uom($product_id)
     {
         try {
-            // Find the product by ID
             $product = Product::find($product_id);
 
             // Check if product is found
@@ -193,7 +192,12 @@ class ProductController extends Controller
                     $product->purchase_uom,
                     $product->production_uom
                 ])->get();
-
+        foreach ($price_list as $uom) {
+            $result = Uom::fullName($uom->id);
+            $price_list->uom_type_name = $result['uom_type_name'] ?? null;
+            $price_list->short_name = $result['short_name'] ?? null;
+            $price_list->full_name = $result['full_name'] ?? null;
+        }
             // Return the price list successfully
             return response()->json([
                 'status' => 200,
