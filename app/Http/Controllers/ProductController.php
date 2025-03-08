@@ -321,7 +321,8 @@ class ProductController extends Controller
     //Endpoint to get all products
     public function store(Request $request)
     {
-        
+        $action = $request->action; 
+        $isApprove = ($action == 'approve') ? 2 : 1;
         // Validate the request
         $validatedData = $request->validate([
             'p_sku_no' => 'required|string|max:50',
@@ -350,6 +351,8 @@ class ProductController extends Controller
             'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
             'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
         ]);
+
+        $validatedData['is_approved'] = $isApprove;
 
         // Create the product
         $product = Product::create($validatedData);
@@ -397,6 +400,8 @@ class ProductController extends Controller
     public function update2(Request $request, $id)
 {
     try {
+        $action = $request->action; 
+        $isApprove = ($action == 'approve') ? 2 : 1;
         // Find the product or return a 404 error
         $product = Product::findOrFail($id);
         $product->fill($request->except(['img1', 'upc_barcode']));
@@ -414,6 +419,7 @@ class ProductController extends Controller
                 throw new \Exception('Failed to upload img1 to DigitalOcean Spaces.');
             }
         }
+        $product->isApprove = $isApprove;
         if ($request->hasFile('upc_barcode')) {
             $file = $request->file('upc_barcode');
             $fileName = $file->getClientOriginalName();
