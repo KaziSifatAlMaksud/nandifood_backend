@@ -284,10 +284,11 @@ class CustomerController extends Controller
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
+                    // Create the customer note
+                $customerNote = CustomerNote::create($validated);
             }
 
-            // Create the customer note
-            $customerNote = CustomerNote::create($validated);
+          
 
             DB::commit();
 
