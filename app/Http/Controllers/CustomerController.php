@@ -268,7 +268,7 @@ class CustomerController extends Controller
 
             if ($CustomerInfo && $request->type == 1) {
                 $customerInfo = $CustomerInfo;
-                $customerInfo->notes = $request->file_description;  // Optionally update customer notes
+                $customerInfo->notes = $request->file_description;  
                 $customerInfo->save();
             }
             if ($CustomerInfo && $request->type == 2) {
