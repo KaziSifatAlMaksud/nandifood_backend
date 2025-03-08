@@ -310,7 +310,7 @@ public function index(Request $request)
             // Validate incoming request
             $validated = $request->validate([
                 'employee_id' => 'required|string|max:11',
-                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg',
+                'file_path' => 'nullable|file|mimes:pdf,png,jpg,jpeg',
                 'note_date' => 'nullable|string', 
                 'file_description' => 'nullable|string|max:255',
             ]);
@@ -319,6 +319,7 @@ public function index(Request $request)
 
             // Fetch employee information
             $employeeInfo = null;
+            $employeeNote = null;
             $EmployeeInfo = Employee::where('id', $validated['employee_id'])->first();
 
             if ($EmployeeInfo) {
@@ -335,13 +336,12 @@ public function index(Request $request)
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
                 if ($uploaded) {
                     $validated['file_path'] = $path;
+                    $employeeNote = EmployeeNotes::create($validated);
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
-            }
-
-            // Create the employee note
-            $employeeNote = EmployeeNotes::create($validated);
+                 
+            }      
 
             DB::commit();
 
