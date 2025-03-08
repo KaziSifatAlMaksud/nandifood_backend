@@ -165,8 +165,9 @@ class ProductPriceController extends Controller
     
     public function getExcelId()
     {
-        $price = PriceExcelFile::select('id', 'price_list_id', 'price_list_name','status')->get();
-
+      $price = PriceExcelFile::select('id', 'price_list_id', 'price_list_name', 'status')
+        ->where('action', 2)
+        ->get();
         return response()->json([
             'status' => 200,
             'message' => 'Price retrieved successfully.',
