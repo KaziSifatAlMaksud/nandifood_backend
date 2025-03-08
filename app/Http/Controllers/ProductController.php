@@ -191,19 +191,23 @@ class ProductController extends Controller
                     $product->inventory_uom,
                     $product->purchase_uom,
                     $product->production_uom
-                ])->get();
+                ])->get(); 
+                 $modified_price_list = [];
         foreach ($price_list as $uom) {
-            $result = Uom::fullName($uom->id);
-            $price_list->uom_type_name = $result['uom_type_name'] ?? null;
-            $price_list->short_name = $result['short_name'] ?? null;
-            $price_list->full_name = $result['full_name'] ?? null;
-        }
+                $result = Uom::fullName($uom->id);
+
+                // Append the additional details
+                $uom->uom_type_name = $result['uom_type_name'] ?? null;
+                $uom->short_name = $result['short_name'] ?? null;
+                $uom->full_name = $result['full_name'] ?? null;
+                $modified_price_list[] = $uom;
+            }
             // Return the price list successfully
             return response()->json([
                 'status' => 200,
                 'message' => 'Product Quantity fetched successfully.',
                 'result' => [
-                    'data' => $price_list,
+                    'data' => $modified_price_list,
                 ],
             ]);
         } catch (\Exception $e) {
