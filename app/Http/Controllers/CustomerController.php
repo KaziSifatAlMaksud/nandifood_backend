@@ -35,7 +35,7 @@ class CustomerController extends Controller
         if ($id) {
             $query->where('id', $id);
         }
-        $customers = $query->paginate($limit, ['*'], 'page', $page);
+        $customers = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
         // Transform the collection for each customer
         $customers->getCollection()->transform(function ($customer) {

@@ -30,7 +30,7 @@ class UomController extends Controller
             'production_uom',
             'purchase_uom',
             'sales_uom'
-        ])->get();
+        ])->orderBy('id','DESC')->get();
 
     // Initialize the query for searching and filtering
     $query = Uom::query();

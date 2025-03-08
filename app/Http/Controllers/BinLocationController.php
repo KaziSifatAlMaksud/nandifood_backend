@@ -151,6 +151,7 @@ public function show($id)
             // DB::raw("CONCAT(bin_location.zone_number, bin_location.section_number, bin_location.aisle_number, bin_location.rack_number, bin_location.shelf_number, bin_location.bin_number) AS full_bin_location")
         ])
         ->where('bin_location.id', $id)
+        ->orderBy('bin_location.id', 'DESC')
         ->firstOrFail(); // Retrieve the first result or fail if not found
         // Prepare the file URLs
         $binLocation->bin_image = $binLocation->bin_image ? Storage::disk('spaces')->url($binLocation->bin_image) : null;

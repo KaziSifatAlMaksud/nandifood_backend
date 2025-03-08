@@ -35,7 +35,7 @@ public function index(Request $request)
             });
         }
         $limit = $request->input('limit', 10); 
-        $employeesPaginated = $query->paginate($limit);
+        $employeesPaginated = $query->orderBy('id', 'DESC')->paginate($limit);
         $employeesPaginated->getCollection()->transform(function ($employee) {
             $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
             $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;

@@ -51,7 +51,8 @@ class WarehouseController extends Controller
         }
     }
     $limit = $request->input('limit', 5);
-    $warehousesPaginated = $query->paginate($limit);
+    $warehousesPaginated = $query->orderBy('id', 'DESC')->paginate($limit);
+
     $warehouses = $warehousesPaginated->getCollection()->map(function ($warehouse) {
         $totals = BinLocation::calculateTotalVolumeForWarehouse($warehouse->id);
         $warehouse->volume_m3 = $totals['total_volume'];

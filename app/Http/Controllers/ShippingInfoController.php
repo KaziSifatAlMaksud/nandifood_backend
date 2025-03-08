@@ -11,8 +11,9 @@ class ShippingInfoController extends Controller
     {
         $shippingInfo = ShippingInfo::where('shipping_type', $shipping_type)
         ->where('cus_or_sup_id', $cus_or_sup_id)
-        ->leftJoin('positions', 'shipping_info.position', '=', 'positions.id') // Join the Positions table
-        ->select('shipping_info.*', 'positions.position_name') // Select all shipping info fields and position_name
+        ->leftJoin('positions', 'shipping_info.position', '=', 'positions.id') 
+        ->select('shipping_info.*', 'positions.position_name') 
+        ->orderBy('shipping_info.id', 'DESC')
         ->get();
 
         // Check if records were found

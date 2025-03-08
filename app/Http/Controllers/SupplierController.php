@@ -38,7 +38,7 @@ class SupplierController extends Controller
         if ($id) {
             $query->where('id', $id);
         }
-        $suppliers = $query->paginate($limit, ['*'], 'page', $page);
+        $suppliers = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
         $suppliers->getCollection()->map(function ($supplier) {
             $supplier->supplier_category_name = SupplierCategories::where('id', $supplier->supplier_category)->value('category_name');
             return $supplier;

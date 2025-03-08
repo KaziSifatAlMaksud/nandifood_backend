@@ -44,7 +44,7 @@ class ProductController extends Controller
 
             // Apply pagination with a default limit
             $limit = $request->input('limit', 10); // Default limit set to 10
-            $productsPaginated = $query->paginate($limit);
+            $productsPaginated = $query->orderBy('id','DESC')->paginate($limit);
 
             // Enrich each product with additional data
             $productsPaginated->getCollection()->transform(function ($product) {

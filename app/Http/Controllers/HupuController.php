@@ -32,7 +32,7 @@ class HupuController extends Controller
                 'width',
                 'height',
                 'bulk_code'
-            ])->get();
+            ])->orderBy('id', 'DESC')->get();
 
 
         $pu_lists = $pu_lists->map(function ($pu_list) {
