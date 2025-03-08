@@ -41,6 +41,7 @@ class Product extends Model
         'last_updated_by',
         'img1',
         'upc_barcode',
+        'is_approved'
     ];
 
 }
