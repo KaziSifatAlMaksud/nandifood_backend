@@ -378,8 +378,8 @@ class ProductController extends Controller
             'eff_date' => 'nullable|string',
             'end_date' => 'nullable|string',
             'status' => 'nullable|string|max:50',
-            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
-            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Added image validation
+            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
         ]);
 
         $validatedData['is_approved'] = $isApprove;
@@ -491,37 +491,57 @@ class ProductController extends Controller
 
 
     
-    public function show($id)
-    {
-        try {
-            // Find the product by ID or throw a 404 error if not found
-            $product = Product::findOrFail($id);
-            $product->product_category_name = Product_category::find($id)?->category_name ?? '';
-            $product->sub_category1_name = product_sub_category1::find($id)?->category_name ?? '';
-            $product->sub_category2_name = product_sub_category2::find($id)?->category_name ?? '';
-            $product->default_sales_uom_name = Uom::find($id)?->uom_id ?? '';
-            $product->inventory_uom_name = Uom::find($id)?->uom_id ?? '';
-            $product->purchase_uom = Uom::find($id)?->uom_id ?? '';
-            $product->production_uom = Uom::find($id)?->uom_id ?? '';
-            $product->product_manager_name = Employee::find($id)?->first_name . ' ' . Employee::find($id)?->middle_name . ' ' . Employee::find($id)?->last_name ?? null;
-            $product->img1 = $product->img1 ? Storage::disk('spaces')->url($product->img1) : null;
-            $product->upc_barcode = $product->upc_barcode ? Storage::disk('spaces')->url($product->upc_barcode) : null;
-            return response()->json([
-                'status' => 200,
-                'success' => true,
-                'message' => 'Product fetched successfully.',
-                'data' => $product,
-            ], 200);
-        } catch (\Exception $e) {
-            // Handle exceptions and return an error response
-            return response()->json([
-                'status' => 404,
-                'success' => false,
-                'message' => 'Product not found.',
-                'error' => $e->getMessage(),
-            ], 404);
-        }
+  public function show($id)
+{
+    try {
+        // Find the product by ID or throw a 404 error if not found
+        $product = Product::findOrFail($id);
+
+        // Fetch related data
+        $product->product_category_name = Product_category::where('id', $product->product_category_id)->value('category_name') ?? '';
+        $product->sub_category1_name = product_sub_category1::where('id', $product->sub_category1_id)->value('category_name') ?? '';
+        $product->sub_category2_name = product_sub_category2::where('id', $product->sub_category2_id)->value('category_name') ?? '';
+
+        // Fetch UOM names
+        $defaultSalesUom = Uom::find($product->default_sales_uom);
+        $product->default_sales_uom_name = $defaultSalesUom ? $defaultSalesUom->uom_id . ' ' . Uom_type::where('id', $defaultSalesUom->uom_type_id)->value('uom_name') : '';
+
+        $inventoryUom = Uom::find($product->inventory_uom);
+        $product->inventory_uom_name = $inventoryUom ? $inventoryUom->uom_id . ' ' . Uom_type::where('id', $inventoryUom->uom_type_id)->value('uom_name') : '';
+
+        $purchaseUom = Uom::find($product->purchase_uom);
+        $product->purchase_uom_name = $purchaseUom ? $purchaseUom->uom_id . ' ' . Uom_type::where('id', $purchaseUom->uom_type_id)->value('uom_name') : '';
+
+        $productionUom = Uom::find($product->production_uom);
+        $product->production_uom_name = $productionUom ? $productionUom->uom_id . ' ' . Uom_type::where('id', $productionUom->uom_type_id)->value('uom_name') : '';
+
+        // Fetch Employee Name
+        $employee = Employee::find($product->product_manager_id);
+        $product->product_manager_name = $employee ? trim("{$employee->first_name} {$employee->middle_name} {$employee->last_name}") : null;
+
+        // Fetch images
+        $product->img1 = $product->img1 ? Storage::disk('spaces')->url($product->img1) : null;
+        $product->upc_barcode = $product->upc_barcode ? Storage::disk('spaces')->url($product->upc_barcode) : null;
+
+        // Fetch Sizes
+        $product->size_kg = Sizes::where('id', $product->size)->value('size_kg') ?? '';
+        $product->size_lb = Sizes::where('id', $product->size)->value('size_lb') ?? '';
+
+        return response()->json([
+            'status' => 200,
+            'success' => true,
+            'message' => 'Product fetched successfully.',
+            'data' => $product,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 404,
+            'success' => false,
+            'message' => 'Product not found.',
+            'error' => $e->getMessage(),
+        ], 404);
     }
+}
 
 
     
