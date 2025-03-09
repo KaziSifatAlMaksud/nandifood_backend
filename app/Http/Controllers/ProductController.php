@@ -449,7 +449,7 @@ class ProductController extends Controller
                 throw new \Exception('Failed to upload img1 to DigitalOcean Spaces.');
             }
         }
-        $product->isApprove = $isApprove;
+        $product->is_approved = $isApprove;
         if ($request->hasFile('upc_barcode')) {
             $file = $request->file('upc_barcode');
             $fileName = $file->getClientOriginalName();

@@ -40,6 +40,8 @@ class Product extends Model
         'last_updated',
         'last_updated_by',
         'img1',
+        'purchase_uom',
+        'production_uom',
         'upc_barcode',
         'is_approved',
         'notes'
