@@ -206,9 +206,11 @@ public function index(Request $request)
 
 
 
-   public function show($id)
+    public function show($id)
     {
+        // Retrieve employee with related notes
         $employee = Employee::with('notes')->find($id);
+
         if (!$employee) {
             return response()->json([
                 'status' => 404,
@@ -218,28 +220,29 @@ public function index(Request $request)
                 ]
             ]);
         }
-       $employee->position_name = Positions::find($employee->position_id)->position_name ?? null;
-        $warehouse = Warehouse::find($employee->warehouse_id);
-        $employee->warehouse_name = $warehouse ? $warehouse->warehouse_name : null;
-        $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
-        $employee->img2 = $employee->img2 ? Storage::disk('spaces')->url($employee->img2) : null;
-        $employee->img3 = $employee->img3 ? Storage::disk('spaces')->url($employee->img3) : null;
 
-
-
-            // Process the notes to include file URLs and file names
-        $employee->notes->map(function ($note) {
-            if ($note->file_path) {
-                $note->file = Storage::disk('spaces')->url($note->file_path);
-                $note->file_name = basename($note->file_path);
-            } else {
-                $note->file = null; // If there's no file, set it to null
-                $note->file_name = null; // No file name if no file exists
-            }
-            return $note;
-        });
+        // Use null-safe operator (PHP 8+) or ternary operator to prevent errors
+        $employee->position_name = Positions::find($employee->position_id)?->position_name ?? null;
         
+        $warehouse = Warehouse::find($employee->warehouse_id);
+        $employee->warehouse_name = $warehouse?->warehouse_name ?? null;
 
+        // Convert image paths to full URLs if they exist
+        $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
+
+        // Process notes safely
+        if ($employee->notes) {
+            $employee->notes->map(function ($note) {
+                if ($note->file_path) { // Corrected from $employee->file_path
+                    $note->file = Storage::disk('spaces')->url($note->file_path);
+                    $note->file_name = basename($note->file_path);
+                } else {
+                    $note->file = null;
+                    $note->file_name = null;
+                }
+                return $note;
+            });
+        }
 
         // Return the employee details
         return response()->json([
