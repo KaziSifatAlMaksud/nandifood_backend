@@ -223,6 +223,8 @@ class ProductController extends Controller
     public function get_all_notes($productId)
     {
         try {
+            $product_info = Product::where('id', $productId)->select('notes')->first();
+
             $product_notes = ProductNote::where('product_id', $productId)->get();
             $product_notes->map(function ($note) {
                 if ($note->file_path) {
@@ -238,7 +240,8 @@ class ProductController extends Controller
                 'status' => 200,
                 'message' => 'Product Notes retrieved successfully.',
                 'result' => [
-                    'data' => $product_notes
+                    'data' => $product_notes,
+                    'product_info' => $product_info,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -256,39 +259,57 @@ class ProductController extends Controller
         try {
             $validated = $request->validate([
                 'product_id' => 'required|string|max:11',
-                'file_path' => 'required|file|mimes:pdf,png,jpg,jpeg', // Added file size limit
-                'note_date' => 'nullable|date', // Changed to date validation for consistency
+                'file_path' => 'nullable|file|mimes:pdf,png,jpg,jpeg',
+                'note_date' => 'nullable|date',
                 'file_description' => 'nullable|string|max:255',
             ]);
+
             DB::beginTransaction();
+
+            $productInfo = Product::find($validated['product_id']);
+            $productNote = null;
+
+            if ($productInfo) {
+                $productInfo->notes = $validated['file_description'];
+                $productInfo->save();
+            }
+
+            // Handle file upload if a file is provided
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName = time() . '_' . $file->getClientOriginalName(); // Ensure unique file names
+                $fileName = time() . '_' . $file->getClientOriginalName();
                 $path = "uploads/product_notes/{$fileName}";
-                $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
-                if ($uploaded) {
+                if (Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public'])) {
                     $validated['file_path'] = $path;
+                    $productNote = ProductNote::create($validated);
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
             }
-            $productNote = ProductNote::create($validated);
+
             DB::commit();
+
             return response()->json([
-                'status' => 200,
-                'message' => 'Product note created successfully.',
-                'result' => [
-                    'data' => $productNote,
-                ],
-            ]);
+                    'status' => 200,
+                    'message' => ($productNote || $productInfo)
+                        ? trim(
+                            ($productNote ? 'Product Notes created successfully. ' : '') .
+                            ($productInfo ? 'Product updated successfully.' : '')
+                        )
+                        : 'No changes were made.',
+                    'result' => [
+                        'data' => $productNote,
+                        'productInfo' => $productInfo ? ['notes' => $productInfo->notes] : null
+                    ]
+                ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => 422,
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            // Roll back the transaction in case of failure
             DB::rollBack();
             return response()->json([
                 'status' => 500,
@@ -296,6 +317,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
 
 
     public function product_notes_delete($id)
