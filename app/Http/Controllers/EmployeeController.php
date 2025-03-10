@@ -202,10 +202,8 @@ public function index(Request $request)
             'message' => 'Employee Notes retrieved successfully.',
             'result' => [
                 'data' => $employee_notes,
-                'employee_info' => [
-                    'notes' => $employee_info 
+                'employee_info' => $employee_info
         ],
-            ],
         ]);
 
     }
