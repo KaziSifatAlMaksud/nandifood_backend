@@ -613,13 +613,13 @@ public function credit_terms_store(Request $request)
         if ($request->type == 2) {  // Supplier
             $supplierInfo = Supplier::find($cus_sup_id);
             if ($supplierInfo) {
-                $supplierInfo->credit_terms = $request->credit_limit;
+                $supplierInfo->credit_terms = $request->credit_terms;
                 $supplierInfo->save();
             }
         } elseif ($request->type == 1) {  // Customer
             $customerInfo = Customer::find($cus_sup_id);
             if ($customerInfo) {
-                $customerInfo->credit_terms = $request->credit_limit;
+                $customerInfo->credit_terms = $request->credit_terms;
                 $customerInfo->save();
             }
         }
