@@ -88,3 +88,8 @@ route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
 route::get('/hu/downloadpdf', [PdfController::class, 'hu_list_pdf'] );
 route::get('/pu/downloadpdf', [PdfController::class, 'pu_list_pdf'] );
 route::get('/employee/downloadpdf', [PdfController::class, 'employee_list_pdf'] );
+
+
+route::get('/customer/downloadpdf', [PdfController::class, 'customer_list_pdf'] );
+route::get('/product/downloadpdf', [PdfController::class, 'product_list_pdf'] );
+route::get('/supplier/downloadpdf', [PdfController::class, 'supplier_list_pdf'] );

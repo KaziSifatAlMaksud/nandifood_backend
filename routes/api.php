@@ -87,6 +87,8 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 
 
 
+Route::get('/supplier/excel/export', [WarehouseController::class, 'export']);
+Route::get('/customer/excel/export', [WarehouseController::class, 'export']);
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 Route::get('/product/excel/export', [UomController::class, 'product_export']);
 //csv file export 
