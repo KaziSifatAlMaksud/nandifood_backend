@@ -213,8 +213,7 @@ public function index(Request $request)
     public function show($id)
     {
         // Retrieve employee with related notes
-        $employee = Employee::with('notes')->find($id);
-
+       $employee = Employee::find($id);
         if (!$employee) {
             return response()->json([
                 'status' => 404,
