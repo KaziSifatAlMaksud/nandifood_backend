@@ -165,14 +165,19 @@ class ProductPriceController extends Controller
     
     public function getExcelId()
     {
-      $price = PriceExcelFile::select('id', 'price_list_id', 'price_list_name', 'status')
+        $price = PriceExcelFile::select('id', 'price_list_id', 'price_list_name', 'status', 'file')
         ->where('action', 2)
-        ->get();
-        return response()->json([
-            'status' => 200,
-            'message' => 'Price retrieved successfully.',
-            'result' => ['data' => $price]
-        ]);
+        ->get()
+        ->map(function ($item) {
+            $item->file_url = $item->file ? Storage::disk('spaces')->url($item->file) : null;
+            return $item;
+        });
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Price retrieved successfully.',
+                'result' => ['data' => $price]
+            ]);
     }
 
 
