@@ -182,6 +182,8 @@ public function index(Request $request)
 
     public function get_all_notes($id)
     {
+
+        $employee_info = Employee::where('id', $id)->select('notes')->first();
         // Retrieve employee notes for the given employee ID
         $employee_notes = EmployeeNotes::where('employee_id', $id)->get();
         $employee_notes->map(function ($note) {
@@ -195,13 +197,17 @@ public function index(Request $request)
         });
 
         // Return the response with the retrieved notes
-        return response()->json([
+       return response()->json([
             'status' => 200,
             'message' => 'Employee Notes retrieved successfully.',
             'result' => [
-                'data' => $employee_notes
+                'data' => $employee_notes,
+                'employee_info' => [
+                    'notes' => $employee_info ? $employee_info->notes : null // Check if employee_info exists before accessing notes
+                ],
             ],
         ]);
+
     }
 
 
@@ -231,18 +237,18 @@ public function index(Request $request)
         $employee->img1 = $employee->img1 ? Storage::disk('spaces')->url($employee->img1) : null;
 
         // Process notes safely
-        if ($employee->notes) {
-            $employee->notes->map(function ($note) {
-                if ($note->file_path) { // Corrected from $employee->file_path
-                    $note->file = Storage::disk('spaces')->url($note->file_path);
-                    $note->file_name = basename($note->file_path);
-                } else {
-                    $note->file = null;
-                    $note->file_name = null;
-                }
-                return $note;
-            });
-        }
+        // if ($employee->notes) {
+        //     $employee->notes->map(function ($note) {
+        //         if ($note->file_path) { 
+        //             $note->file = Storage::disk('spaces')->url($note->file_path);
+        //             $note->file_name = basename($note->file_path);
+        //         } else {
+        //             $note->file = null;
+        //             $note->file_name = null;
+        //         }
+        //         return $note;
+        //     });
+        // }
 
         // Return the employee details
         return response()->json([
