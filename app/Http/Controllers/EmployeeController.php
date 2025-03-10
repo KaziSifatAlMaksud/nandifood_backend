@@ -203,8 +203,8 @@ public function index(Request $request)
             'result' => [
                 'data' => $employee_notes,
                 'employee_info' => [
-                    'notes' => $employee_info ? $employee_info->notes : null // Check if employee_info exists before accessing notes
-                ],
+                    'notes' => $employee_info 
+        ],
             ],
         ]);
 
