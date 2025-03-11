@@ -23,6 +23,7 @@ use App\Models\SupplierCategories;
 use App\Models\CreditTerm;
 use App\Models\CreditName;
 use App\Models\Customer;
+use App\Http\Controllers\SupplierExport;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
 class ExcelController extends Controller
