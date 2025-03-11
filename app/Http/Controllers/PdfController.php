@@ -12,6 +12,9 @@ use App\Models\Employee;
 use App\Models\Positions;
 use App\Models\Hupu;
 use App\Models\Uom_type;
+use App\Models\Customer;
+use App\Models\Supplier;
+use App\Models\Product;
 
 
 class PdfController extends Controller
@@ -66,6 +69,8 @@ class PdfController extends Controller
             ], 500);
         }
     }
+
+
 
 
 
@@ -203,6 +208,21 @@ public function pu_list_pdf(Request $request)
         // Download the generated PDF
         return $pdf->download('employee_list.pdf');
     }
+
+    
+    public function customer_list_pdf()
+    {
+        $customers = Customer::all();
+        $pdf = PDF::loadView('pdf.customer_list', ['customers' => $customers]);
+        return $pdf->download('customer-list.pdf');
+    }
+    public function supplier_list_pdf()
+    {
+        $suppliers = Supplier::all();
+        $pdf = PDF::loadView('pdf.supplier_list', ['suppliers' => $suppliers]);
+        return $pdf->download('supplier_list.pdf');
+    }
+
 
 
     

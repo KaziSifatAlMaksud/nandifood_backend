@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nandi Foods - All Product List</title>
+    <title>Nandi Foods - All Supplier List</title>
     <style>
         body {
             font-family: "Times New Roman", sans-serif;
@@ -123,63 +123,61 @@
                 <td style="border: none; " colspan="5">
                     <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
                     <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">All Employee List</h1>
+                    <h1 style="font-size: 18px; line-height: 2;">All Supplier List</h1>
                 </td>                
             </tr>
         </table>
     </header>
 
     <table>
-       
         <thead>
             <tr>
-                <th class="uom-id"  width="2%">SI</th>
-                <th class="uom-name"  width="5%">Country</th>
-                <th class="description"  width="5%">State</th>
-                <th class="hu_long_name" width="5%">City</th>
-                <th class="production-uom"  width="5%">Warehouse</th>
-                <th class="purchase-uom" width="5%">Default Warehouse</th>
-                <th class="sales-uom" width="5%">SKU</th>
-                <th class="sales-uom" width="5%">UPC</th>
-                <th class="sales-uom"  width="5%">Product Name</th>
-                <th class="sales-uom" width="15%">Category</th>
-                <th class="sales-uom"  width="12%">Sub-Category</th>
-                <th class="purchase-uom"  width="10%">Sub-Category 1</th>
-                <th class="purchase-uom"  width="10%">Sub-Category 2</th>
-                <th class="sales-uom" width="10%" >Inventory UOM</th>
-                <th class="sales-uom"  width="10%">Sales UOM 1</th>
-                <th class="sales-uom"  width="10%">On Hand Qty</th>
-                <th class="sales-uom"  width="10%">Sales UOM 2</th>
+                <th>SI</th>
+                <th>Supplier ID</th>
+                <th>Supplier No</th>
+                <th>Legal Name</th>
+                <th>Trade Name</th>
+                <th>Address</th>
+                <th>Country</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Zip Code</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Credit Terms</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $i = 1;
-            @endphp
-            @foreach ($proudcts as $proudct)
+            @php $i = 1; @endphp
+            @foreach ($suppliers as $supplier)
                 <tr>
-                    <td class="uom-id">{{ $i }}</td>
-                    <td class="center-align">{{ $proudct->id ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->country ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->state ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->city ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->default_warehouse ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->p_sku_no ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->product_upc ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->p_long_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->product_category_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->sub_category1_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->sub_category2_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->inventory_uom_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->default_sales_uom_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->size_kg ?? 'N/A' }} kg</td>
-                    <td class="left-align">{{ $proudct->size_lb ?? 'N/A' }} lb</td>
+                    <td>{{ $i }}</td>
+                    <td>{{ $supplier->id ?? 'N/A' }}</td>
+                    <td>{{ $supplier->supplier_no ?? 'N/A' }}</td>
+                    <td>{{ $supplier->supplier_legal_name ?? 'N/A' }}</td>
+                    <td>{{ $supplier->supplier_trade_name ?? 'N/A' }}</td>
+                    <td>{{ $supplier->address1 ?? 'N/A' }} {{ $supplier->address2 ?? '' }}</td>
+                    <td>{{ $supplier->country ?? 'N/A' }}</td>
+                    <td>{{ $supplier->state ?? 'N/A' }}</td>
+                    <td>{{ $supplier->city ?? 'N/A' }}</td>
+                    <td>{{ $supplier->zip_code ?? 'N/A' }}</td>
+                    <td>{{ $supplier->email ?? 'N/A' }}</td>
+                    <td>{{ $supplier->phone ?? 'N/A' }}</td>
+                    <td>{{ $supplier->first_name ?? 'N/A' }}</td>
+                    <td>{{ $supplier->last_name ?? 'N/A' }}</td>
+                    <td>{{ $supplier->supplier_category_name ?? 'N/A' }}</td>
+                    <td>{{ $supplier->eff_date ?? 'N/A' }}</td>
+                    <td>{{ $supplier->credit_terms ?? 'N/A' }}</td>
                 </tr>
-                @php
-                    $i++;
-                @endphp
+                @php $i++; @endphp
             @endforeach
         </tbody>
+        
+        
     </table>
     <h4 class="center-align">Printed By:  Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
 </div>

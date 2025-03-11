@@ -6,6 +6,9 @@ use App\Models\Hupu;
 use App\Models\Uom_type;
 use App\Models\Employee;
 use App\Models\Positions;
+use App\Models\Customer;
+use App\Models\Supplier;
+use App\Models\Product;
 use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
@@ -81,6 +84,22 @@ Route::get('/employee-list-view', function () {
    
         return view('pdf.product_list', ['employees' => $employees]);
 });
+Route::get('/customer-list-view', function () {
+  $customers  = Customer::all();
+  return view('pdf.customer_list', ['customers' => $customers]);
+});
+Route::get('/supplier-list-view', function () {
+  $suppliers  = Supplier::all();
+  return view('pdf.supplier_list', ['suppliers' => $suppliers]);
+});
+
+Route::get('/proudct-list-view', function () {
+  $proudcts  = Product::all();
+  return view('pdf.product_list', ['proudcts' => $proudcts]);
+});
+
+
+
 
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
