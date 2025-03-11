@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductPriceController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ShippingInfoController;
+use App\Http\Controllers\ExcelController;
 
 
 
@@ -87,15 +88,19 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 
 
 
-Route::get('/supplier/excel/export', [WarehouseController::class, 'export']);
-Route::get('/customer/excel/export', [WarehouseController::class, 'export']);
-Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
+
+Route::get('/supplier/excel/export',[ExcelController::class, 'supplier_export']);
 Route::get('/product/excel/export', [UomController::class, 'product_export']);
+Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
+
 //csv file export 
 
 Route::get('/uom/excel/export', [UomController::class, 'uom_export']);
 Route::get('/hu/excel/export', [HupuController::class, 'hu_export']);
 Route::get('/employee/excel/export', [EmployeeController::class, 'employeeExport']);
+
+Route::get('/customer/excel/export',[ExcelController::class, 'customer_export']);
+
 
 Route::get('/uom/csv/export', [WarehouseController::class, 'exportCsv']);
 

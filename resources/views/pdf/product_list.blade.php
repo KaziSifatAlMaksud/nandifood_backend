@@ -123,7 +123,7 @@
                 <td style="border: none; " colspan="5">
                     <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
                     <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">All Employee List</h1>
+                    <h1 style="font-size: 18px; line-height: 2;">All Product List</h1>
                 </td>                
             </tr>
         </table>
@@ -138,9 +138,8 @@
                 <th class="description"  width="5%">State</th>
                 <th class="hu_long_name" width="5%">City</th>
                 <th class="production-uom"  width="5%">Warehouse</th>
-                <th class="purchase-uom" width="5%">Default Warehouse</th>
                 <th class="sales-uom" width="5%">SKU</th>
-                <th class="sales-uom" width="5%">UPC</th>
+                {{-- <th class="sales-uom" width="5%">UPC</th> --}}
                 <th class="sales-uom"  width="5%">Product Name</th>
                 <th class="sales-uom" width="15%">Category</th>
                 <th class="sales-uom"  width="12%">Sub-Category</th>
@@ -156,24 +155,23 @@
             @php
                 $i = 1;
             @endphp
-            @foreach ($proudcts as $proudct)
+            @foreach ($products as $product)
                 <tr>
                     <td class="uom-id">{{ $i }}</td>
-                    <td class="center-align">{{ $proudct->id ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->country ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->state ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->city ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->default_warehouse ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->p_sku_no ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->product_upc ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->p_long_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->product_category_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->sub_category1_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->sub_category2_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->inventory_uom_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->default_sales_uom_name ?? 'N/A' }}</td>
-                    <td class="left-align">{{ $proudct->size_kg ?? 'N/A' }} kg</td>
-                    <td class="left-align">{{ $proudct->size_lb ?? 'N/A' }} lb</td>
+                    <td class="left-align">{{ $product->country ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->state ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->city ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->default_warehouse ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->p_sku_no ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->product_upc ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->p_long_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->product_category_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->sub_category1_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->sub_category2_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->inventory_uom_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->default_sales_uom_name ?? 'N/A' }}</td>
+                    <td class="left-align">{{ $product->size_kg ?? 'N/A' }} kg</td>
+                    <td class="left-align">{{ $product->size_lb ?? 'N/A' }} lb</td>
                 </tr>
                 @php
                     $i++;

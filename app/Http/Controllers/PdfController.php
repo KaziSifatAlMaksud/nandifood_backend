@@ -216,6 +216,12 @@ public function pu_list_pdf(Request $request)
         $pdf = PDF::loadView('pdf.customer_list', ['customers' => $customers]);
         return $pdf->download('customer-list.pdf');
     }
+    public function product_list_pdf()
+    {
+        $products = Product::all();
+        $pdf = PDF::loadView('pdf.product_list', ['products' => $products]);
+        return $pdf->download('product-list.pdf');
+    }
     public function supplier_list_pdf()
     {
         $suppliers = Supplier::all();
