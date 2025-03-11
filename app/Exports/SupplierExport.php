@@ -19,8 +19,12 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
         return Supplier::select([
             'id',
             'supplier_no',
-            'supplier_name',
-            'contact_name',
+            'supplier_legal_name',
+            'supplier_trade_name',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'position',
             'address1',
             'address2',
             'country',
@@ -31,6 +35,7 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'phone',
             'mobile',
             'supplier_category',
+            'supplier_category_name',
             'account_manager',
             'category_manager',
             'eff_date',
@@ -38,7 +43,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'last_updated',
             'last_updated_by',
             'status',
-            'notes'
+            'is_approved',
+            'notes',
+            'notes2',
+            'img'
         ])->get();
     }
 
@@ -52,8 +60,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
         return [
             'Supplier ID',
             'Supplier No.',
-            'Supplier Name',
+            'Supplier Legal Name',
+            'Supplier Trade Name',
             'Contact Name',
+            'Position',
             'Address 1',
             'Address 2',
             'Country',
@@ -63,7 +73,8 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'Email',
             'Phone',
             'Mobile',
-            'Supplier Category',
+            'Supplier Category ID',
+            'Supplier Category Name',
             'Account Manager',
             'Category Manager',
             'Effective Date',
@@ -71,7 +82,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'Last Updated',
             'Last Updated By',
             'Status',
-            'Notes'
+            'Approval Status',
+            'Notes',
+            'Additional Notes',
+            'Image URL'
         ];
     }
 
@@ -86,8 +100,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
         return [
             $supplier->id,
             $supplier->supplier_no,
-            $supplier->supplier_name,
-            $supplier->contact_name ?? 'N/A',
+            $supplier->supplier_legal_name,
+            $supplier->supplier_trade_name,
+            trim(($supplier->first_name ?? '') . ' ' . ($supplier->middle_name ?? '') . ' ' . ($supplier->last_name ?? '')),
+            $supplier->position ?? 'N/A',
             $supplier->address1,
             $supplier->address2 ?? 'N/A',
             $supplier->country,
@@ -96,8 +112,9 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             $supplier->zip_code,
             $supplier->email,
             $supplier->phone,
-            $supplier->mobile,
+            $supplier->mobile ?? 'N/A',
             $supplier->supplier_category,
+            $supplier->supplier_category_name ?? 'N/A',
             $supplier->account_manager ?? 'N/A',
             $supplier->category_manager ?? 'N/A',
             $supplier->eff_date,
@@ -105,7 +122,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             $supplier->last_updated,
             $supplier->last_updated_by ?? 'N/A',
             $supplier->status,
+            $supplier->is_approved,
             $supplier->notes ?? 'N/A',
+            $supplier->notes2 ?? 'N/A',
+            $supplier->img ?? 'N/A'
         ];
     }
 }
