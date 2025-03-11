@@ -42,11 +42,7 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'credit_terms',
             'last_updated',
             'last_updated_by',
-            'status',
-            'is_approved',
-            'notes',
-            'notes2',
-            'img'
+            'status'
         ])->get();
     }
 
@@ -62,7 +58,9 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'Supplier No.',
             'Supplier Legal Name',
             'Supplier Trade Name',
-            'Contact Name',
+            'First Name',
+            'Middle Name',
+            'Last Name',
             'Position',
             'Address 1',
             'Address 2',
@@ -81,11 +79,7 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             'Credit Terms',
             'Last Updated',
             'Last Updated By',
-            'Status',
-            'Approval Status',
-            'Notes',
-            'Additional Notes',
-            'Image URL'
+            'Status'
         ];
     }
 
@@ -102,8 +96,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             $supplier->supplier_no,
             $supplier->supplier_legal_name,
             $supplier->supplier_trade_name,
-            trim(($supplier->first_name ?? '') . ' ' . ($supplier->middle_name ?? '') . ' ' . ($supplier->last_name ?? '')),
-            $supplier->position ?? 'N/A',
+            $supplier->first_name,
+            $supplier->middle_name ?? 'N/A',
+            $supplier->last_name,
+            $supplier->position,
             $supplier->address1,
             $supplier->address2 ?? 'N/A',
             $supplier->country,
@@ -121,11 +117,7 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             $supplier->credit_terms ?? 'N/A',
             $supplier->last_updated,
             $supplier->last_updated_by ?? 'N/A',
-            $supplier->status,
-            $supplier->is_approved,
-            $supplier->notes ?? 'N/A',
-            $supplier->notes2 ?? 'N/A',
-            $supplier->img ?? 'N/A'
+            $supplier->status
         ];
     }
 }
