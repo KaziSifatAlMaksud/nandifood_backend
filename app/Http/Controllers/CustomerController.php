@@ -28,14 +28,14 @@ class CustomerController extends Controller
     public function customer_list(Request $request)
     {
         $id = $request->input('id');
-        $limit = (int) $request->input('limit', 5); // Default limit is 5
+        $limit = (int) $request->input('limit', 5); 
         $page = (int) $request->input('page', 1);  
         $query = Customer::query();
 
         if ($id) {
             $query->where('id', $id);
         }
-        $customers = $query->paginate($limit, ['*'], 'page', $page);
+        $customers = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
         // Transform the collection for each customer
         $customers->getCollection()->transform(function ($customer) {
@@ -223,8 +223,11 @@ class CustomerController extends Controller
             $customer_notes_info = new stdClass(); // Initialize the object first (if needed)
 
             // Fetch notes and notes2 from the database
-            $customer_notes_info->notes = Customer::where('id', $id)->value('notes') ?? null; 
-            $customer_notes_info->notes2 = Customer::where('id', $id)->value('notes2') ?? null; 
+            $notes = Customer::where('id', $id)->value('notes'); 
+            $notes2 = Customer::where('id', $id)->value('notes2'); 
+
+            $customer_notes_info->notes = $notes ?? '';  
+            $customer_notes_info->notes2 = $notes2 ?? ''; 
 
 
         $customer_notes->map(function ($note) {
@@ -259,12 +262,13 @@ class CustomerController extends Controller
             ]);
 
             DB::beginTransaction();
-            $customerInfo = null;
+            $customerInfo = "";
+            $customerNote = "";
             $CustomerInfo = Customer::where('id', $validated['customer_id'])->first();
 
-            if ($CustomerInfo && $request->type == 1 ) {
+            if ($CustomerInfo && $request->type == 1) {
                 $customerInfo = $CustomerInfo;
-                $customerInfo->notes = $request->file_description;  // Optionally update customer notes
+                $customerInfo->notes = $request->file_description;  
                 $customerInfo->save();
             }
             if ($CustomerInfo && $request->type == 2) {
@@ -281,14 +285,13 @@ class CustomerController extends Controller
                 $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
                 if ($uploaded) {
                     $validated['file_path'] = $path;
+                    $customerNote = CustomerNote::create($validated);
                 } else {
                     throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
                 }
-                    // Create the customer note
-                $customerNote = CustomerNote::create($validated);
             }
 
-          
+      
 
             DB::commit();
 
