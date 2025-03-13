@@ -40,7 +40,7 @@ class CustomerController extends Controller
         // Transform the collection for each customer
         $customers->getCollection()->transform(function ($customer) {
             // Get the position name for each customer
-            $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
+            // $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
 
             // Add the image URL if it exists
             $customer->img = $customer->img ? Storage::disk('spaces')->url($customer->img) : null;
@@ -134,9 +134,9 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         $customer->img = $customer->img ? Storage::disk('spaces')->url($customer->img) : null;
-        $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
+        // $customer->position_name = Positions::where('id', $customer->position)->value('position_name');
         $customer->account_manager_name = Employee::where('id', $customer->account_manager)->value('first_name','middle_name', 'last_name');
-        $customer->account_manager_name = Employee::where('id', $customer->category_manager)->value('first_name','middle_name', 'last_name');
+        $customer->category_manager_name = Employee::where('id', $customer->category_manager)->value('first_name','middle_name', 'last_name');
         if (!$customer) {
             return response()->json([
                 'status' => 404,
