@@ -75,7 +75,7 @@ class ShippingInfoController extends Controller
         }
 
         $validatedData = $request->validate([
-            'select_shipping_location' => 'required|string|max:255',
+            'select_shipping_location' => 'nullable|string|max:255',
             'address1' => 'required|string|max:255',
             'address2' => 'nullable|string|max:255',
             'city' => 'required|string|max:100',
