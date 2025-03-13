@@ -59,7 +59,7 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($id);
         $supplier->img = $supplier->img ? Storage::disk('spaces')->url($supplier->img) : null;
-        $supplier->position_name = Positions::where('id', $supplier->position)->value('position_name');
+        // $supplier->position_name = Positions::where('id', $supplier->position)->value('position_name');
         $supplier->account_manager_name = Employee::where('id', $supplier->account_manager)
             ->selectRaw("CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name) as full_name")
             ->value('full_name');
