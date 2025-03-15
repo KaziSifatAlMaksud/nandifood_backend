@@ -29,11 +29,11 @@ class GRN extends Model
         'received_details'
     ];
 
-    protected $casts = [
-        'date_received' => 'date',
-        'bol_date' => 'date',
-        'last_updated' => 'datetime',
-        'received_details' => 'array',
-        'is_approve' => 'boolean',
-    ];
+    // protected $casts = [
+    //     'date_received' => 'date',
+    //     'bol_date' => 'date',
+    //     'last_updated' => 'datetime',
+    //     'received_details' => 'array',
+    //     'is_approve' => 'boolean',
+    // ];
 }

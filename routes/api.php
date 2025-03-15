@@ -226,10 +226,16 @@ Route::delete('/product/notes/delete/{id}', [ProductController::class, 'product_
 
 // Get all route GRNs
 Route::get('/grns', [GRNController::class, 'index']); 
-Route::post('/grns', [GRNController::class, 'store']);
+Route::post('/grns/create', [GRNController::class, 'store']);
 Route::get('/grns/{id}', [GRNController::class, 'show']); 
 Route::post('/grns/{id}', [GRNController::class, 'update']);
 Route::delete('/grns/{id}', [GRNController::class, 'destroy']); 
+
+
+Route::post('/grn_attachment/create', [GRNController::class, 'store_attachment']);
+Route::get('/grn_attachment/{id}', [GRNController::class, 'get_all_attachments']);
+Route::delete('/grn_attachment/delete/{id}', [GRNController::class, 'delete_attachment']);
+
 
 // GRN API Helper
 Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);
