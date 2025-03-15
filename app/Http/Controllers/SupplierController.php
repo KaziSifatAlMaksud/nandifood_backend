@@ -225,6 +225,8 @@ class SupplierController extends Controller
             // Delete the Supplier record
             $supplier->delete();
 
+            $supplier_linked = SupplierNote::where('supplier_id', $id)->delete();
+
             // Return a success response
             return response()->json([
                 'status' => 200,

@@ -354,7 +354,7 @@ class CustomerController extends Controller
     public function customer_destroy($id)
     {
          $customer = Customer::findOrFail($id);
-
+         $customer_linked = CustomerNote::where('customer_id', $id)->delete();
         // Check if the country exists
         if (!$customer) {
             return response()->json([

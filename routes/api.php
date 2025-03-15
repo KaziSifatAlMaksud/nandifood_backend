@@ -229,7 +229,7 @@ Route::get('/grns', [GRNController::class, 'index']);
 Route::post('/grns/create', [GRNController::class, 'store']);
 Route::get('/grns/{id}', [GRNController::class, 'show']); 
 Route::post('/grns/{id}', [GRNController::class, 'update']);
-Route::delete('/grns/{id}', [GRNController::class, 'destroy']); 
+Route::delete('/grns/{id}/delete', [GRNController::class, 'destroy']); 
 
 
 Route::post('/grn_attachment/create', [GRNController::class, 'store_attachment']);

@@ -171,7 +171,8 @@ class GRNController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        $grn = GRN::find($id);
+        $grn = GRN::findOrFail($id);
+        $grn_linked = GRNAttachment::where('grn_id', $id)->delete();
         if (!$grn) {
             return response()->json(['message' => 'GRN not found'], 404);
         }
