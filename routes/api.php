@@ -15,6 +15,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ShippingInfoController;
 use App\Http\Controllers\ExcelController;
+use App\Http\Controllers\GRNController;
 
 
 
@@ -223,6 +224,17 @@ route::post('/product_attachment/create', [ProductController::class, 'product_no
 route::get('/product_attachment/{id}', [ProductController::class, 'get_all_notes']);
 Route::delete('/product/notes/delete/{id}', [ProductController::class, 'product_notes_delete']);
 
+// Get all route GRNs
+Route::get('/grns', [GRNController::class, 'index']); 
+Route::post('/grns', [GRNController::class, 'store']);
+Route::get('/grns/{id}', [GRNController::class, 'show']); 
+Route::post('/grns/{id}', [GRNController::class, 'update']);
+Route::delete('/grns/{id}', [GRNController::class, 'destroy']); 
+
+// GRN API Helper
+Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);
+
+// Get all route GRNs
 
 //Helper Common API
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
@@ -236,12 +248,7 @@ route::get('/product_size', [ProductController::class,'size_name']);
 route::get('/uom_name',[UomController::class, 'uom_name']);
 
 route::get('/credit_terms_name', [SupplierController::class, 'get_credit_terms_name']);
-
-
-
 Route::get('/shipping_info', [SupplierController::class, 'get_shipping_info']);
-
-
 route::get('/country_name',[WarehouseController::class, 'getCountries']);
 Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
