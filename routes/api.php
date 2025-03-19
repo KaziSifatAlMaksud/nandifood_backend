@@ -245,8 +245,9 @@ Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);
 //Helper Common API
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 Route::get('/product_category', [ProductController::class, 'getproduct_cat']);
-Route::get('/product_sub_category', [ProductController::class, 'getproduct_sub_cat']);
-Route::get('/product_sub_category2', [ProductController::class, 'getproduct_sub_cat2']);
+Route::get('/product_category2/{category_id}', [ProductController::class, 'getproduct_sub_cat']);
+Route::get('/product_category3/{category_id}', [ProductController::class, 'getproduct_sub_cat2']);
+
 Route::get('/employee_name', [EmployeeController::class, 'get_employee_name']);
 route::get('/war_name', [WarehouseController::class,'warehouse_name']);
 route::get('/defult_warehouse_info', [WarehouseController::class,'defult_warehouse_info']);

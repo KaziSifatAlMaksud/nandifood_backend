@@ -430,6 +430,7 @@ class ProductController extends Controller
     public function update2(Request $request, $id)
 {
     try {
+        
         $action = $request->action; 
         $isApprove = ($action == 'approve') ? 2 : 1;
         // Find the product or return a 404 error
@@ -570,11 +571,10 @@ class ProductController extends Controller
 
 
 
-     // Helper Apis for Product Controller
+ 
 
      public function getproduct_cat(){
-        $product_category = Product_category::select('id', 'category_name')->get(); // Fetch only id and category_name columns
-
+      $product_category = Product_sub_category2::select('category_id as category_name')->distinct()->get();
         return response()->json([
         'status' => 200,
         'message' => 'Product categories fetched successfully.',
@@ -582,31 +582,39 @@ class ProductController extends Controller
             'data' => $product_category
             ],
         ]);
-     }
-     
-     public function getproduct_sub_cat(){
-        $product_sub_category1 = product_sub_category1::select('id', 'category_name')->get(); // Fetch only id and category_name columns
+     } 
+
+    public function getproduct_sub_cat($category_id){
+        $product_category = Product_sub_category2::where('category_id', $category_id)
+       ->select('sub_category1 as sub_category1_name')
+        ->distinct()
+        ->get();
 
         return response()->json([
         'status' => 200,
-        'message' => 'Product Sub categories 1 fetched successfully.',
+        'message' => 'Product Sub Category fetched successfully.',
         'result' => [
-            'data' => $product_sub_category1
+            'data' => $product_category
             ],
         ]);
-     }
-
-     public function getproduct_sub_cat2(){
-        $product_sub_category2 = Product_sub_category2::select('id', 'category_name')->get(); // Fetch only id and category_name columns
+     } 
+       public function getproduct_sub_cat2($category_id){
+        $product_category = Product_sub_category2::where('sub_category1', $category_id)
+        ->select('category_name as sub_category2_name')
+        ->distinct()
+        ->get();
 
         return response()->json([
         'status' => 200,
-        'message' => 'Product Sub categories 2 fetched successfully.',
+       'message' => 'Product Sub categories 2 fetched successfully.',
         'result' => [
-            'data' => $product_sub_category2
+            'data' => $product_category
             ],
         ]);
-     }
+     } 
+
+
+
 
      public function size_name(){
         $size = Sizes::all(); 
