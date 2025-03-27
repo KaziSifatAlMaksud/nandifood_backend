@@ -16,6 +16,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ShippingInfoController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\GRNController;
+use App\Http\Controllers\GTNController;
 
 
 
@@ -241,6 +242,20 @@ Route::delete('/grn_attachment/delete/{id}', [GRNController::class, 'delete_atta
 Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);
 
 // Get all route GRNs
+
+//GTN API
+Route::get('/gtns', [GTNController::class, 'index']); 
+Route::post('/gtns/create', [GTNController::class, 'store']);
+Route::get('/gtns/{id}', [GTNController::class, 'show']); 
+Route::post('/gtns/{id}', [GTNController::class, 'update']);
+Route::delete('/gtns/{id}/delete', [GTNController::class, 'destroy']);
+
+
+
+//GTN Attachment API
+Route::post('/gtn_attachment/create', [GTNController::class, 'store_attachment']);
+Route::get('/gtn_attachment/{id}', [GTNController::class, 'get_all_attachments']);
+Route::delete('/gtn_attachment/delete/{id}', [GTNController::class, 'delete_attachment']);
 
 //Helper Common API
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
