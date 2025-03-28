@@ -257,6 +257,22 @@ Route::post('/gtn_attachment/create', [GTNController::class, 'store_attachment']
 Route::get('/gtn_attachment/{id}', [GTNController::class, 'get_all_attachments']);
 Route::delete('/gtn_attachment/delete/{id}', [GTNController::class, 'delete_attachment']);
 
+
+//DGN API
+
+Route::get('/dgns', [DGNController::class, 'index']); 
+Route::post('/dgns/create', [DGNController::class, 'store']);
+Route::get('/dgns/{id}', [DGNController::class, 'show']); 
+Route::post('/dgns/{id}', [DGNController::class, 'update']);
+Route::delete('/dgns/{id}/delete', [DGNController::class, 'destroy']);
+
+
+
+//DGN Attachment API
+Route::post('/dgn_attachment/create', [DGNController::class, 'store_attachment']);
+Route::get('/dgn_attachment/{id}', [DGNController::class, 'get_all_attachments']);
+Route::delete('/dgn_attachment/delete/{id}', [DGNController::class, 'delete_attachment']);
+
 //Helper Common API
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 Route::get('/product_category', [ProductController::class, 'getproduct_cat']);

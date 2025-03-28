@@ -292,7 +292,9 @@ class ProductPriceController extends Controller
     {
         // Fetch data from the database
        
-        $productPrice = PriceExcelFile::where('action', 2)->get()->all();
+        $productPrice = PriceExcelFile::where('action', 2)
+        ->orderBy('id', 'desc')
+        ->get();
         foreach ($productPrice as $product) {
             $product->file_name = Storage::disk('spaces')->url($product->file);
         }
