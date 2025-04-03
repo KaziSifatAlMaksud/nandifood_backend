@@ -12,27 +12,79 @@ use Illuminate\Support\Facades\DB;
 
 class GTNController extends Controller
 {
-    public function index(Request $request): JsonResponse
-    {
+  
+public function index(Request $request): JsonResponse
+{
+    try {
         $id = $request->input('id');
         $limit = (int) $request->input('limit', 5);
         $page = (int) $request->input('page', 1);
 
         $query = GTN::query();
-        
+
         if ($id) {
             $query->where('id', $id);
         }
 
         $gtns = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
+        // Get all warehouse IDs needed for both in and out warehouses
+        $warehouseIds = collect();
+        foreach ($gtns as $gtn) {
+            if ($gtn->transfer_out_warehouse) {
+                $warehouseIds->push($gtn->transfer_out_warehouse);
+            }
+            if ($gtn->transfer_in_warehouse) {
+                $warehouseIds->push($gtn->transfer_in_warehouse);
+            }
+        }
+
+        // Fetch all warehouses with their relationships in one query
+        $warehouses = Warehouse::whereIn('id', $warehouseIds->unique())
+            ->select('id', 'warehouse_name', 'country', 'state', 'city')
+            ->get();
+
+        // Transform the results to include flattened warehouse fields
+        $transformedData = $gtns->getCollection()->map(function ($gtn) use ($warehouses) {
+            // Find the matching out and in warehouse
+            $outWarehouse = $warehouses->firstWhere('id', $gtn->transfer_out_warehouse);
+            $inWarehouse = $warehouses->firstWhere('id', $gtn->transfer_in_warehouse);
+
+            return array_merge($gtn->toArray(), [
+                'out_warehouse_name' => $outWarehouse->warehouse_name ?? null,
+                'out_warehouse_country' => $outWarehouse->country ?? null,
+                'out_warehouse_state' => $outWarehouse->state ?? null,
+                'out_warehouse_city' => $outWarehouse->city ?? null,
+                'in_warehouse_name' => $inWarehouse->warehouse_name ?? null,
+                'in_warehouse_country' => $inWarehouse->country ?? null,
+                'in_warehouse_state' => $inWarehouse->state ?? null,
+                'in_warehouse_city' => $inWarehouse->city ?? null,
+            ]);
+        });
+
+        // Create new paginator with transformed data
+        $transformedGtns = new \Illuminate\Pagination\LengthAwarePaginator(
+            $transformedData,
+            $gtns->total(),
+            $gtns->perPage(),
+            $gtns->currentPage(),
+            ['path' => $request->url()]
+        );
+
         return response()->json([
             'status' => 200,
             'message' => 'GTN list retrieved successfully',
-            'result' => $gtns
+            'result' => $transformedGtns
         ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'message' => 'Failed to retrieve GTN list',
+            'error' => $e->getMessage(),
+        ], 500);
     }
-   
+}
+
     public function store(Request $request): JsonResponse
     {
 
