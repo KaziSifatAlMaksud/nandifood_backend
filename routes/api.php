@@ -17,7 +17,8 @@ use App\Http\Controllers\ShippingInfoController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\GRNController;
 use App\Http\Controllers\GTNController;
-
+use App\Http\Controllers\DGNController;
+use App\Http\Controllers\PRDController;
 
 
 Route::get('/user', function (Request $request) {
@@ -272,6 +273,19 @@ Route::delete('/dgns/{id}/delete', [DGNController::class, 'destroy']);
 Route::post('/dgn_attachment/create', [DGNController::class, 'store_attachment']);
 Route::get('/dgn_attachment/{id}', [DGNController::class, 'get_all_attachments']);
 Route::delete('/dgn_attachment/delete/{id}', [DGNController::class, 'delete_attachment']);
+
+// PRD API
+Route::get('/prds', [PRDController::class, 'index']); 
+Route::post('/prds/create', [PRDController::class, 'store']);
+Route::get('/prds/{id}', [PRDController::class, 'show']); 
+Route::post('/prds/{id}', [PRDController::class, 'update']);
+Route::delete('/prds/{id}/delete', [PRDController::class, 'destroy']);
+
+// PRD Attachment API
+Route::post('/prd_attachment/create', [PRDController::class, 'store_attachment']);
+Route::get('/prd_attachment/{id}', [PRDController::class, 'get_all_attachments']);
+Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_attachment']);
+
 
 //Helper Common API
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
