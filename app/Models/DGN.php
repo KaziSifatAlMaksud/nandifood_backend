@@ -28,11 +28,9 @@ class DGN extends Model
         'status',
         'office_phone',
         'notes',
-        'is_approve',
+        'is_approved',
     ];
-
-    // Optionally, you can define relationships if needed.
-    // For example, if you want to define a relationship with DGNAttachment.
+    public $timestamps = false; 
     public function attachments()
     {
         return $this->hasMany(DGNAttachment::class, 'dgn_id');

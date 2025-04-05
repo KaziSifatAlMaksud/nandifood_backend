@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GRN;
+use App\Models\DGN;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Warehouse;
 
-use App\Models\GRNAttachment;
+use App\Models\DGNAttachment;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;

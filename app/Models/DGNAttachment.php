@@ -9,7 +9,7 @@ class DGNAttachment extends Model
 {
     use HasFactory;
 
-    protected $table = 'dgn_attachments';
+    protected $table = 'dgn_attachment';
 
     protected $fillable = [
         'dgn_id',
@@ -18,7 +18,7 @@ class DGNAttachment extends Model
         'file_path',
         'uploaded_at',
     ];
-
+     public $timestamps = false; // Disable timestamps if not needed
     // Define relationship with DGN
     public function dgn()
     {
