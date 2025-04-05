@@ -102,7 +102,10 @@ public function index(Request $request): JsonResponse
             'transferred_out_by' => 'nullable|string|max:100',
             'status' => 'nullable|string',
             'notes' => 'nullable|string',
-            'last_updated_by' => 'nullable|string|max:100'
+            'last_updated_by' => 'nullable|string|max:100',
+            'bol_number' => 'nullable|string|max:100',
+            'supplier_invoice_no' => 'nullable|string|max:100',
+            'supplier' => 'nullable|string|max:100'
         ]);
 
         // Determine approval status

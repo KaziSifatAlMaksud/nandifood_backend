@@ -26,7 +26,10 @@ class GRN extends Model
         'status',
         'grn_notes',
         'is_approve',
-        'received_details'
+        'received_details',
+        'bol_number',
+        'supplier_invoice_no',
+        'supplier'
     ];
 
     // protected $casts = [
