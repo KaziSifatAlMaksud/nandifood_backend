@@ -21,6 +21,7 @@ class GRN extends Model
         'bol_date',
         'delivery_driver',
         'received_by',
+        'other_reference',
         'last_updated',
         'last_updated_by',
         'status',
