@@ -23,14 +23,33 @@ class GRNController extends Controller
         $limit = (int) $request->input('limit', 5);
         $page = (int) $request->input('page', 1);
 
+        // Initial GRN query
         $query = GRN::query();
-        
+
         if ($id) {
             $query->where('id', $id);
         }
-        
 
+        // Paginate GRNs
         $grns = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
+
+        // Get unique warehouse IDs from GRNs
+        $warehouseIds = $grns->pluck('receiving_warehouse_id')->unique()->toArray();
+
+        // Fetch related warehouses
+        $warehouses = Warehouse::whereIn('id', $warehouseIds)->get()->keyBy('id');
+
+        // Append warehouse info to each GRN
+        foreach ($grns as $grn) {
+            $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
+
+            if ($warehouse) {
+                $grn->warehouse_name = $warehouse->name;
+                $grn->country = $warehouse->country;
+                $grn->state = $warehouse->state;
+                $grn->city = $warehouse->city;
+            }
+        }
 
         return response()->json([
             'status' => 200,
@@ -38,6 +57,7 @@ class GRNController extends Controller
             'result' => $grns
         ]);
     }
+
 
     public function getWarehouse(){
         // System will auto populate the default warehouse of the user.
