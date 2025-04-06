@@ -35,11 +35,9 @@ class GRNController extends Controller
 
         // Get unique warehouse IDs from GRNs
         $warehouseIds = $grns->pluck('receiving_warehouse_id')->unique()->toArray();
-
-        // Fetch related warehouses
+        
         $warehouses = Warehouse::whereIn('id', $warehouseIds)->get()->keyBy('id');
 
-        // Append warehouse info to each GRN
         foreach ($grns as $grn) {
             $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
 

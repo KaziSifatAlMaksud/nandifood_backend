@@ -28,6 +28,22 @@ class PRDController extends Controller
 
         $peds = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
+          // Get unique warehouse IDs from GRNs
+        // $warehouseIds = $grns->pluck('receiving_warehouse_id')->unique()->toArray();
+        
+        // $warehouses = Warehouse::whereIn('id', $warehouseIds)->get()->keyBy('id');
+
+        // foreach ($grns as $grn) {
+        //     $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
+
+        //     if ($warehouse) {
+        //         $grn->warehouse_name = $warehouse->name;
+        //         $grn->country = $warehouse->country;
+        //         $grn->state = $warehouse->state;
+        //         $grn->city = $warehouse->city;
+        //     }
+        // }
+
         return response()->json([
             'status' => 200,
             'message' => 'PRD list retrieved successfully',
@@ -153,17 +169,6 @@ class PRDController extends Controller
 
         $ped->delete();
 
-        return response()->json(['message' => 'PRD deleted successfully']);
-    }
-
-      public function destroy($id): JsonResponse
-    {
-        $prd = PRD::findOrFail($id);
-        $prd_linked = PRDAttachment::where('prd_id', $id)->delete();
-        if (!$grn) {
-            return response()->json(['message' => 'PRD not found'], 404);
-        }
-        $grn->delete();
         return response()->json(['message' => 'PRD deleted successfully']);
     }
 
