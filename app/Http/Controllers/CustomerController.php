@@ -355,6 +355,10 @@ class CustomerController extends Controller
     {
          $customer = Customer::findOrFail($id);
          $customer_linked = CustomerNote::where('customer_id', $id)->delete();
+
+             ShippingInfo::where('cus_or_sup_id', $id)
+                ->where('shipping_type', 1)
+                ->delete();
         // Check if the country exists
         if (!$customer) {
             return response()->json([

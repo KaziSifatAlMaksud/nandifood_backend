@@ -226,6 +226,11 @@ class SupplierController extends Controller
             $supplier->delete();
 
             $supplier_linked = SupplierNote::where('supplier_id', $id)->delete();
+            
+            ShippingInfo::where('cus_or_sup_id', $id)
+                ->where('shipping_type', 2)
+                ->delete();
+
 
             // Return a success response
             return response()->json([
