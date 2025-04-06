@@ -30,8 +30,10 @@ class GRN extends Model
         'received_details',
         'bol_number',
         'supplier_invoice_no',
-        'supplier'
+        'supplier',
+        'other_reference'
     ];
+     public $timestamps = false;
 
     // protected $casts = [
     //     'date_received' => 'date',

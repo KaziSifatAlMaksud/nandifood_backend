@@ -23,5 +23,5 @@ class InvoicePaymentTerm extends Model
     ];
 
     // Optionally, disable timestamps if you don't want 'created_at' and 'updated_at' columns
-    public $timestamps = true; // Set to false if you don't need timestamps
+    public $timestamps = false; // Set to false if you don't need timestamps
 }
