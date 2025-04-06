@@ -71,6 +71,10 @@ class GRNController extends Controller
             'status' => 'nullable|string',
             'grn_notes' => 'nullable|string',
             'received_details' => 'nullable|string', 
+            'bol_number' => 'nullable|string|max:100',
+            'supplier_invoice_no' => 'nullable|string|max:100',
+            'supplier' => 'nullable|string|max:100',
+            'other_reference' => 'nullable|string|max:100',
         ]);
 
         // Determine approval status
