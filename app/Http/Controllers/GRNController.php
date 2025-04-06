@@ -67,6 +67,7 @@ class GRNController extends Controller
             'bol_date' => 'nullable|string|max:255', 
             'delivery_driver' => 'nullable|string|max:255',
             'received_by' => 'nullable|string|max:255',
+            'last_updated' => 'nullable|string|max:255',
             'last_updated_by' => 'nullable|string|max:100',
             'status' => 'nullable|string',
             'grn_notes' => 'nullable|string',
