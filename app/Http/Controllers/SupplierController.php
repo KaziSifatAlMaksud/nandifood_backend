@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Supplier;
+use App\Models\ShippingInfo;
 use App\Models\SupplierNote;
 use App\Models\SupplierCategories;
 use App\Models\CreditTerm;
