@@ -378,8 +378,9 @@ class ProductController extends Controller
             'eff_date' => 'nullable|string',
             'end_date' => 'nullable|string',
             'status' => 'nullable|string|max:50',
-            'img1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
-            'upc_barcode' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+            'img1' => 'nullable|image|max:10048',
+            'upc_barcode' => 'nullable|image|max:10048',
+
         ]);
 
         $validatedData['is_approved'] = $isApprove;
