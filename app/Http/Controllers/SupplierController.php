@@ -610,7 +610,10 @@ public function credit_terms_store(Request $request)
     private function handleCreditTerm($validated, $request)
     {
         $cus_sup_id = $request->cus_sup_id;
-        $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)->first();
+        $type = $request->type;
+       $creditTerm = CreditTerm::where('cus_sup_id', $cus_sup_id)
+                        ->where('type', $type)
+                        ->first();
 
         if ($creditTerm) {
             $creditTerm->update($validated);
