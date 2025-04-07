@@ -579,7 +579,7 @@ public function credit_terms_store(Request $request)
         // Now we handle the credit terms and file upload together
         if ($request->type == 1) {
             $fileData['customer_id'] = $request->cus_sup_id;
-            $fileData['type'] = 2;   
+            $fileData['type'] = 1;   
             $creditData = array_merge($validated, $fileData);
         
             
