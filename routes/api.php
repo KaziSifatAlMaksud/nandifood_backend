@@ -93,7 +93,8 @@ route::get('/bin_storage_type',[WarehouseController::class, 'bin_storage_type'])
 
 
 Route::get('/supplier/excel/export',[ExcelController::class, 'supplier_export']);
-Route::get('/product/excel/export', [UomController::class, 'product_export']);
+Route::get('/product/excel/export', [ExcelController::class, 'product_export']);
+
 Route::get('/warehouse/excel/export', [WarehouseController::class, 'export']);
 
 //csv file export 
@@ -118,6 +119,8 @@ Route::post('/price/import_excel_from_database', [ProductPriceController::class,
 Route::delete('/price/delete_excel/{id}', [ProductPriceController::class, 'destroyExcel'])->name('price.destroyExcel');
 Route::delete('/price/delete/{id}', [ProductPriceController::class, 'destroy'])->name('price.destroy');
 Route::get('/price/get_excel_price/{id}', [ProductPriceController::class, 'getExcelById']);
+Route::get('/price/{excel_id}/{on_off}', [ProductPriceController::class, 'price_active_inactive']);
+
 
 
 //price API End  

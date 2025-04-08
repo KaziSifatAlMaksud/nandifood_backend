@@ -145,6 +145,27 @@ class ProductPriceController extends Controller
         ]);
     }
 
+ public function price_active_inactive($excel_id, $on_off, Request $request)
+    {
+        $priceexcel = PriceExcelFile::find($excel_id);
+
+        if (!$priceexcel) {
+            return response()->json([
+                'message' => 'Price not found'
+            ], 404);
+        }
+
+        $priceexcel->action = $on_off;
+        $priceexcel->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Price status updated successfully.',
+            'result' => ['data' => $priceexcel]
+        ]);
+    }
+
+
 
     public function getExcelById($id)
     {
