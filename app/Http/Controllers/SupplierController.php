@@ -523,7 +523,6 @@ class SupplierController extends Controller
 public function credit_terms_store(Request $request)
 {
         $action = $request->action;
-
         // Shared validation
         $validated = $request->validate([
             'credit_terms' => 'required|string|max:11',
@@ -579,7 +578,7 @@ public function credit_terms_store(Request $request)
         // Now we handle the credit terms and file upload together
         if ($request->type == 1) {
             $fileData['customer_id'] = $request->cus_sup_id;
-            $fileData['type'] = 1;   
+            $fileData['type'] =  2;   
             $creditData = array_merge($validated, $fileData);
         
             
