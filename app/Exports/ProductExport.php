@@ -43,7 +43,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'status',
             'last_updated',
             'last_updated_by',
-            'is_approved',
             'notes'
         ])->get();
     }
@@ -82,7 +81,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'Status',
             'Last Updated',
             'Last Updated By',
-            'Approved',
             'Notes'
         ];
     }
@@ -122,7 +120,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             $product->status,
             $product->last_updated,
             $product->last_updated_by,
-            $product->is_approved,
             $product->notes,
         ];
     }
