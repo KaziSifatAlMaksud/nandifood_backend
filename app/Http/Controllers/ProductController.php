@@ -377,9 +377,7 @@ class ProductController extends Controller
             'product_manager' => 'nullable|string|max:100',
             'eff_date' => 'nullable|string',
             'end_date' => 'nullable|string',
-            'status' => 'nullable|string|max:50',
-            'img1' => 'nullable|image|max:10048',
-            'upc_barcode' => 'nullable|image|max:10048',
+            'status' => 'nullable|string|max:50'
 
         ]);
 
