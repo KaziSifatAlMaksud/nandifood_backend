@@ -40,8 +40,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'product_manager',
             'eff_date',
             'end_date',
-            'status',
-            'last_updated',
             'last_updated_by',
             'notes'
         ])->get();
@@ -78,8 +76,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'Product Manager',
             'Effective Date',
             'End Date',
-            'Status',
-            'Last Updated',
             'Last Updated By',
             'Notes'
         ];
@@ -117,8 +113,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             $product->product_manager,
             $product->eff_date,
             $product->end_date,
-            $product->status,
-            $product->last_updated,
             $product->last_updated_by,
             $product->notes,
         ];
