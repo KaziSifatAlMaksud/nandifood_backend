@@ -155,7 +155,7 @@ class ProductPriceController extends Controller
             ], 404);
         }
 
-        $priceexcel->action = $on_off;
+        $priceexcel->status = $on_off;
         $priceexcel->save();
 
         return response()->json([
