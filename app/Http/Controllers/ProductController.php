@@ -115,8 +115,11 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            // Get the price list for the product based on SKU
-            $price_list = Price::where('sku', $product->p_sku_no)->get();
+            $price_list = Price::select('price.*') // only select from the price table
+            ->where('sku', $product->p_sku_no)
+            ->join('price_excel_file', 'price.excel_id', '=', 'price_excel_file.id')
+            ->where('price_excel_file.status', 'active')
+            ->get();
 
             // Return the price list successfully
             return response()->json([
