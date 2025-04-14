@@ -41,7 +41,9 @@ class DGNController extends Controller
             ], 500);
         }
     }
-    public function store(Request $request): JsonResponse
+
+    
+   public function store(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -61,6 +63,12 @@ class DGNController extends Controller
                 'status' => 'nullable|string|max:255',
                 'office_phone' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
+                'dgn_number' => 'nullable|string|max:255',
+                'Supplier' => 'nullable|string|max:255',
+                'bol_number' => 'nullable|string|max:255',
+                'disposal_date' => 'nullable|string|max:255',
+                'disposal_by' => 'nullable|string|max:255',
+                'last_updated_by' => 'nullable|string|max:255'
             ]);
 
             // Determine approval status
@@ -69,17 +77,18 @@ class DGNController extends Controller
 
             // Generate DGN Number
             $todayDate = now()->format('ymd');
-            $lastDGN = DGN::where('regerence_no', 'LIKE', "DGN{$todayDate}-%")
-                ->orderBy('regerence_no', 'DESC')
+            $lastDGN = DGN::where('dgn_number', 'LIKE', "DGN{$todayDate}-%")
+                ->orderBy('dgn_number', 'DESC')
                 ->first();
 
             $count = 1;
             if ($lastDGN) {
-                $lastCount = (int) substr($lastDGN->regerence_no, -3);
+                // Fix: use dgn_number instead of regerence_no
+                $lastCount = (int) substr($lastDGN->dgn_number, -3);
                 $count = $lastCount + 1;
             }
 
-            $validated['regerence_no'] = "DGN{$todayDate}-" . str_pad($count, 3, '0', STR_PAD_LEFT);
+            $validated['dgn_number'] = "DGN{$todayDate}-" . str_pad($count, 3, '0', STR_PAD_LEFT);
 
             // Store DGN record
             $dgn = DGN::create($validated);

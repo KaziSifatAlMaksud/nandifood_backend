@@ -29,6 +29,13 @@ class DGN extends Model
         'office_phone',
         'notes',
         'is_approved',
+
+        'dgn_number',
+        'Supplier',
+        'bol_number',
+        'disposal_date',
+        'disposal_by',
+        'last_updated_by'
     ];
     public $timestamps = false; 
     public function attachments()
