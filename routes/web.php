@@ -112,3 +112,10 @@ route::get('/employee/downloadpdf', [PdfController::class, 'employee_list_pdf'] 
 route::get('/customer/downloadpdf', [PdfController::class, 'customer_list_pdf'] );
 route::get('/product/downloadpdf', [PdfController::class, 'product_list_pdf'] );
 route::get('/supplier/downloadpdf', [PdfController::class, 'supplier_list_pdf'] );
+
+
+route::get('/grns/downloadpdf', [PdfController::class, 'grns_list_pdf'] );
+route::get('/gtns/downloadpdf', [PdfController::class, 'gtns_list_pdf'] );
+route::get('/rgns/downloadpdf', [PdfController::class, 'rgns_list_pdf'] );
+route::get('/dgns/downloadpdf', [PdfController::class, 'dgns_list_pdf'] );
+route::get('/prds/downloadpdf', [PdfController::class, 'prds_list_pdf'] );
