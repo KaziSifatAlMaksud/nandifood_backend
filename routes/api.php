@@ -19,6 +19,8 @@ use App\Http\Controllers\GRNController;
 use App\Http\Controllers\GTNController;
 use App\Http\Controllers\DGNController;
 use App\Http\Controllers\PRDController;
+use App\Http\Controllers\RGNController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -241,6 +243,18 @@ Route::post('/grn_attachment/create', [GRNController::class, 'store_attachment']
 Route::get('/grn_attachment/{id}', [GRNController::class, 'get_all_attachments']);
 Route::delete('/grn_attachment/delete/{id}', [GRNController::class, 'delete_attachment']);
 
+
+// Get all route GRNs
+Route::get('/rgns', [RGNController::class, 'index']); 
+Route::post('/rgns/create', [RGNController::class, 'store']);
+Route::get('/rgns/{id}', [RGNController::class, 'show']); 
+Route::post('/rgns/{id}', [RGNController::class, 'update']);
+Route::delete('/rgns/{id}/delete', [RGNController::class, 'destroy']); 
+
+
+Route::post('/rgn_attachment/create', [RGNController::class, 'store_attachment']);
+Route::get('/rgn_attachment/{id}', [RGNController::class, 'get_all_attachments']);
+Route::delete('/rgn_attachment/delete/{id}', [RGNController::class, 'delete_attachment']);
 
 // GRN API Helper
 Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);

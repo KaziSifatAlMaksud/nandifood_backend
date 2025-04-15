@@ -29,7 +29,6 @@ class DGN extends Model
         'office_phone',
         'notes',
         'is_approved',
-
         'dgn_number',
         'Supplier',
         'bol_number',

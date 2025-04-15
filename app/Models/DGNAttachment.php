@@ -18,8 +18,8 @@ class DGNAttachment extends Model
         'file_path',
         'uploaded_at',
     ];
-     public $timestamps = false; // Disable timestamps if not needed
-    // Define relationship with DGN
+     public $timestamps = false;
+     
     public function dgn()
     {
         return $this->belongsTo(DGN::class, 'dgn_id');
