@@ -42,7 +42,7 @@ class GRNController extends Controller
             $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
 
             if ($warehouse) {
-                $grn->warehouse_name = $warehouse->name;
+                $grn->warehouse_name = $warehouse->warehouse_name;
                 $grn->country = $warehouse->country;
                 $grn->state = $warehouse->state;
                 $grn->city = $warehouse->city;

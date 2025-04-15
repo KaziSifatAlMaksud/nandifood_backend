@@ -15,7 +15,7 @@ use App\Models\PRDAttachment;
 
 class RGNController extends Controller
 {
-     public function index(Request $request): JsonResponse
+   public function index(Request $request): JsonResponse
     {
         $id = $request->input('id');
         $limit = (int) $request->input('limit', 5);
@@ -27,7 +27,26 @@ class RGNController extends Controller
             $query->where('id', $id);
         }
 
+        // Paginate the RGN data first
         $rgns = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
+
+        // Get unique warehouse IDs from current RGN page
+        $warehouseIds = $rgns->pluck('warehouse_id')->unique()->toArray();
+
+        // Fetch warehouses and index by ID
+        $warehouses = Warehouse::whereIn('id', $warehouseIds)->get()->keyBy('id');
+
+        // Transform each RGN item to include warehouse info
+        $rgns->getCollection()->transform(function ($rgn) use ($warehouses) {
+            $warehouse = $warehouses[$rgn->warehouse_id] ?? null;
+
+            $rgn->warehouse_name = $warehouse->warehouse_name ?? null;
+            $rgn->country = $warehouse->country ?? null;
+            $rgn->state = $warehouse->state ?? null;
+            $rgn->city = $warehouse->city ?? null;
+
+            return $rgn;
+        });
 
         return response()->json([
             'status' => 200,
@@ -35,6 +54,8 @@ class RGNController extends Controller
             'result' => $rgns
         ]);
     }
+
+
 
 
     public function store(Request $request): JsonResponse
