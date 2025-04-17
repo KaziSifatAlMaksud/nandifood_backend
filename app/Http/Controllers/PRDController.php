@@ -62,7 +62,7 @@ class PRDController extends Controller
             'country' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:150', 
-            'prd_date' => 'nullable|string',
+            'prd_date' => 'nullable|string|max: 150',
             'prd_no' => 'nullable|string|max:255',
             'pro_start_date' => 'nullable|string|max:50',
             'pro_end_date' => 'nullable|string|max:150', 
