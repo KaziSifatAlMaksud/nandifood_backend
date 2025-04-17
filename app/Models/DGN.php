@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DGN extends Model
 {
@@ -37,8 +39,16 @@ class DGN extends Model
         'last_updated_by'
     ];
     public $timestamps = false; 
+    public function damageDetails()
+    {
+        return $this->hasMany(DgnDamageDetail::class, 'dgn_id');
+    }
     public function attachments()
     {
         return $this->hasMany(DGNAttachment::class, 'dgn_id');
     }
+
+
+
+    
 }

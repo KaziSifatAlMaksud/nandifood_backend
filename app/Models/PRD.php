@@ -29,4 +29,6 @@ class PRD extends Model
     ];
 
     public $timestamps = false; 
+
+
 }

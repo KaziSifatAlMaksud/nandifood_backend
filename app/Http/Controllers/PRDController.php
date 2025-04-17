@@ -65,10 +65,10 @@ class PRDController extends Controller
             'prd_date' => 'nullable|string|max: 150',
             'prd_no' => 'nullable|string|max:255',
             'pro_start_date' => 'nullable|string|max:200',
-            'pro_end_date' => 'nullable|string|max:150', 
-            'pro_supervisor' => 'nullable|string|max:150',
-            'last_updated' => 'nullable|string|max:200',
-            'last_updated_by' => 'nullable|string|max:150',
+            'pro_end_date' => 'nullable|string|max:200', 
+            'pro_supervisor' => 'nullable|string|max:100',
+            'last_updated' => 'nullable|string|max:100',
+            'last_updated_by' => 'nullable|string|max:100',
             'status' => 'nullable|string',
             'notes' => 'nullable|string'
         ]);

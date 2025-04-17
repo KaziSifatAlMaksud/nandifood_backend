@@ -11,6 +11,7 @@ use App\Models\DGNAttachment;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\DgnDamageDetail;
 
 class DGNController extends Controller
 {
@@ -107,41 +108,41 @@ class DGNController extends Controller
     }
 
 
-    public function show($id): JsonResponse
-    {
-        // Find the DGN entry
-        $dgn = DGN::find($id);
+   public function show($id): JsonResponse
+{
+    // Find the DGN record with its related damage details
+    $dgn = DGN::with('damageDetails')->find($id);
 
-        // Check if DGN exists
-        if (!$dgn) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'DGN not found'
-            ], 404);
-        }
-
-        // Fetch warehouse details
-        $warehouse = Warehouse::find($dgn->defult_warehouse);
-
-        // Add warehouse details to the response (without modifying the DGN record)
-        $dgn->warehouse_name = $warehouse ? $warehouse->name : null;
-        $dgn->warehouse_country = $warehouse ? $warehouse->country : null;
-        $dgn->warehouse_state = $warehouse ? $warehouse->state : null;
-        $dgn->warehouse_city = $warehouse ? $warehouse->city : null;
-
+    // Check if DGN exists
+    if (!$dgn) {
         return response()->json([
-            'status' => 200,
-            'message' => 'DGN details retrieved successfully',
-            'result' => $dgn
-        ]);
+            'status' => 404,
+            'message' => 'DGN not found'
+        ], 404);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    // Fetch related warehouse
+    $warehouse = Warehouse::find($dgn->defult_warehouse);
+
+    // Add warehouse fields to the response object
+    $dgn->warehouse_name    = $warehouse->name ?? null;
+    $dgn->warehouse_country = $warehouse->country ?? null;
+    $dgn->warehouse_state   = $warehouse->state ?? null;
+    $dgn->warehouse_city    = $warehouse->city ?? null;
+
+    return response()->json([
+        'status' => 200,
+        'message' => 'DGN details retrieved successfully',
+        'result' => $dgn
+    ]);
+}
+
+
+    public function update(Request $request, $id)
     {
         // Find the DGN record
         $dgn = DGN::find($id);
 
-        // Check if DGN exists
         if (!$dgn) {
             return response()->json([
                 'status' => 404,
@@ -149,16 +150,43 @@ class DGNController extends Controller
             ], 404);
         }
 
-        // Convert request data to an array
+        // Get all incoming request data
         $data = $request->all();
-
-        // Determine approval status
         if ($request->has('action')) {
             $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
         }
 
-        // Update DGN record with the provided data
+        // Update DGN with new data
         $dgn->update($data);
+
+        // Delete existing damage details
+        DgnDamageDetail::where('dgn_id', $dgn->id)->delete();
+
+        $damageDetails = $request->input('dgn_damagedetails');
+        if (is_array($damageDetails)) {
+                         
+            foreach ($damageDetails as $detail) {
+         
+                DgnDamageDetail::create([
+                    'dgn_id'         => $dgn->id,
+                    'sku'            => $detail['sku'] ?? null,
+                    'productName'    => $detail['productName'] ?? null,
+                    'size'           => $detail['size'] ?? null,
+                    'uom'            => $detail['uom'] ?? null,
+                    'batchNo'        => $detail['batchNo'] ?? null,
+                    'totalAmount'    => $detail['totalAmount'] ?? null,
+                    'expirationDate' => $detail['expirationDate'] ?? null,
+                    'qtyDamaged'     => $detail['qtyDamaged'] ?? null,
+                    'unitCost'       => $detail['unitCost'] ?? null,
+                    'comment'        => $detail['comment'] ?? null,
+                    'created_at'     => $detail['created_at'] ?? now(),
+                    'updated_at'     => $detail['updated_at'] ?? now(),
+                ]);
+            }
+        }
+
+        // Load fresh damage details
+        $dgn->load('damageDetails');
 
         return response()->json([
             'status' => 200,
@@ -166,6 +194,7 @@ class DGNController extends Controller
             'result' => $dgn
         ]);
     }
+
 
     public function destroy($id): JsonResponse
     {
@@ -294,6 +323,9 @@ class DGNController extends Controller
             // Delete the DGN attachment record from the database
             $dgnAttachment->delete();
 
+            
+            DgnDamageDetail::where('dgn_id', $id)->delete();
+            
             return response()->json([
                 'status' => 200,
                 'message' => 'DGN Attachment deleted successfully.',
