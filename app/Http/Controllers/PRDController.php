@@ -26,7 +26,7 @@ class PRDController extends Controller
             $query->where('id', $id);
         }
 
-        $peds = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
+        $prds = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
           // Get unique warehouse IDs from GRNs
         // $warehouseIds = $grns->pluck('receiving_warehouse_id')->unique()->toArray();
@@ -47,7 +47,7 @@ class PRDController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'PRD list retrieved successfully',
-            'result' => $peds
+            'result' => $prds
         ]);
     }
 
@@ -106,9 +106,9 @@ class PRDController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $ped = PRD::find($id);
+        $prd = PRD::find($id);
 
-        if (!$ped) {
+        if (!$prd) {
             return response()->json([
                 'status' => 404,
                 'message' => 'PRD not found'
@@ -118,7 +118,7 @@ class PRDController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'PRD details retrieved successfully',
-            'result' => $ped
+            'result' => $prd
         ]);
     }
 
@@ -161,13 +161,13 @@ class PRDController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        $ped = PRD::find($id);
+        $prd = PRD::find($id);
 
-        if (!$ped) {
+        if (!$prd) {
             return response()->json(['message' => 'PRD not found'], 404);
         }
 
-        $ped->delete();
+        $prd->delete();
 
         return response()->json(['message' => 'PRD deleted successfully']);
     }
@@ -183,23 +183,23 @@ class PRDController extends Controller
 
                 $validated = $request->all(); // No validation as per your structure
 
-                $pedInfo = PRD::find($validated['prd_id']);
-                if ($pedInfo && $request->type == 1) {
-                    $pedInfo->notes = $request->file_description;
-                    $pedInfo->save();
+                $prdInfo = PRD::find($validated['prd_id']);
+                if ($prdInfo && $request->type == 1) {
+                    $prdInfo->notes = $request->file_description;
+                    $prdInfo->save();
                 }
 
-                $pedAttachment = null;
+                $prdAttachment = null;
                 if ($request->hasFile('file_path')) {
                     $file = $request->file('file_path');
                     $fileName = $file->getClientOriginalName();
-                    $path = "uploads/ped_attachments/{$fileName}";
+                    $path = "uploads/prd_attachments/{$fileName}";
                     $uploaded = Storage::disk('spaces')->put($path, file_get_contents($file), ['visibility' => 'public']);
 
                     if ($uploaded) {
                         $validated['file_path'] = $path;
                         $fileUrl = Storage::disk('spaces')->url($path); 
-                        $pedAttachment = PRDAttachment::create($validated);
+                        $prdAttachment = PRDAttachment::create($validated);
                         $validated['file_url'] = $fileUrl;
                     } else {
                         throw new \Exception('Failed to upload file to DigitalOcean Spaces.');
@@ -210,18 +210,18 @@ class PRDController extends Controller
 
                 return response()->json([
                     'status' => 200,
-                    'message' => ($pedAttachment && $pedInfo)
+                    'message' => ($prdAttachment && $prdInfo)
                         ? 'PRD Attachment and Notes updated successfully.'
-                        : ($pedAttachment
+                        : ($prdAttachment
                             ? 'PRD Attachment created successfully.'
-                            : ($pedInfo
+                            : ($prdInfo
                                 ? 'PRD Notes updated successfully.'
                                 : 'No changes were made.'
                             )
                         ),
                     'result' => [
-                        'data' => $pedAttachment,
-                        'pedInfo' => $pedInfo
+                        'data' => $prdAttachment,
+                        'prdInfo' => $prdInfo
                     ]
                 ]);
 
@@ -236,13 +236,13 @@ class PRDController extends Controller
 
         public function get_all_attachments($prd_id): JsonResponse
         {
-            $ped_attachments = PRDAttachment::where('prd_id', $prd_id)->get();
+            $prd_attachments = PRDAttachment::where('prd_id', $prd_id)->get();
 
-            $ped_info = new \stdClass();
+            $prd_info = new \stdClass();
             $notes = PRD::where('id', $prd_id)->value('notes');
-            $ped_info->notes = $notes ?? '';
+            $prd_info->notes = $notes ?? '';
 
-            $ped_attachments->map(function ($attachment) {
+            $prd_attachments->map(function ($attachment) {
                 if ($attachment->file_path) {
                     $attachment->file = Storage::disk('spaces')->url($attachment->file_path);
                     $attachment->file_name = basename($attachment->file_path);
@@ -256,8 +256,8 @@ class PRDController extends Controller
                 'status' => 200,
                 'message' => 'PRD Attachments retrieved successfully.',
                 'result' => [
-                    'data' => $ped_attachments,
-                    'ped_info' => $ped_info
+                    'data' => $prd_attachments,
+                    'prd_info' => $prd_info
                 ],
             ]);
         }
@@ -265,17 +265,17 @@ class PRDController extends Controller
         public function delete_attachment($id): JsonResponse
         {
             try {
-                $pedAttachment = PRDAttachment::findOrFail($id);
+                $prdAttachment = PRDAttachment::findOrFail($id);
 
-                if ($pedAttachment->file_path) {
-                    $filePath = $pedAttachment->file_path;
+                if ($prdAttachment->file_path) {
+                    $filePath = $prdAttachment->file_path;
 
                     if (Storage::disk('spaces')->exists($filePath)) {
                         Storage::disk('spaces')->delete($filePath);
                     }
                 }
 
-                $pedAttachment->delete();
+                $prdAttachment->delete();
 
                 return response()->json([
                     'status' => 200,
