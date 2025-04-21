@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Warehouse;
 
 use App\Models\GRNAttachment;
+use App\Models\GrnReceivingDetail;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -180,6 +181,42 @@ class GRNController extends Controller
         // Update GRN record with the provided data
         $grn->update($data);
 
+      
+
+       // GrnReceivingDetail::where('grn_id', $grn->id)->delete();
+        $receivingDetails = $request->input('grn_receivingdetails');
+            dd($receivingDetails);
+             if (is_array($receivingDetails)) {
+                         
+            foreach ($receivingDetails as $detail) {
+            
+         
+                GrnReceivingDetail::create([
+                    'grn_id'                 => $dgn->id,
+                    'supplier_sku'           => $detail['supplier_sku'] ?? null,
+                    'our_sku'                => $detail['our_sku'] ?? null,
+                    'product_name'           => $detail['product_name'] ?? null,
+                    'size'                   => $detail['size'] ?? null,
+                    'uom'                    => $detail['uom'] ?? null,
+                    'batch_no'               => $detail['batch_no'] ?? null,
+                    'expiration_date'        => $detail['expiration_date'] ?? null,
+                    'qty_order'              => $detail['qty_order'] ?? null,
+                    'qty_received'           => $detail['qty_received'] ?? null,
+                    'qty_variance'           => $detail['qty_variance'] ?? null,
+                    'unit_cost'              => $detail['unit_cost'] ?? null,
+                    'total_amount'           => $detail['total_amount'] ?? null,
+                    'receive_reject_action'  => $detail['receive_reject_action'] ?? null,
+                    'rejection_resolution'   => $detail['rejection_resolution'] ?? null,
+                    'comment'                => $detail['comment'] ?? null,
+                    'created_at'             => $detail['created_at'] ?? now(),
+                    'updated_at'             => $detail['updated_at'] ?? now(),
+                ]);
+            }
+        }
+
+       // Load fresh damage details
+        $grn->load('receivingDetails');
+
         return response()->json([
             'status' => 200,
             'message' => 'GRN updated successfully',
@@ -313,6 +350,8 @@ class GRNController extends Controller
             }
 
             $grnAttachment->delete();
+
+            GrnReceivingDetail::where('grn_id', $id)->delete();
 
             return response()->json([
                 'status' => 200,

@@ -35,6 +35,11 @@ class GRN extends Model
     ];
      public $timestamps = false;
 
+         public function receivingDetails()
+    {
+        return $this->hasMany(GrnReceivingDetail::class, 'grn_id');
+    }
+
     // protected $casts = [
     //     'date_received' => 'date',
     //     'bol_date' => 'date',
