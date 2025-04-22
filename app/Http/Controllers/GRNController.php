@@ -127,7 +127,7 @@ class GRNController extends Controller
     public function show($id): JsonResponse
     {
         // Find the GRN entry
-        $grn = GRN::find($id);
+        $grn = GRN::with('receivingDetails')->find($id);
 
         // Check if GRN exists
         if (!$grn) {
@@ -182,17 +182,17 @@ class GRNController extends Controller
         $grn->update($data);
 
       
-
-       // GrnReceivingDetail::where('grn_id', $grn->id)->delete();
+       // dd($request->all());
+       GrnReceivingDetail::where('grn_id', $grn->id)->delete();
         $receivingDetails = $request->input('grn_receivingdetails');
-            dd($receivingDetails);
+       //     dd($receivingDetails);
              if (is_array($receivingDetails)) {
                          
             foreach ($receivingDetails as $detail) {
             
          
                 GrnReceivingDetail::create([
-                    'grn_id'                 => $dgn->id,
+                    'grn_id'                 => $grn->id,
                     'supplier_sku'           => $detail['supplier_sku'] ?? null,
                     'our_sku'                => $detail['our_sku'] ?? null,
                     'product_name'           => $detail['product_name'] ?? null,
@@ -208,8 +208,8 @@ class GRNController extends Controller
                     'receive_reject_action'  => $detail['receive_reject_action'] ?? null,
                     'rejection_resolution'   => $detail['rejection_resolution'] ?? null,
                     'comment'                => $detail['comment'] ?? null,
-                    'created_at'             => $detail['created_at'] ?? now(),
-                    'updated_at'             => $detail['updated_at'] ?? now(),
+                    'created_at'             => $detail['created_at'] ?? null,
+                    'updated_at'             => $detail['updated_at'] ?? null,
                 ]);
             }
         }
@@ -237,6 +237,8 @@ class GRNController extends Controller
             return response()->json(['message' => 'GRN not found'], 404);
         }
         $grn->delete();
+        GrnReceivingDetail::where('grn_id', $id)->delete();
+        
         return response()->json(['message' => 'GRN deleted successfully']);
     }
 
@@ -351,7 +353,7 @@ class GRNController extends Controller
 
             $grnAttachment->delete();
 
-            GrnReceivingDetail::where('grn_id', $id)->delete();
+           
 
             return response()->json([
                 'status' => 200,

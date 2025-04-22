@@ -30,4 +30,7 @@ class GTN extends Model
         'last_updated_by',
         'is_approved'
     ];
+    public function transferOutDetail(){
+        return $this->hasMany(GtnTransferOutDetail::class, 'gtn_id');
+    }
 }

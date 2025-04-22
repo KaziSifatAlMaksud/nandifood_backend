@@ -208,7 +208,6 @@ class DGNController extends Controller
 
         // Delete associated attachments
         DGNAttachment::where('dgn_id', $id)->delete();
-
         // Delete the DGN record
         $dgn->delete();
 
@@ -323,8 +322,7 @@ class DGNController extends Controller
             // Delete the DGN attachment record from the database
             $dgnAttachment->delete();
 
-            
-            DgnDamageDetail::where('dgn_id', $id)->delete();
+           
             
             return response()->json([
                 'status' => 200,

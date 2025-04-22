@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Warehouse;
 use App\Models\GTNAttachment;
 use App\Models\GTN;
-
+use App\Models\GtnTransferOutDetail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -138,7 +138,7 @@ public function index(Request $request): JsonResponse
     public function show($id): JsonResponse
     {
         // Find the GTN entry
-        $gtn = GTN::find($id);
+        $gtn = GTN::with('transferOutDetail')->find($id);
 
         // Check if GTN exists
         if (!$gtn) {
@@ -194,6 +194,37 @@ public function index(Request $request): JsonResponse
         // Update GTN record with the provided data
         $gtn->update($data);
 
+        GtnTransferOutDetail::where('gtn_id', $gtn->id)->delete();
+        $transferOutDetail = $request->input('gtn_transferoutDetail');
+
+
+        if (is_array($transferOutDetail)) {
+                         
+            foreach ($transferOutDetail as $detail) {
+            
+         
+                GtnTransferOutDetail::create([
+                    'gtn_id'                 => $gtn->id,
+                    'sku'                    => $detail['sku'] ?? null,
+                    'product_name'           => $detail['product_name'] ?? null,
+                    'size'                   => $detail['size'] ?? null,
+                    'uom'                    => $detail['uom'] ?? null,
+                    'batch_no'               => $detail['batch_no'] ?? null,
+                    'expiration_date'        => $detail['expiration_date'] ?? null,
+                    'qty_ordered'            => $detail['qty_ordered'] ?? null,
+                    'qty_transferred_out'    => $detail['qty_transferred_out'] ?? null,
+                    'qty_variance'           => $detail['qty_variance'] ?? null,
+                    'unit_cost'              => $detail['unit_cost'] ?? null,
+                    'total_amount'           => $detail['total_amount'] ?? null,
+                    'transfer'               => $detail['transfer'] ?? null,
+                    'comment'                => $detail['comment'] ?? null,
+                    'created_at'             => $detail['created_at'] ?? null,
+                    'updated_at'             => $detail['updated_at'] ?? null,
+                ]);
+            }
+        }
+        $gtn->load('transferOutDetail');
+
         return response()->json([
             'status' => 200,
             'message' => 'GTN updated successfully',
@@ -213,8 +244,7 @@ public function index(Request $request): JsonResponse
 
         // Delete associated attachments
         GTNAttachment::where('gtn_id', $id)->delete();
-
-        // Delete the GTN record
+        GtnTransferOutDetail::where('gtn_id', $id)->delete();
         $gtn->delete();
 
         return response()->json(['message' => 'GTN deleted successfully']);
@@ -329,6 +359,7 @@ public function index(Request $request): JsonResponse
 
             // Delete the GTN attachment record from the database
             $gtnAttachment->delete();
+          
 
             return response()->json([
                 'status' => 200,
