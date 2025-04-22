@@ -197,6 +197,7 @@ Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'suppli
 
 //Supplier Helper API
 route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
+route::get('/supplier_list', [SupplierController::class, 'supplier_list_api']);
 
 route::post('/credit_terms/create', [SupplierController::class, 'credit_terms_store']);
 Route::get('/credit_terms/{type}/{cus_sup_id}', [SupplierController::class, 'get_credit_terms']);

@@ -606,6 +606,7 @@ public function credit_terms_store(Request $request)
         ]);
     }
 
+
     private function handleCreditTerm($validated, $request)
     {
         $cus_sup_id = $request->cus_sup_id;
@@ -638,6 +639,19 @@ public function credit_terms_store(Request $request)
         return response()->json([
             'message' => 'Credit term handled successfully!',
             'data' => $creditTerm
+        ]);
+    }
+
+    public function supplier_list_api(){
+        $suppliers = Supplier::select('supplier_no', 'supplier_legal_name', 'address1')
+            ->orderBy('supplier_no', 'desc')
+            ->get();
+
+       
+        return response()->json([
+            'status' => 200,
+            'message' => 'Supplier list retrieved successfully',
+            'result' => $suppliers
         ]);
     }
 
