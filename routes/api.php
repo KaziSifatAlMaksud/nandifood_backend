@@ -20,6 +20,7 @@ use App\Http\Controllers\GTNController;
 use App\Http\Controllers\DGNController;
 use App\Http\Controllers\PRDController;
 use App\Http\Controllers\RGNController;
+use App\Http\Controllers\POController;
 
 
 
@@ -253,6 +254,18 @@ Route::delete('/grns/{id}/delete', [GRNController::class, 'destroy']);
 Route::post('/grn_attachment/create', [GRNController::class, 'store_attachment']);
 Route::get('/grn_attachment/{id}', [GRNController::class, 'get_all_attachments']);
 Route::delete('/grn_attachment/delete/{id}', [GRNController::class, 'delete_attachment']);
+
+//Get All route for PO..
+// PO Routes
+Route::get('/pos', [POController::class, 'index']);
+Route::post('/pos/create', [POController::class, 'store']);
+Route::get('/pos/{id}', [POController::class, 'show']);
+Route::post('/pos/{id}', [POController::class, 'update']);
+Route::delete('/pos/{id}/delete', [POController::class, 'destroy']);
+
+Route::post('/po_attachment/create', [POController::class, 'store_attachment']);
+Route::get('/po_attachment/{id}', [POController::class, 'get_all_attachments']);
+Route::delete('/po_attachment/delete/{id}', [POController::class, 'delete_attachment']);
 
 
 // Get all route GRNs
