@@ -111,7 +111,7 @@ class POController extends Controller
     public function show($id): JsonResponse
     {
         // Find the PO record with its related item details
-        $po = PO::with('POItemDetail')->find($id);
+        $po = PO::with('poItemDetails')->find($id);
 
         // Check if PO exists
         if (!$po) {
