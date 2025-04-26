@@ -329,6 +329,9 @@ Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_atta
 
 
 //Helper Common API
+Route::get('/product_name_sku', [ProductController::class, 'get_product_name']);
+Route::get('/product_name_sku/{prductorsku}', [ProductController::class, 'product_name_sku_prductorsku']);
+
 Route::get('/uom_type',[WarehouseController::class, 'uom_type']);
 Route::get('/product_category', [ProductController::class, 'getproduct_cat']);
 Route::get('/product_category2/{category_id}', [ProductController::class, 'getproduct_sub_cat']);
@@ -347,6 +350,7 @@ Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
+
 
 
 

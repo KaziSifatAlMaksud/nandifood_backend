@@ -22,6 +22,58 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
 
+    public function get_product_name()
+    {
+        try {
+            // Fetch distinct rows based on the specified columns
+            $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name')->distinct()->get();
+
+            // Return the response with the fetched data
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product Name fetched successfully.',
+                'result' => [
+                    'data' => $products,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // If an error occurs, return a 500 response with the error message
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function product_name_sku_prductorsku($prductorsku)
+    {
+        try {
+            // Fetch distinct rows based on the specified columns
+           $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name')
+                ->where('p_sku_no', $prductorsku) 
+                ->orWhere('p_long_name', 'like', "%$prductorsku%")  
+                ->orWhere('product_short_name', 'like', "%$prductorsku%") 
+                ->distinct()
+                ->get();
+
+            // Return the response with the fetched data
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product Name fetched successfully.',
+                'result' => [
+                    'data' => $products,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // If an error occurs, return a 500 response with the error message
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    
   
     public function index(Request $request)
     {
@@ -553,6 +605,9 @@ class ProductController extends Controller
 }
 
 
+
+
+
     
 
  public function destroy($id)
@@ -621,7 +676,16 @@ class ProductController extends Controller
         ]);
      } 
 
-
+    //  public function get_product_name(){
+    //     $product = Product::select('p_long_name as product_name')->distinct()->get();
+    //     return response()->json([
+    //     'status' => 200,
+    //     'message' => 'Product Name fetched successfully.',
+    //     'result' => [
+    //         'data' => $product
+    //         ],
+    //     ]);
+    //  }
 
 
      public function size_name(){
