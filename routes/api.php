@@ -196,9 +196,7 @@ Route::get('/get_supplier_all_notes/{id}/{type}', [SupplierController::class, 'g
 Route::post('/supplier_notes/create', [SupplierController::class, 'supplier_notes_store']);
 Route::delete('/supplier_notes/delete/{id}', [SupplierController::class, 'supplier_notes_delete']);
 
-//Supplier Helper API
-route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
-route::get('/supplier_list', [SupplierController::class, 'supplier_list_api']);
+
 
 route::post('/credit_terms/create', [SupplierController::class, 'credit_terms_store']);
 Route::get('/credit_terms/{type}/{cus_sup_id}', [SupplierController::class, 'get_credit_terms']);
@@ -329,6 +327,12 @@ Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_atta
 
 
 //Helper Common API
+
+//Supplier Helper API
+route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
+route::get('/supplier_list', [SupplierController::class, 'supplier_list_api']);
+
+
 Route::get('/product_name_sku', [ProductController::class, 'get_product_name']);
 Route::get('/product_name_sku/{prductorsku}', [ProductController::class, 'product_name_sku_prductorsku']);
 
