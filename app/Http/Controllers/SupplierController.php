@@ -643,7 +643,7 @@ public function credit_terms_store(Request $request)
     }
 
     public function supplier_list_api(){
-        $suppliers = Supplier::select('supplier_no', 'supplier_legal_name', 'address1')
+        $suppliers = Supplier::select('supplier_no', 'supplier_legal_name', 'address1','country','state','city','zip_code','email','phone')
             ->orderBy('supplier_no', 'desc')
             ->get();
 
