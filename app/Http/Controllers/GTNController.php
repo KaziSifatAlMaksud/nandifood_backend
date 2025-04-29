@@ -185,7 +185,7 @@ public function index(Request $request): JsonResponse
 
         // Convert request data to an array
         $data = $request->all();
-
+      // dd($data);
         // Determine approval status
         if ($request->has('action')) {
             $data['is_approved'] = ($request->input('action') === 'approve') ? 2 : 1;

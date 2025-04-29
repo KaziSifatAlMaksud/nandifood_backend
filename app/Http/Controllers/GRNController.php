@@ -89,16 +89,18 @@ class GRNController extends Controller
             'last_updated' => 'nullable|string|max:255',
             'last_updated_by' => 'nullable|string|max:100',
             'status' => 'nullable|string',
-            'grn_notes' => 'nullable|string',
             'received_details' => 'nullable|string', 
             'bol_number' => 'nullable|string|max:100',
             'supplier_invoice_no' => 'nullable|string|max:100',
             'supplier' => 'nullable|string|max:100',
             'other_reference' => 'nullable|string|max:100',
+            'grn_notes' => 'nullable|string',
+            'action' => 'nullable|string'
         ]);
 
         // Determine approval status
         $action = $request->input('action'); 
+ 
         $validated['is_approve'] = ($action == 'approve') ? 2 : 1;
         $todayDate = now()->format('ymd'); 
         $lastGRN = GRN::where('grn_no', 'LIKE', "GRN{$todayDate}-%")
@@ -170,18 +172,13 @@ class GRNController extends Controller
             ], 404);
         }
 
-        // Convert request data to an array
         $data = $request->all();
 
-        // Determine approval status
         if ($request->has('action')) {
-            $data['is_approved'] = ($request->input('action') === 'approve') ? 2 : 1;
+            $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
         }
-
-        // Update GRN record with the provided data
         $grn->update($data);
 
-      
        // dd($request->all());
        GrnReceivingDetail::where('grn_id', $grn->id)->delete();
         $receivingDetails = $request->input('grn_receivingdetails');

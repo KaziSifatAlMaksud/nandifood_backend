@@ -12,6 +12,7 @@ use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Models\PRD;
 use App\Models\PRDAttachment;
+use App\Models\RgnItemsDetail;
 
 class RGNController extends Controller
 {
@@ -106,7 +107,7 @@ class RGNController extends Controller
     public function show($id): JsonResponse
     {
         // Find the GTN entry
-        $rgn = RGN::find($id);
+        $rgn = RGN::with('rgnitemDetails')->find($id);
 
         // Check if GTN exists
         if (!$rgn) {
@@ -145,36 +146,62 @@ class RGNController extends Controller
     }
 
 
-   public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $id)
     {
-        // Find the GTN record
         $rgn = RGN::find($id);
-
-        // Check if GTN exists
         if (!$rgn) {
             return response()->json([
                 'status' => 404,
                 'message' => 'RGN not found'
             ], 404);
         }
-
-        // Convert request data to an array
+    
+        // Get all request data
         $data = $request->all();
-
-        // Determine approval status
         if ($request->has('action')) {
-            $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
+            $data['is_approve'] = ($request->input('action') == 'approve') ? 2 : 1;
         }
-
-        // Update GTN record with the provided data
+    
         $rgn->update($data);
+    
+        // Delete existing item details linked to this RGN
+       RgnItemsDetail::where('rgn_id', $rgn->id)->delete();
+       $rgnItemDetails = $request->input('rgn_item_details');
 
+        if (is_array($rgnItemDetails)) {
+            foreach ($rgnItemDetails as $detail) {
+                RgnItemsDetail::create([
+                    'rgn_id'          => $rgn->id,
+                    'sku'             => $detail['sku'] ?? null,
+                    'product_name'    => $detail['product_name'] ?? null,
+                    'size'            => $detail['size'] ?? null,
+                    'uom'             => $detail['uom'] ?? null,
+                    'batch_no'        => $detail['batch_no'] ?? null,
+                    'expiration_date' => $detail['expiration_date'] ?? null,
+                    'returned_qty'    => $detail['returned_qty'] ?? null,
+                    'qty_received'    => $detail['qty_received'] ?? null,
+                    'qty_varience'    => $detail['qty_varience'] ?? null,
+                    'unit_cost'       => $detail['unit_cost'] ?? null,
+                    'total_amount'    => $detail['total_amount'] ?? null,
+                    'status'          => $detail['status'] ?? null,
+                    'comment'         => $detail['comment'] ?? null,
+                    'created_at'     => $detail['created_at'] ?? now(),
+                    'updated_at'     => $detail['updated_at'] ?? now(),
+                ]);
+            }
+        }
+    
+        // Reload the related item details
+        $rgn->load('rgnItemDetails');
+
+    
         return response()->json([
             'status' => 200,
             'message' => 'RGN updated successfully',
             'result' => $rgn
         ]);
     }
+
 
     public function destroy($id): JsonResponse
         {

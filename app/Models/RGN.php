@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\RgnItemsDetail;
 
 class Rgn extends Model
 {
@@ -24,9 +24,15 @@ class Rgn extends Model
         'status',
         'total_amount',
         'last_updated_by',
+        'last_updated',
         'is_approve',
         'notes',
     ];
 
     public $timestamps = false; 
+    public function rgnItemDetails()
+    {
+        return $this->hasMany(RgnItemsDetail::class, 'rgn_id');
+    }
+
 }
