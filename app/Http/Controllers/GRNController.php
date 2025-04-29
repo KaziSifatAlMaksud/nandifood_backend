@@ -94,7 +94,6 @@ class GRNController extends Controller
             'supplier_invoice_no' => 'nullable|string|max:100',
             'supplier' => 'nullable|string|max:100',
             'other_reference' => 'nullable|string|max:100',
-            'grn_notes' => 'nullable|string',
             'action' => 'nullable|string'
         ]);
 
