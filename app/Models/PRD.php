@@ -30,5 +30,11 @@ class PRD extends Model
 
     public $timestamps = false; 
 
+    public function productionOrders()
+    {
+        return $this->hasMany(ProductionOrder::class, 'prd_id');
+    }
+
+
 
 }

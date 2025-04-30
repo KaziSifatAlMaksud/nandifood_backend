@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ProductionOrder;
 
 class PRDController extends Controller
 {
@@ -126,34 +127,65 @@ class PRDController extends Controller
      * Update a PRD
      */
 
-     public function update(Request $request, $id): JsonResponse
-    {
-        // Find the GRN record
-        $prd = PRD::find($id);
+     public function update(Request $request, $id)
+     {
+         // Find the PRD record
+         $prd = PRD::find($id);
+ 
+         // Check if PRD exists
+         if (!$prd) {
+             return response()->json([
+                 'status' => 404,
+                 'message' => 'PRD not found'
+             ], 404);
+         }
 
-        // Check if GRN exists
-        if (!$prd) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'GRN not found'
-            ], 404);
-        }
-        $data = $request->all();
+         $data = $request->all();
+        // dd($data);
+     
+         if ($request->has('action')) {
+             $data['is_approve'] = ($request->input('action') == 'approve') ? 2 : 1;
+         }
+     
+         $prd->update($data);
 
-        // Determine approval status
-        if ($request->has('action')) {
-            $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
-        }
+         ProductionOrder::where('prd_id', $prd->id)->delete();
 
-        // Update GRN record with the provided data
-        $prd->update($data);
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'PRD updated successfully',
-            'result' => $prd
-        ]);
-    }
+         $productionOrders = $request->input('perchase_order');
+         if (is_array($productionOrders)) {
+             foreach ($productionOrders as $order) {
+                 ProductionOrder::create([
+                     'prd_id'           => $prd->id,
+                     'production_order_no' => $order['production_order_no'] ?? null,
+                     'type'             => $order['type'] ?? null,
+                     'production_date'  => $order['production_date'] ?? null,
+                     'product_category' => $order['product_category'] ?? null,
+                     'sub_category1'    => $order['sub_category1'] ?? null,
+                     'sub_category2'    => $order['sub_category2'] ?? null,
+                     'output_product'   => $order['output_product'] ?? null,
+                     'input_item'       => $order['input_item'] ?? null,
+                     'sku'              => $order['sku'] ?? null,
+                     'size'             => $order['size'] ?? null,
+                     'uom'              => $order['uom'] ?? null,
+                     'qty'              => $order['qty'] ?? null,
+                     'currency'         => $order['currency'] ?? null,
+                     'unit_cost'        => $order['unit_cost'] ?? null,
+                     'amount'           => $order['amount'] ?? null,
+                     'created_at'       => $order['created_at'] ?? now(),
+                 ]);
+             }
+         }
+     
+         // Load fresh related purchase orders
+         $prd->load('productionOrders');
+     
+         return response()->json([
+             'status' => 200,
+             'message' => 'PRD updated successfully',
+             'result' => $prd
+         ]);
+     }
+     
 
     
     /**
