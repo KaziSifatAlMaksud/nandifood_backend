@@ -107,7 +107,7 @@ class PRDController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $prd = PRD::find($id);
+        $prd = PRD::with('productionOrders')->find($id);
 
         if (!$prd) {
             return response()->json([
