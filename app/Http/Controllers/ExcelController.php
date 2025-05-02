@@ -27,6 +27,14 @@ use App\Exports\SupplierExport;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use App\Exports\ProductExport;
 use App\Models\Product;
+use App\Models\GRN;
+use App\Exports\GrnExport;
+use App\Exports\GtnExport;
+use App\Exports\DgnExport;
+use App\Exports\RgnExport;
+use App\Exports\PrdExport;
+use App\Exports\PoExport;
+
 
 class ExcelController extends Controller
 {
@@ -50,5 +58,56 @@ class ExcelController extends Controller
 
         return Excel::download(new ProductExport, $fileName);
     }
+
+    public function grns_export()
+    {
+        $fileName = 'grn_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new GrnExport, $fileName);
+    }
+
+
+    public function gtns_export()
+    {
+        $fileName = 'gtn_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new GtnExport, $fileName);
+    }
+
+
+
+    public function rgns_export()
+    {
+        $fileName = 'rgn_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new RgnExport, $fileName);
+    }
+   
+  
+    
+    public function dgns_export()
+    {
+        $fileName = 'dgn_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new DgnExport, $fileName);
+    }
+
+
+
+
+    public function prds_export()
+    {
+        $fileName = 'prd_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new PrdExport, $fileName);
+    }
+
+ 
+
+    public function pos_export()
+    {
+        $fileName = 'po_export_' . date('Y_m_d_H_i_s') . '.xlsx';
+        return Excel::download(new PoExport, $fileName);
+    }
+
+
+    
+
+    
 
 }

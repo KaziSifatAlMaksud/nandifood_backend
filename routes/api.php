@@ -109,11 +109,12 @@ Route::get('/employee/excel/export', [EmployeeController::class, 'employeeExport
 Route::get('/customer/excel/export',[ExcelController::class, 'customer_export']);
 
 
-Route::get('/grns/excel/export', [WarehouseController::class, 'grns_export']);
-Route::get('/gtns/excel/export', [WarehouseController::class, 'gtns_export']);
-Route::get('/rgns/excel/export', [WarehouseController::class, 'rgns_export']);
-Route::get('/dgns/excel/export', [WarehouseController::class, 'dgns_export']);
-Route::get('/prds/excel/export', [WarehouseController::class, 'prds_export']);
+Route::get('/grns/excel/export', [ExcelController::class, 'grns_export']);
+Route::get('/gtns/excel/export', [ExcelController::class, 'gtns_export']);
+Route::get('/rgns/excel/export', [ExcelController::class, 'rgns_export']);
+Route::get('/dgns/excel/export', [ExcelController::class, 'dgns_export']);
+Route::get('/prds/excel/export', [ExcelController::class, 'prds_export']);
+Route::get('/pos/excel/export', [ExcelController::class, 'pos_export'] );
 
 
 

@@ -131,7 +131,6 @@ class PRDController extends Controller
      {
          // Find the PRD record
          $prd = PRD::find($id);
- 
          // Check if PRD exists
          if (!$prd) {
              return response()->json([
