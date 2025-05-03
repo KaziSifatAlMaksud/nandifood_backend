@@ -173,6 +173,7 @@ class GRNController extends Controller
 
         $data = $request->all();
 
+
         if ($request->has('action')) {
             $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
         }
@@ -180,7 +181,7 @@ class GRNController extends Controller
 
        // dd($request->all());
        GrnReceivingDetail::where('grn_id', $grn->id)->delete();
-        $receivingDetails = $request->input('grn_receivingdetails');
+        $receivingDetails = $request->input('receiving_details');
        //     dd($receivingDetails);
              if (is_array($receivingDetails)) {
                          
