@@ -119,3 +119,4 @@ route::get('/gtns/downloadpdf', [PdfController::class, 'gtns_list_pdf'] );
 route::get('/rgns/downloadpdf', [PdfController::class, 'rgns_list_pdf'] );
 route::get('/dgns/downloadpdf', [PdfController::class, 'dgns_list_pdf'] );
 route::get('/prds/downloadpdf', [PdfController::class, 'prds_list_pdf'] );
+route::get('/pos/downloadpdf', [PdfController::class, 'pos_list_pdf'] );

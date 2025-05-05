@@ -16,6 +16,14 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\Product;
 
+use App\Models\GRN;
+
+use App\Models\GTN;
+use App\Models\RGN;
+use App\Models\DGN;
+use App\Models\PRD;
+use App\Models\PO;
+
 
 class PdfController extends Controller
 {
@@ -228,6 +236,48 @@ public function pu_list_pdf(Request $request)
         $pdf = PDF::loadView('pdf.supplier_list', ['suppliers' => $suppliers]);
         return $pdf->download('supplier_list.pdf');
     }
+
+    public function grns_list_pdf()
+    {
+        $grns = GRN::all();
+        $pdf = PDF::loadView('pdf.grns_list', ['grns' => $grns]);
+        return $pdf->download('grns-list.pdf');
+    }
+    public function gtns_list_pdf(){
+        $gtns = GTN::all();
+        $pdf = PDF::loadView('pdf.gtns_list', ['gtn_lists' => $gtns]);
+        return $pdf->download('gtns-list.pdf');
+    }
+
+    public function rgns_list_pdf()
+    {
+        $rgns = RGN::all();
+        $pdf = PDF::loadView('pdf.rgns_list', ['rgn_lists' => $rgns]);
+        return $pdf->download('rgns-list.pdf');
+    }
+
+    public function dgns_list_pdf()
+    {
+        $dgns = DGN::all();
+        $pdf = PDF::loadView('pdf.dgns_list', ['dgn_lists' => $dgns]);
+        return $pdf->download('dgns-list.pdf');
+    }
+
+    public function prds_list_pdf()
+    {
+        $prds = PRD::all();
+        $pdf = PDF::loadView('pdf.prds_list', ['prd_lists' => $prds]);
+        return $pdf->download('prds-list.pdf');
+    }
+    public function pos_list_pdf()
+    {
+        $pos = PO::all();
+        $pdf = Pdf::loadView('pdf.pos_list', ['po_lists' => $pos]);
+        return $pdf->download('pos-list.pdf');
+    }
+    
+
+    
 
 
 
