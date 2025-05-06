@@ -202,6 +202,7 @@ class GRNController extends Controller
                     'qty_variance'           => $detail['qty_variance'] ?? null,
                     'unit_cost'              => $detail['unit_cost'] ?? null,
                     'total_amount'           => $detail['total_amount'] ?? null,
+                    'grn_notes'              =>    $detail['grn_notes'] ?? "",
                     'receive_reject_action'  => $detail['receive_reject_action'] ?? null,
                     'rejection_resolution'   => $detail['rejection_resolution'] ?? null,
                     'comment'                => $detail['comment'] ?? null,
