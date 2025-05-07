@@ -155,32 +155,27 @@
                 <td class="title">Good Transfer Note (GTN)</td>
             </tr>
         </table>
-        
         <table class="info-table">
             <tr>
                 <td width="70%"></td>
                 <td width="30%">
                     <table>
                         <tr>
-                            <td class="info-label1">Date Received:</td>
+                            <td class="info-label1">Date Transferred Out:</td>
                             <td class="info-value1">
-                                {{ !empty($gtns->date_received) ? \Carbon\Carbon::createFromTimestamp(strtotime($gtns->date_received))->format('d-m-Y') : 'N/A' }}
+                                {{ !empty($gtns->date_tran_out) ? \Carbon\Carbon::createFromTimestamp(strtotime($gtns->date_tran_out))->format('d-m-Y') : 'N/A' }}
                             </td>
                         </tr>
                         <tr>
-                            <td class="info-label1">Goods Receive Note No:</td>
+                            <td class="info-label1">Goods Transfer Notes No:</td>
                             <td class="info-value1">{{ $gtns->grn_no ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">PO No:</td>
-                            <td class="info-value1">{{ $gtns->our_po ?? 'N/A' }}</td>
+                            <td class="info-value1">{{ $gtns->po_id ?? 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td class="info-label1">Supplier Invoice No:</td>
-                            <td class="info-value1">{{ $gtns->supplier_invoice_no ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">BOE No:</td>
+                            <td class="info-label1">BOL No:</td>
                             <td class="info-value1">{{ $gtns->bol_number ?? 'N/A' }}</td>
                         </tr>
                         <tr>
@@ -188,12 +183,12 @@
                             <td class="info-value1">{{ $gtns->other_reference ?? 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td class="info-label1">Received by:</td>
+                            <td class="info-label1">Transfered Out by:</td>
                             @php
-                                $employee = $gtns->received_by ? \App\Models\Employee::find($gtns->received_by) : null;
+                                $employee = $gtns->transferred_out_by ? \App\Models\Employee::find($gtns->transferred_out_by) : null;
                             @endphp
                             <td class="info-value1">
-                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$gtns->received_by .')'  ?? 'N/A') : 'N/A' }}
+                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$gtns->transferred_out_by .')'  ?? 'N/A') : 'N/A' }}
                             </td>
 
                         </tr>

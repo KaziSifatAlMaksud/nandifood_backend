@@ -235,10 +235,28 @@ class PdfController extends Controller
             'suppliers' => $suppliers
         ])->setPaper('a4', 'landscape');
         // Download the generated PDF
-        return $pdf->download('grn_details_' . $grns->id . '.pdf');
-        return $pdf->download('grn_details_' . $grns->id . '.pdf');
-      
+        return $pdf->download('grn_details_' . $grns->id . '.pdf');     
 
+    }
+
+    public function gtns_print_pdf($id)
+    {
+        $gtns = GTN::with('transferOutDetail')->find($id);
+
+        if (!$gtns) {
+            abort(404, "GRN not found");
+        }
+        $out_warhouse = Warehouse::find($gtns->transfer_out_warehouse);
+        $in_warehouse = Warehouse::find($gtns->transfer_in_warehouse);
+
+        // Load the Blade view and pass the data
+        $pdf = Pdf::loadView('pdf.gtn.gtn_details', [
+            'gtns' => $gtns,
+            'out_warhouse' => $out_warhouse,
+            'in_warehouse' => $in_warehouse
+        ])->setPaper('a4', 'landscape');
+        // Download the generated PDF
+        return $pdf->download('gtn_details_' . $gtns->id . '.pdf');     
     }
     
 
