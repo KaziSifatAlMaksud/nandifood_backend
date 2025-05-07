@@ -142,8 +142,8 @@
                 <td style="border: none; text-align:start;">
                    
                 </td>
-                <td width="20%" class="logo">
-                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo" width="150">
+                <td style="border: none; text-align:start;" width="20%">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
                 </td>
                 <td width="60%">
                     <div class="company-name">Nandi Foods</div>
