@@ -152,53 +152,40 @@
         
         <table>
             <tr>
-                <td class="title">Good Received Note</td>
+                <td class="title">Damaged Goods Note</td>
             </tr>
         </table>
-        
         <table class="info-table">
             <tr>
                 <td width="70%"></td>
                 <td width="30%">
                     <table>
                         <tr>
-                            <td class="info-label1">Date Received:</td>
+                            <td class="info-label1">Date:</td>
                             <td class="info-value1">
                                 {{ 
-                                    !empty($dgns->date_received) 
-                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->date_received))->format('d-m-Y') 
+                                    !empty($dgns->damage_date) 
+                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->damage_date))->format('d-m-Y') 
                                         : 'N/A' 
                                 }}
-                              
                             </td>
+
                         </tr>
                         <tr>
-                            <td class="info-label1">Goods Receive Note No:</td>
-                            <td class="info-value1">{{ $grns->grn_no ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">PO No:</td>
-                            <td class="info-value1">{{ $grns->our_po ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">Supplier Invoice No:</td>
-                            <td class="info-value1">{{ $grns->supplier_invoice_no ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">BOE No:</td>
-                            <td class="info-value1">{{ $grns->bol_number ?? 'N/A' }}</td>
+                            <td class="info-label1">Damaged Goods Note No:</td>
+                            <td class="info-value1">{{ $dgns->dgn_number ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">Reference Number:</td>
-                            <td class="info-value1">{{ $grns->other_reference ?? 'N/A' }}</td>
+                            <td class="info-value1">{{ $dgns->regerence_no ?? 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <td class="info-label1">Received by:</td>
+                            <td class="info-label1">Damage Report by:</td>
                             @php
-                                $employee = $grns->received_by ? \App\Models\Employee::find($grns->received_by) : null;
+                                $employee = $dgns->damage_reported_by ? \App\Models\Employee::find($dgns->damage_reported_by) : null;
                             @endphp
                             <td class="info-value1">
-                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$grns->received_by .')'  ?? 'N/A') : 'N/A' }}
+                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$dgns->damage_reported_by .')'  ?? 'N/A') : 'N/A' }}
                             </td>
 
                         </tr>
@@ -213,47 +200,8 @@
 
         <table class="supplier-receiver">
             <tr>
-                @if($suppliers)
-                    <td width="60%" valign="top">
-                        <div class="section-title">Supplied by:</div>
-                        <table>
-                            <tr>
-                                <td class="info-value">{{ $suppliers->supplier_legal_name ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value">
-                                    <b> Contact: </b> 
-                                    {{ $suppliers->first_name ?? '' }}  
-                                    {{ $suppliers->middle_name ?? '' }} 
-                                    {{ $suppliers->last_name ?? '' }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"><b>Address:</b> {{ $suppliers->address1 ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"><b> City: </b> {{ $suppliers->city ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"><b>State: </b> {{ $suppliers->state ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"><b> ZipCode:  </b> {{ $suppliers->zip_code ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"> <b> Country:</b> {{ $suppliers->country ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"><b>E-mail: </b>  {{ $suppliers->email ?? 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="info-value"> <b> Phone: </b>  {{ $suppliers->phone ?? 'N/A' }}</td>
-                            </tr>
-                        </table>
-                    </td>
-                @endif
                 <td width="40%" valign="top">
-                    <div class="section-title">Receiving Warehouse:</div>
+                    <div class="section-title">Warehouse:</div>
                     <table>
                         @if($warehouse)
                             <tr>
@@ -298,44 +246,42 @@
                 <th>UOM</th>
                 <th>Batch No.</th>
                 <th>Expiration Date</th>
-                <th>Qty Received</th>
-                <th>QTY Variance</th>
+                <th>Qty Damaged</th>
                 <th>Unit Cost</th>
                 <th>Total Amount</th>
-                <th>Received</th>
+                <th>Damaged</th>
             </tr>
             @php
-                $totalAmount = 0; 
+                $total_Amount = 0; 
             @endphp
-            @foreach ($grns->receivingDetails as $receiving_detail)
+            @foreach ($dgns->damageDetails as $receiving_detail)
             <tr>
-                <td>{{ $receiving_detail->our_sku }}</td>
-                <td>{{ $receiving_detail->product_name }}</td>
+                <td>{{ $receiving_detail->sku }}</td>
+                <td>{{ $receiving_detail->productName }}</td>
                 <td>{{ $receiving_detail->size }}</td>
                 <td>{{ $receiving_detail->uom }}</td>
-                <td>{{ $receiving_detail->batch_no ?? 'N/A' }}</td>
-                <td>{{ $receiving_detail->expiration_date ?? 'N/A' }}</td>
-                <td>{{ $receiving_detail->qty_received ?? 0 }}</td>
-                <td>{{ $receiving_detail->qty_variance ?? 0 }}</td>
-                <td>${{ number_format($receiving_detail->unit_cost ?? 0, 2) }}</td>
-                <td>${{ number_format($receiving_detail->total_amount ?? 0, 2) }}</td>
+                <td>{{ $receiving_detail->batchNo ?? 'N/A' }}</td>
+                <td>{{ $receiving_detail->expirationDate ?? 'N/A' }}</td>
+                <td>{{ $receiving_detail->qtyDamaged ?? 0 }}</td>
+                <td>${{ number_format($receiving_detail->unitCost ?? 0, 2) }}</td>
+                <td>${{ number_format($receiving_detail->totalAmount ?? 0, 2) }}</td>
                 <td>{{ $receiving_detail->receive_reject_action ? '✓' : '✗' }}</td>
             </tr>   
             @php
-                $totalAmount += $receiving_detail->total_amount ?? 0;
+                $total_Amount += $receiving_detail->totalAmount ?? 0;
             @endphp     
             @endforeach
         
             <tr>
-                <td colspan="9" class="total-row">Total:</td>
-                <td>${{ number_format($totalAmount, 2) }}</td>
+                <td colspan="8" class="total-row">Total:</td>
+                <td>${{ number_format($total_Amount, 2) }}</td>
                 <td></td>
             </tr>
         </table>
         
         <table class="notes-table">
             <tr>
-                <td class="notes-title">Receiving Notes</td>
+                <td class="notes-title">Damage Goods Notes</td>
             </tr>
             <tr>
                 <td class="notes-content">{{ $rgns->grn_notes ?? 'N/A' }}</td>

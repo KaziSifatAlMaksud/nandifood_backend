@@ -163,7 +163,11 @@
                         <tr>
                             <td class="info-label1">Date Transferred Out:</td>
                             <td class="info-value1">
-                                {{ !empty($gtns->date_tran_out) ? \Carbon\Carbon::createFromTimestamp(strtotime($gtns->date_tran_out))->format('d-m-Y') : 'N/A' }}
+                                {{ 
+                                    !empty($dgns->date_tran_out) 
+                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->date_tran_out))->format('d-m-Y') 
+                                        : 'N/A' 
+                                }}
                             </td>
                         </tr>
                         <tr>

@@ -22,48 +22,54 @@
 
         .container {
             width: 100%; 
-            max-width: 900px;
+            max-width: 1000px;
             padding: 10px;
             box-sizing: border-box;
         }
 
         header {
-            text-align: center;
             margin-bottom: 20px;
+            width: 100%;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-left {
+            width: 20%;
+            text-align: left;
+        }
+
+        .header-center {
+            width: 60%;
+            text-align: center;
+        }
+
+        .header-right {
+            width: 20%;
+            text-align: right;
+            font-size: 12px;
+            color: #555;
         }
 
         header img {
-            max-width: 150px;
-            margin-bottom: 10px;
+            max-width: 120px;
         }
 
         h1 {   
-            font-size: 14px;
+            font-size: 20px;
             color: #333;
+            margin: 5px 0;
         }
 
-        h4 {
-            text-align: left;
-            font-size: 12px;
+        h2 {
+            font-size: 16px;
             color: #333;
-        }
-        .header-info {
-            display: flex;
-            justify-content: space-between; 
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .left-section {
-            width: 50%; 
-            text-align: left;
-            font-size: 12px;
-        }
-
-        .right-section {
-            width: 50%;
-            text-align: right;
-            font-size: 12px;
+            margin: 5px 0;
         }
 
         .footer {
@@ -115,16 +121,21 @@
 <div class="container">
 
     <header>
-        <table style="border: none; width: 100%; border-collapse: collapse;">
-            <tr style="border: none;">
-                <td style="border: none; text-align:start;">
-                   <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
+        <table class="header-table">
+            <tr>
+                <td class="header-left">
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo">
                 </td>
-                <td style="border: none; " colspan="5">
-                    <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
-                    <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">All Employee List</h1>
-                </td>                
+                <td class="header-center">
+                    <h1>Nandi Foods</h1>
+                    <p style="margin:0;">A Passion for Good Food</p>
+                    <h2>All Employee List</h2>
+                </td>
+                <td class="header-right">
+                    Printed By: <br>
+                    Printed Time: <br>
+                    {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}
+                </td>
             </tr>
         </table>
     </header>
@@ -132,21 +143,20 @@
     <table>
         <thead>
             <tr>
-                <th class="uom-id" width="2%">SI</th>
-                <th class="uom-name" width="5%">Employee ID</th>
-                <th class="description" width="5%">First Name</th>
-                <th class="hu_long_name" width="5%">Middle Name</th>
-                <th class="production-uom" width="5%">Last Name</th>
-                <th class="purchase-uom" width="5%">Position</th>     
-                <th class="sales-uom" width="5%">Country</th>
-                <th class="sales-uom" width="5%">State</th>
-                <th class="sales-uom" width="5%">City</th>
-                <th class="sales-uom" width="15%">Warehouse</th>
-                <th class="sales-uom" width="12%">Email</th>
-                <th class="purchase-uom" width="10%">Office Phone</th>     
-                <th class="sales-uom" width="10%">Mobile</th>
+                <th width="2%">SI</th>
+                <th width="5%">Employee ID</th>
+                <th width="5%">First Name</th>
+                <th width="5%">Middle Name</th>
+                <th width="5%">Last Name</th>
+                <th width="5%">Position</th>     
+                <th width="5%">Country</th>
+                <th width="5%">State</th>
+                <th width="5%">City</th>
+                <th width="15%">Warehouse</th>
+                <th width="12%">Email</th>
+                <th width="10%">Office Phone</th>     
+                <th width="10%">Mobile</th>
             </tr>
-            
         </thead>
         <tbody>
             @php
@@ -154,8 +164,8 @@
             @endphp
             @foreach ($employees as $employee)
                 <tr>
-                    <td class="uom-id">{{ $i }}</td>
-                    <td class="center-align">{{ $employee->id ?? 'N/A' }}</td>
+                    <td>{{ $i }}</td>
+                    <td>{{ $employee->id ?? 'N/A' }}</td>
                     <td class="left-align">{{ $employee->first_name ?? 'N/A' }}</td>
                     <td class="left-align">{{ $employee->middle_name ?? 'N/A' }}</td>
                     <td class="left-align">{{ $employee->last_name ?? 'N/A' }}</td>
@@ -172,10 +182,9 @@
                     $i++;
                 @endphp
             @endforeach
-       
         </tbody>
     </table>
-    <h4 class="center-align">Printed By:  Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
+
 </div>
 
 </body>

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +14,7 @@
             padding: 0;
             background-color: #fff;
             width: 100%;
-            height: 100vh;
+            height: auto;
             display: flex;
             flex-direction: column;
             align-items: center; 
@@ -22,7 +24,7 @@
 
         .container {
             width: 100%; 
-            max-width: 900px;
+            max-width: 100%; /* full width for print */
             padding: 10px;
             box-sizing: border-box;
         }
@@ -38,8 +40,9 @@
         }
 
         h1 {   
-            font-size: 14px;
+            font-size: 16px;
             color: #333;
+            margin: 10px 0;
         }
 
         h4 {
@@ -47,6 +50,7 @@
             font-size: 12px;
             color: #333;
         }
+
         .header-info {
             display: flex;
             justify-content: space-between; 
@@ -77,7 +81,6 @@
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
-            border: 1px solid #000;
             table-layout: fixed; 
             margin: 0 auto; 
         }
@@ -87,8 +90,9 @@
             font-size: 10px;
             word-wrap: break-word;
             border: 1px solid #000;
+            padding: 4px;
         }
-        
+
         th.right-align, td.right-align {
             text-align: right; 
         }
@@ -100,12 +104,47 @@
             background-color: #f2f2f2;
         }
 
-        @page {
-            size: A4; 
-            margin: 20mm;
+        /* Make header-table completely borderless */
+        .header-table, 
+        .header-table tr, 
+        .header-table td, 
+        .header-table th {
+            border: none !important;
         }
-        table, th, td {
-            border: 1px solid #000; 
+
+        /* Print styles */
+        @page {
+            size: A4 landscape; 
+            margin: 15mm;
+        }
+
+        @media print {
+            body {
+                width: 100%;
+                height: auto;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            table {
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tfoot {
+                display: table-footer-group;
+            }
         }
 
     </style>
@@ -115,48 +154,56 @@
 <div class="container">
 
     <header>
-        <table style="border: none; width: 100%; border-collapse: collapse;">
-            <tr style="border: none;">
-                <td style="border: none; text-align:start;">
-                   <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
+        <table class="header-table" style="width: 100%;">
+            <tr>
+                <td style="text-align:start;">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
                 </td>
-                <td style="border: none; " colspan="5">
-                    <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
-                    <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">All Customer List</h1>
-                </td>                
+               <td width="60%">
+                    <div class="company-name" style="font-weight:bold; font-size:24px;">Nandi Foods</div>
+                    <div class="address" style="font-size:14px; line-height: 1.6;">
+                        7931 Coronet Road, Edmonton, Alberta T5E 4N7 CANADA  <br/> 
+                        Email: info@nandifoods.com <br/>  
+                        Phone: +1 780 328 0957 <br/> 
+                        Visit Us: www.nandifoods.com
+                    </div>
+                </td>
+
+                <td width="20%"></td>
             </tr>
         </table>
+
+        <h1>All Customer List</h1>
     </header>
 
     <table>
         <thead>
             <tr>
-                <th class="uom-id" width="2%">SI</th>
-                <th class="uom-name" width="5%">Customer ID</th>
-                <th class="description" width="5%">Customer No</th>
-                <th class="hu_long_name" width="10%">Legal Name</th>
-                <th class="hu_long_name" width="10%">Trade Name</th>
-                <th class="production-uom" width="10%">Address</th>
-                <th class="sales-uom" width="5%">Country</th>     
-                <th class="sales-uom" width="5%">State</th>
-                <th class="sales-uom" width="5%">City</th>
-                <th class="sales-uom" width="5%">Zip Code</th>
-                <th class="sales-uom" width="15%">Email</th>
-                <th class="sales-uom" width="10%">Phone</th>
-                <th class="purchase-uom" width="5%">First Name</th>     
-                <th class="sales-uom" width="5%">Last Name</th>
-                <th class="sales-uom" width="5%">Category</th>
-                <th class="sales-uom" width="5%">Date</th>
-                <th class="sales-uom" width="5%">Credit Terms</th>
+                <th width="2%">SI</th>
+                <th width="5%">Customer ID</th>
+                <th width="5%">Customer No</th>
+                <th width="10%">Legal Name</th>
+                <th width="10%">Trade Name</th>
+                <th width="10%">Address</th>
+                <th width="5%">Country</th>     
+                <th width="5%">State</th>
+                <th width="5%">City</th>
+                <th width="5%">Zip Code</th>
+                <th width="15%">Email</th>
+                <th width="10%">Phone</th>
+                <th width="5%">First Name</th>     
+                <th width="5%">Last Name</th>
+                <th width="5%">Category</th>
+                <th width="5%">Date</th>
+                <th width="5%">Credit Terms</th>
             </tr>
         </thead>
         <tbody>
             @php $i = 1; @endphp
             @foreach ($customers as $customer)
                 <tr>
-                    <td class="uom-id">{{ $i }}</td>
-                    <td class="center-align">{{ $customer->id ?? 'N/A' }}</td>
+                    <td>{{ $i }}</td>
+                    <td>{{ $customer->id ?? 'N/A' }}</td>
                     <td class="left-align">{{ $customer->customer_no ?? 'N/A' }}</td>
                     <td class="left-align">{{ $customer->customer_legal_name ?? 'N/A' }}</td>
                     <td class="left-align">{{ $customer->customer_trade_name ?? 'N/A' }}</td>
@@ -176,9 +223,8 @@
                 @php $i++; @endphp
             @endforeach
         </tbody>
-        
-        
     </table>
+
     <h4 class="center-align">Printed By:  Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
 </div>
 

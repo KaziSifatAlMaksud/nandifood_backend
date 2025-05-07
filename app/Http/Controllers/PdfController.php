@@ -258,8 +258,24 @@ class PdfController extends Controller
         // Download the generated PDF
         return $pdf->download('gtn_details_' . $gtns->id . '.pdf');     
     }
-    
 
+    public function dgns_print_pdf($id)
+    {
+        $dgns = DGN::with('damageDetails')->find($id);
+
+        if (!$dgns) {
+            abort(404, "DGN not found");
+        }
+        $defult_warehouse = Warehouse::find($dgns->defult_warehouse);
+
+        // Load the Blade view and pass the data
+        $pdf = Pdf::loadView('pdf.dgn.dgn_details', [
+            'dgns' => $dgns,
+            'warehouse' => $defult_warehouse
+        ])->setPaper('a4', 'landscape');
+        // Download the generated PDF
+        return $pdf->download('gtn_details_' . $dgns->id . '.pdf');     
+    }
     
     public function customer_list_pdf()
     {

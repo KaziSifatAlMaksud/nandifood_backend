@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nandi Foods - All Supplier List</title>
+    <title>{{ $page_title ?? 'Document Title' }}</title> <!-- Dynamic title -->
     <style>
         body {
             font-family: "Times New Roman", sans-serif;
@@ -22,7 +22,7 @@
 
         .container {
             width: 100%; 
-            max-width: 900px;
+            max-width: 1200px;
             padding: 10px;
             box-sizing: border-box;
         }
@@ -32,80 +32,74 @@
             margin-bottom: 20px;
         }
 
-        header img {
-            max-width: 150px;
-            margin-bottom: 10px;
-        }
-
-        h1 {   
-            font-size: 14px;
-            color: #333;
-        }
-
-        h4 {
-            text-align: left;
-            font-size: 12px;
-            color: #333;
-        }
-        .header-info {
-            display: flex;
-            justify-content: space-between; 
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .left-section {
-            width: 50%; 
-            text-align: left;
-            font-size: 12px;
-        }
-
-        .right-section {
-            width: 50%;
-            text-align: right;
-            font-size: 12px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 10px;
-            color: #777;
-        }
-
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            border: 1px solid #000;
+        .header-table {
+            width: 100%; 
+            border: none;
             table-layout: fixed; 
-            margin: 0 auto; 
+            margin-bottom: 20px;
+        }
+
+        .header-table td {
+            padding: 5px;
+        }
+
+        .header-table .company-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .header-table .address {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .title-table {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title-table td.title {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px;
+        }
+
+        /* Print A4 Landscape */
+        @media print {
+            @page {
+                size: A4 landscape; 
+                margin: 10mm;
+            }
+            body {
+                width: 100%;
+                height: auto;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            table th, table td {
+                font-size: 9px;
+            }
+            .header-table .company-name {
+                font-size: 20px;
+            }
+            .header-table .address {
+                font-size: 10px;
+            }
+        }
+
+        table, th, td {
+            border: 1px solid #000;
+            border-collapse: collapse;
         }
 
         th, td {
             text-align: center;
+            padding: 5px;
             font-size: 10px;
-            word-wrap: break-word;
-            border: 1px solid #000;
-        }
-        
-        th.right-align, td.right-align {
-            text-align: right; 
-        }
-        th.left-align, td.left-align {
-            text-align: left; 
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        @page {
-            size: A4; 
-            margin: 20mm;
-        }
-        table, th, td {
-            border: 1px solid #000; 
         }
 
     </style>
@@ -113,22 +107,35 @@
 <body>
 
 <div class="container">
-
+    <!-- Header Section -->
     <header>
-        <table style="border: none; width: 100%; border-collapse: collapse;">
-            <tr style="border: none;">
+        <table class="header-table">
+            <tr>
                 <td style="border: none; text-align:start;">
-                   <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo" class="logo">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
                 </td>
-                <td style="border: none; " colspan="5">
-                    <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
-                    <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">All Supplier List</h1>
-                </td>                
+                <td width="60%">
+                    <div class="company-name">Nandi Foods</div>
+                    <div class="address">
+                        7931 Coronet Road, Edmonton, Alberta T5E 4N7 CANADA <br/>
+                        Email: info@nandifoods.com <br/>
+                        Phone: +1 780 328 0957 <br/>
+                        Visit Us: www.nandifoods.com
+                    </div>
+                </td>
+                <td width="20%"></td>
             </tr>
         </table>
     </header>
 
+    <!-- Dynamic Title Section -->
+    <table class="title-table">
+        <tr>
+            <td class="title">{{ $page_title ?? 'Good Received Note' }}</td> <!-- Dynamic Title -->
+        </tr>
+    </table>
+
+    <!-- Content Table (Suppliers Data) -->
     <table>
         <thead>
             <tr>
@@ -176,9 +183,8 @@
                 @php $i++; @endphp
             @endforeach
         </tbody>
-        
-        
     </table>
+
     <h4 class="center-align">Printed By:  Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
 </div>
 

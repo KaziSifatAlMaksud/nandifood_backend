@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Http\Controllers\EmployeeController;
 use App\Models\GRN;
 use App\Models\GTN;
+use App\Models\DGN;
 use App\Models\Warehouse;
 
 Route::get('/', function () {
@@ -83,7 +84,7 @@ Route::get('/uom-list-view', function () {
 
 
 Route::get('/employee-list-view', function () {
-   
+  $employees  = Employee::all();
         return view('pdf.product_list', ['employees' => $employees]);
 });
 Route::get('/customer-list-view', function () {
@@ -97,7 +98,7 @@ Route::get('/supplier-list-view', function () {
 
 Route::get('/proudct-list-view', function () {
   $proudcts  = Product::all();
-  return view('pdf.product_list', ['proudcts' => $proudcts]);
+  return view('pdf.product_list', ['products' => $proudcts]);
 });
 
 Route::get('/grns_print_view/{id}', function ($id) {
@@ -133,8 +134,22 @@ Route::get('/gtns_print_view/{id}', function ($id) {
   ]);
 });
 
+Route::get('/dgns_print_view/{id}', function ($id) {
+  $dgns = DGN::with('damageDetails')->find($id);
+  if (!$dgns) {
+      abort(404, "DGN not found");
+  }
+  $defult_warehouse = Warehouse::find($dgns->defult_warehouse);
+
+  return view('pdf.dgn.dgn_details', [
+      'dgns' => $dgns,
+      'warehouse' => $defult_warehouse
+  ]);
+});
+
 Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
-Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('grns.printpdf');
+Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('gtns.printpdf');
+Route::get('/dgns/printpdf/{id}', [PdfController::class, 'dgns_print_pdf'])->name('dgns.printpdf');
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
 route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
@@ -149,6 +164,7 @@ route::get('/supplier/downloadpdf', [PdfController::class, 'supplier_list_pdf'] 
 
 
 route::get('/grns/downloadpdf', [PdfController::class, 'grns_list_pdf'] );
+
 
 
 route::get('/gtns/downloadpdf', [PdfController::class, 'gtns_list_pdf'] );
