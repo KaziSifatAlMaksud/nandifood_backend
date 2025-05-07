@@ -10,6 +10,8 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Http\Controllers\EmployeeController;
+use App\Models\GRN;
+use App\Models\Warehouse;
 
 Route::get('/', function () {
     return view('welcome');
@@ -79,7 +81,6 @@ Route::get('/uom-list-view', function () {
 
 
 
-
 Route::get('/employee-list-view', function () {
    
         return view('pdf.product_list', ['employees' => $employees]);
@@ -98,8 +99,25 @@ Route::get('/proudct-list-view', function () {
   return view('pdf.product_list', ['proudcts' => $proudcts]);
 });
 
+// Route::get('/grns_print_view/{id}', function ($id) {
+//   $grns = GRN::with('receivingDetails')->find($id);
+//   if (!$grns) {
+//       abort(404, "GRN not found");
+//   }
+
+//   $warehouse = Warehouse::find($grns->receiving_warehouse_id);
+//   $suppliers = Supplier::where('supplier_no', $grns->supplier)->first();
 
 
+//   return view('pdf.grn.grn_details', [
+//       'grns' => $grns,
+//       'warehouse' => $warehouse,
+//       'suppliers' => $suppliers
+//   ]);
+// });
+
+
+Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
 
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
@@ -115,6 +133,8 @@ route::get('/supplier/downloadpdf', [PdfController::class, 'supplier_list_pdf'] 
 
 
 route::get('/grns/downloadpdf', [PdfController::class, 'grns_list_pdf'] );
+
+
 route::get('/gtns/downloadpdf', [PdfController::class, 'gtns_list_pdf'] );
 route::get('/rgns/downloadpdf', [PdfController::class, 'rgns_list_pdf'] );
 route::get('/dgns/downloadpdf', [PdfController::class, 'dgns_list_pdf'] );

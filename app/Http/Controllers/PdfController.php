@@ -142,64 +142,64 @@ class PdfController extends Controller
     }
 
 
-public function pu_list_pdf(Request $request)
-{
-    try {
-        $pu_code = 'PU';
+    public function pu_list_pdf(Request $request)
+    {
+        try {
+            $pu_code = 'PU';
 
-        $pu_lists = Hupu::select([
-                'id', 'hu_pu_code', 'hu_pu_type', 'hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name',
-                'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
-            ])
-            ->where('hu_pu_code', $pu_code)
-            ->get()
-            ->map(function ($pu_list) {
-                // Get UOM type name safely
-                $pu_list->hu_pu_type_name = optional(Uom_type::find($pu_list->hu_pu_type))->uom_name;
+            $pu_lists = Hupu::select([
+                    'id', 'hu_pu_code', 'hu_pu_type', 'hu_pu_id', 'bulk_code', 'flex', 'pu_hu_name',
+                    'description', 'unit', 'length', 'width', 'height', 'min_weight', 'max_weight'
+                ])
+                ->where('hu_pu_code', $pu_code)
+                ->get()
+                ->map(function ($pu_list) {
+                    // Get UOM type name safely
+                    $pu_list->hu_pu_type_name = optional(Uom_type::find($pu_list->hu_pu_type))->uom_name;
 
-                // Check if unit is cm/kg (0) or in/lb (1)
-                $is_cm = $pu_list->unit == 0;
+                    // Check if unit is cm/kg (0) or in/lb (1)
+                    $is_cm = $pu_list->unit == 0;
 
-                // Metric (cm/kg) & Imperial (in/lb) conversions
-                $pu_list->length_cm = $is_cm ? $pu_list->length : round($pu_list->length * 2.54, 2);
-                $pu_list->width_cm = $is_cm ? $pu_list->width : round($pu_list->width * 2.54, 2);
-                $pu_list->height_cm = $is_cm ? $pu_list->height : round($pu_list->height * 2.54, 2);
-                $pu_list->min_weight_kg = $is_cm ? $pu_list->min_weight : round($pu_list->min_weight * 0.453592, 2);
-                $pu_list->max_weight_kg = $is_cm ? $pu_list->max_weight : round($pu_list->max_weight * 0.453592, 2);
+                    // Metric (cm/kg) & Imperial (in/lb) conversions
+                    $pu_list->length_cm = $is_cm ? $pu_list->length : round($pu_list->length * 2.54, 2);
+                    $pu_list->width_cm = $is_cm ? $pu_list->width : round($pu_list->width * 2.54, 2);
+                    $pu_list->height_cm = $is_cm ? $pu_list->height : round($pu_list->height * 2.54, 2);
+                    $pu_list->min_weight_kg = $is_cm ? $pu_list->min_weight : round($pu_list->min_weight * 0.453592, 2);
+                    $pu_list->max_weight_kg = $is_cm ? $pu_list->max_weight : round($pu_list->max_weight * 0.453592, 2);
 
-                $pu_list->length_in = !$is_cm ? $pu_list->length : round($pu_list->length / 2.54, 2);
-                $pu_list->width_in = !$is_cm ? $pu_list->width : round($pu_list->width / 2.54, 2);
-                $pu_list->height_in = !$is_cm ? $pu_list->height : round($pu_list->height / 2.54, 2);
-                $pu_list->min_weight_lb = !$is_cm ? $pu_list->min_weight : round($pu_list->min_weight / 0.453592, 2);
-                $pu_list->max_weight_lb = !$is_cm ? $pu_list->max_weight : round($pu_list->max_weight / 0.453592, 2);
+                    $pu_list->length_in = !$is_cm ? $pu_list->length : round($pu_list->length / 2.54, 2);
+                    $pu_list->width_in = !$is_cm ? $pu_list->width : round($pu_list->width / 2.54, 2);
+                    $pu_list->height_in = !$is_cm ? $pu_list->height : round($pu_list->height / 2.54, 2);
+                    $pu_list->min_weight_lb = !$is_cm ? $pu_list->min_weight : round($pu_list->min_weight / 0.453592, 2);
+                    $pu_list->max_weight_lb = !$is_cm ? $pu_list->max_weight : round($pu_list->max_weight / 0.453592, 2);
 
-                // Volume calculation
-                $volume_cm3 = $pu_list->length_cm * $pu_list->width_cm * $pu_list->height_cm;
-                $pu_list->volume_ft3 = round($volume_cm3 / 28316.8466, 4);
+                    // Volume calculation
+                    $volume_cm3 = $pu_list->length_cm * $pu_list->width_cm * $pu_list->height_cm;
+                    $pu_list->volume_ft3 = round($volume_cm3 / 28316.8466, 4);
 
-                // Get additional details
-                $result = Hupu::fullName($pu_list->id);
-                if ($result) {
-                    $pu_list->short_name = $result['short_name'] ?? null;
-                    $pu_list->full_name = $result['full_name'] ?? null;
-                    $pu_list->volumem3 = $result['volumem3'] ?? null;
-                    $pu_list->volumeft3 = $result['volumeft3'] ?? null;
-                }
+                    // Get additional details
+                    $result = Hupu::fullName($pu_list->id);
+                    if ($result) {
+                        $pu_list->short_name = $result['short_name'] ?? null;
+                        $pu_list->full_name = $result['full_name'] ?? null;
+                        $pu_list->volumem3 = $result['volumem3'] ?? null;
+                        $pu_list->volumeft3 = $result['volumeft3'] ?? null;
+                    }
 
-                return $pu_list;
-            });
+                    return $pu_list;
+                });
 
-        // Generate and Download PDF
-        $pdf = Pdf::loadView('pdf.pu_list', compact('pu_lists'));
-        return $pdf->download('pu_list.pdf');
+            // Generate and Download PDF
+            $pdf = Pdf::loadView('pdf.pu_list', compact('pu_lists'));
+            return $pdf->download('pu_list.pdf');
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'An error occurred while generating the PU list PDF.',
-            'error' => $e->getMessage()
-        ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while generating the PU list PDF.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
     public function employee_list_pdf()
@@ -216,6 +216,31 @@ public function pu_list_pdf(Request $request)
         // Download the generated PDF
         return $pdf->download('employee_list.pdf');
     }
+
+
+    public function grns_print_pdf($id)
+    {
+        $grns = GRN::with('receivingDetails')->find($id);
+
+        if (!$grns) {
+            abort(404, "GRN not found");
+        }
+        $warehouse = Warehouse::find($grns->receiving_warehouse_id);
+        $suppliers = Supplier::where('supplier_no', $grns->supplier)->first();
+
+        // Load the Blade view and pass the data
+        $pdf = Pdf::loadView('pdf.grn.grn_details', [
+            'grns' => $grns,
+            'warehouse' => $warehouse,
+            'suppliers' => $suppliers
+        ])->setPaper('a4', 'landscape');
+        // Download the generated PDF
+        return $pdf->download('grn_details_' . $grns->id . '.pdf');
+        return $pdf->download('grn_details_' . $grns->id . '.pdf');
+      
+
+    }
+    
 
     
     public function customer_list_pdf()

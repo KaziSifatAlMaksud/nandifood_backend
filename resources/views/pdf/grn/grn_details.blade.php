@@ -57,18 +57,25 @@
         .info-label {
             font-weight: bold;
             font-size: 12px;
+            line-height: 0.7;
         }
 
-        
+        .info-value {
+            font-size: 12px;
+            line-height: 0.7;
+           
+        }
         .info-label1 {
             font-weight: bold;
             font-size: 12px;
-            text-align: left; /* left align */
+            text-align: left;
+            line-height: 0.7;
         }
 
         .info-value1 {
-            font-size: 12px;
-            text-align: right; /* right align */
+            font-size: 10px;
+            text-align: right; 
+            line-height: 0.5;
         }
                 
         .supplier-receiver {
@@ -83,7 +90,7 @@
         
         .section-title {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             margin-bottom: 5px;
         }
         
@@ -132,8 +139,11 @@
     <div class="border-container">
         <table class="header-table">
             <tr>
+                <td style="border: none; text-align:start;">
+                   
+                </td>
                 <td width="20%" class="logo">
-                    <img src="logo-horizontal.png" alt="Nandi Foods Logo" width="150">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo" width="150">
                 </td>
                 <td width="60%">
                     <div class="company-name">Nandi Foods</div>
@@ -156,106 +166,128 @@
                     <table>
                         <tr>
                             <td class="info-label1">Date Received:</td>
-                            <td class="info-value1">2023-06-15</td>
+                            <td class="info-value1">
+                                {{ !empty($grns->date_received) ? \Carbon\Carbon::createFromTimestamp(strtotime($grns->date_received))->format('d-m-Y') : 'N/A' }}
+                            </td>
                         </tr>
                         <tr>
                             <td class="info-label1">Goods Receive Note No:</td>
-                            <td class="info-value1">GRN230615-01</td>
+                            <td class="info-value1">{{ $grns->grn_no ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">PO No:</td>
-                            <td class="info-value1">123456</td>
+                            <td class="info-value1">{{ $grns->our_po ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">Supplier Invoice No:</td>
-                            <td class="info-value1">1234567</td>
+                            <td class="info-value1">{{ $grns->supplier_invoice_no ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">BOE No:</td>
-                            <td class="info-value1">7432456</td>
+                            <td class="info-value1">{{ $grns->bol_number ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">Reference Number:</td>
-                            <td class="info-value1">PSN230615-01</td>
+                            <td class="info-value1">{{ $grns->other_reference ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td class="info-label1">Received by:</td>
-                            <td class="info-value1">Dinal Mahlangui</td>
+                            @php
+                                $employee = $grns->received_by ? \App\Models\Employee::find($grns->received_by) : null;
+                            @endphp
+                            <td class="info-value1">
+                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$grns->received_by .')'  ?? 'N/A') : 'N/A' }}
+                            </td>
+
                         </tr>
                     </table>
+                    
                 </td>
             </tr>
         </table>
         
+
+     <br>
+
         <table class="supplier-receiver">
             <tr>
-                <td width="50%" valign="top">
-                    <div class="section-title">Supplied by:</div>
-                    <table>
-                        <tr>
-                            <td class="info-value">ABC Milling Company (58011)</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Contact: John Doe</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">9140 Forest Lane</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Dallas</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Texas</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">75243</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">USA</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">E-mail: test001@demosupplier.com</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Phone: +1 972 000 0000</td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="50%" valign="top">
+                @if($suppliers)
+                    <td width="60%" valign="top">
+                        <div class="section-title">Supplied by:</div>
+                        <table>
+                            <tr>
+                                <td class="info-value">{{ $suppliers->supplier_legal_name ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value">
+                                    <b> Contact: </b> 
+                                    {{ $suppliers->first_name ?? '' }}  
+                                    {{ $suppliers->middle_name ?? '' }} 
+                                    {{ $suppliers->last_name ?? '' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>Address:</b> {{ $suppliers->address1 ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b> City: </b> {{ $suppliers->city ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>State: </b> {{ $suppliers->state ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b> ZipCode:  </b> {{ $suppliers->zip_code ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"> <b> Country:</b> {{ $suppliers->country ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>E-mail: </b>  {{ $suppliers->email ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"> <b> Phone: </b>  {{ $suppliers->phone ?? 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                @endif
+                <td width="40%" valign="top">
                     <div class="section-title">Receiving Warehouse:</div>
                     <table>
-                        <tr>
-                            <td class="info-value">Edmonton Warehouse (WH001)</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Contact: Dinal Mahlangui</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">7931 Coronet Road</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Edmonton</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Alberta</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">T5E 4N7</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">CANADA</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">E-mail: info@nandifoods.com</td>
-                        </tr>
-                        <tr>
-                            <td class="info-value">Phone: +1 780 328 0957</td>
-                        </tr>
+                        @if($warehouse)
+                            <tr>
+                                <td class="info-value">{{ $warehouse->warehouse_name ?? 'N/A' }} ({{ $warehouse->id ?? 'N/A' }})</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b> Contact: </b> Dinal Mahlangui</td> {{-- This is hardcoded --}}
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>Address:</b> {{ $warehouse->address1 ?? 'N/A' }} </td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>City: </b> {{ $warehouse->city ?? 'N/A' }} </td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>State:</b> {{ $warehouse->state ?? 'N/A' }} </td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>ZipCode:</b> {{ $warehouse->zip_code ?? 'N/A' }} </td> {{-- Fixed this --}}
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>Country: </b> {{ $warehouse->country ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>E-mail:</b> {{ $warehouse->email ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-value"><b>Phone: </b> {{ $warehouse->warehouse_contact ?? 'N/A' }}</td>
+                            </tr>
+                        @endif
+
                     </table>
                 </td>
             </tr>
         </table>
-        
+     
         <table class="products-table">
             <tr>
                 <th>SKU</th>
@@ -270,48 +302,31 @@
                 <th>Total Amount</th>
                 <th>Received</th>
             </tr>
+            @php
+                $totalAmount = 0; 
+            @endphp
+            @foreach ($grns->receivingDetails as $receiving_detail)
             <tr>
-                <td>ABC12345</td>
-                <td>White Corn Grain - 1MT Tote Bags</td>
-                <td>1MT</td>
-                <td>EACH</td>
-                <td>32001</td>
-                <td>2025-12-31</td>
-                <td>50</td>
-                <td>50</td>
-                <td>$250.00</td>
-                <td>$12,500.00</td>
-                <td>✓</td>
-            </tr>
-            <tr>
-                <td>ABC12346</td>
-                <td>Yellow Corn Grain - 1MT Tote Bags</td>
-                <td>1MT</td>
-                <td>EACH</td>
-                <td>32002</td>
-                <td>2025-12-31</td>
-                <td>50</td>
-                <td>50</td>
-                <td>$230.00</td>
-                <td>$11,500.00</td>
-                <td>✓</td>
-            </tr>
-            <tr>
-                <td>ABC12347</td>
-                <td>White Sorghum Grain - 1MT Tote Bags</td>
-                <td>1MT</td>
-                <td>EACH</td>
-                <td>32003</td>
-                <td>2025-12-31</td>
-                <td>50</td>
-                <td>50</td>
-                <td>$280.00</td>
-                <td>$14,000.00</td>
-                <td>✓</td>
-            </tr>
+                <td>{{ $receiving_detail->our_sku }}</td>
+                <td>{{ $receiving_detail->product_name }}</td>
+                <td>{{ $receiving_detail->size }}</td>
+                <td>{{ $receiving_detail->uom }}</td>
+                <td>{{ $receiving_detail->batch_no ?? 'N/A' }}</td>
+                <td>{{ $receiving_detail->expiration_date ?? 'N/A' }}</td>
+                <td>{{ $receiving_detail->qty_received ?? 0 }}</td>
+                <td>{{ $receiving_detail->qty_variance ?? 0 }}</td>
+                <td>${{ number_format($receiving_detail->unit_cost ?? 0, 2) }}</td>
+                <td>${{ number_format($receiving_detail->total_amount ?? 0, 2) }}</td>
+                <td>{{ $receiving_detail->receive_reject_action ? '✓' : '✗' }}</td>
+            </tr>   
+            @php
+                $totalAmount += $receiving_detail->total_amount ?? 0;
+            @endphp     
+            @endforeach
+        
             <tr>
                 <td colspan="9" class="total-row">Total:</td>
-                <td>$38,000.00</td>
+                <td>${{ number_format($totalAmount, 2) }}</td>
                 <td></td>
             </tr>
         </table>
@@ -321,7 +336,7 @@
                 <td class="notes-title">Receiving Notes</td>
             </tr>
             <tr>
-                <td class="notes-content">All goods received in good condition</td>
+                <td class="notes-content">{{ $rgns->grn_notes ?? 'N/A' }}</td>
             </tr>
         </table>
     </div>
