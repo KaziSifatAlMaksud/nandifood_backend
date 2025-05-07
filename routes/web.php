@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use App\Models\Product;
 use App\Http\Controllers\EmployeeController;
 use App\Models\GRN;
+use App\Models\GTN;
 use App\Models\Warehouse;
 
 Route::get('/', function () {
@@ -99,26 +100,41 @@ Route::get('/proudct-list-view', function () {
   return view('pdf.product_list', ['proudcts' => $proudcts]);
 });
 
-// Route::get('/grns_print_view/{id}', function ($id) {
-//   $grns = GRN::with('receivingDetails')->find($id);
-//   if (!$grns) {
-//       abort(404, "GRN not found");
-//   }
+Route::get('/grns_print_view/{id}', function ($id) {
+  $grns = GRN::with('receivingDetails')->find($id);
+  if (!$grns) {
+      abort(404, "GRN not found");
+  }
 
-//   $warehouse = Warehouse::find($grns->receiving_warehouse_id);
-//   $suppliers = Supplier::where('supplier_no', $grns->supplier)->first();
+  $warehouse = Warehouse::find($grns->receiving_warehouse_id);
+  $suppliers = Supplier::where('supplier_no', $grns->supplier)->first();
 
 
-//   return view('pdf.grn.grn_details', [
-//       'grns' => $grns,
-//       'warehouse' => $warehouse,
-//       'suppliers' => $suppliers
-//   ]);
-// });
+  return view('pdf.grn.grn_details', [
+      'grns' => $grns,
+      'warehouse' => $warehouse,
+      'suppliers' => $suppliers
+  ]);
+});
 
+Route::get('/gtns_print_view/{id}', function ($id) {
+  $gtns = GTN::with('transferOutDetail')->find($id);
+  if (!$gtns) {
+      abort(404, "GTN not found");
+  }
+
+  $out_warhouse = Warehouse::find($gtns->transfer_out_warehouse);
+  $in_warehouse = Warehouse::find($gtns->transfer_in_warehouse);
+
+  return view('pdf.gtn.gtn_details', [
+      'gtns' => $gtns,
+      'out_warhouse' => $out_warhouse,
+      'in_warehouse' => $in_warehouse
+  ]);
+});
 
 Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
-
+Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('grns.printpdf');
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
 route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
