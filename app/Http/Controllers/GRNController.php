@@ -72,6 +72,21 @@ class GRNController extends Controller
         ]);
     }
 
+    public function getReceivingDetails($id)
+    {
+        $receivingDetails = GrnReceivingDetail::where('grn_id', $id)->get();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Ok',
+            'result' => [
+                'data' => $receivingDetails
+            ]
+        ]);
+    }
+
+
+
 
     /**
      * Store a new GRN

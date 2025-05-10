@@ -247,6 +247,8 @@ Route::get('/grns', [GRNController::class, 'index']);
 Route::post('/grns/create', [GRNController::class, 'store']);
 Route::get('/grns/{id}', [GRNController::class, 'show']); 
 Route::post('/grns/{id}', [GRNController::class, 'update']);
+Route::get('/grns/receivingDetails/{id}', [GRNController::class, 'getReceivingDetails']);
+
 Route::delete('/grns/{id}/delete', [GRNController::class, 'destroy']); 
 
 
@@ -355,6 +357,8 @@ Route::get('/states/{countryName}', [WarehouseController::class, 'getStates']);
 Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
+
+
 
 
 
