@@ -40,6 +40,12 @@ class GRN extends Model
         return $this->hasMany(GrnReceivingDetail::class, 'grn_id');
     }
 
+    public function putAwayDetails()
+    {
+        return $this->hasMany(\App\Models\PutAwayDetail::class, 'grn_id', 'id');
+    }
+
+
     // protected $casts = [
     //     'date_received' => 'date',
     //     'bol_date' => 'date',

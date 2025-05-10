@@ -35,4 +35,6 @@ class Rgn extends Model
         return $this->hasMany(RgnItemsDetail::class, 'rgn_id');
     }
 
+
+
 }

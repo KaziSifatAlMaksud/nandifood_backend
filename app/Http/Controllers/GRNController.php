@@ -9,6 +9,7 @@ use App\Models\Warehouse;
 
 use App\Models\GRNAttachment;
 use App\Models\GrnReceivingDetail;
+use App\Models\PutAwayDetail;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -128,7 +129,7 @@ class GRNController extends Controller
     public function show($id): JsonResponse
     {
         // Find the GRN entry
-        $grn = GRN::with('receivingDetails')->find($id);
+        $grn = GRN::with('receivingDetails','putAwayDetails')->find($id);
 
         // Check if GRN exists
         if (!$grn) {
@@ -172,16 +173,49 @@ class GRNController extends Controller
         }
 
         $data = $request->all();
-
+// dd($data);
 
         if ($request->has('action')) {
             $data['is_approve'] = ($request->input('action') === 'approve') ? 2 : 1;
         }
         $grn->update($data);
 
-       // dd($request->all());
+    //    dd($request->all());
        GrnReceivingDetail::where('grn_id', $grn->id)->delete();
+       PutAwayDetail::where('grn_id', $grn->id)->delete();
         $receivingDetails = $request->input('receiving_details');
+        $putAwayDetails = $request->input('put_away_details');
+
+       if (is_array($putAwayDetails)) {
+            foreach ($putAwayDetails as $putAwayDetail) {
+                \App\Models\PutAwayDetail::create([
+                    'grn_id'             => $grn->id,
+                    'sku'                => $putAwayDetail['sku'] ?? null,
+                    'product_name'       => $putAwayDetail['product_name'] ?? null,
+                    'size'               => $putAwayDetail['size'] ?? null,
+                    'uom'                => $putAwayDetail['uom'] ?? null,
+                    'batch_no'           => $putAwayDetail['batch_no'] ?? null,
+                    'exp_date'           => $putAwayDetail['exp_date'] ?? null,
+                    'qty_rec'            => $putAwayDetail['qty_rec'] ?? null,
+                    'qty_put_away'       => $putAwayDetail['qty_put_away'] ?? null,
+                    'qty_varience'       => $putAwayDetail['qty_varience'] ?? null,
+                    'pu'                 => $putAwayDetail['pu'] ?? null,
+                    'pu_count'           => $putAwayDetail['pu_count'] ?? null,
+                    'hu'                 => $putAwayDetail['hu'] ?? null,
+                    'hu_count'           => $putAwayDetail['hu_count'] ?? null,
+                    'req_storage'        => $putAwayDetail['req_storage'] ?? null,
+                    'bin_location_id'    => $putAwayDetail['bin_location_id'] ?? null,
+                    'avilable_storage'   => $putAwayDetail['avilable_storage'] ?? null,
+                    'aviable_storage2'   => $putAwayDetail['aviable_storage2'] ?? null,
+                    'put_away_status'    => $putAwayDetail['put_away_status'] ?? null,
+                    'comment'            => $putAwayDetail['comment'] ?? '',
+                    'created_at'         => $putAwayDetail['created_at'] ?? now(),
+                    'updated_at'         => $putAwayDetail['updated_at'] ?? now(),
+                ]);
+            }
+        }
+
+
        //     dd($receivingDetails);
              if (is_array($receivingDetails)) {
                          
@@ -213,7 +247,9 @@ class GRNController extends Controller
         }
 
        // Load fresh damage details
-        $grn->load('receivingDetails');
+        $grn->load(['putAwayDetails', 'receivingDetails']);
+
+      
 
         return response()->json([
             'status' => 200,
@@ -236,6 +272,7 @@ class GRNController extends Controller
         }
         $grn->delete();
         GrnReceivingDetail::where('grn_id', $id)->delete();
+        PutAwayDetail::where('grn_id', $id)->delete();
         
         return response()->json(['message' => 'GRN deleted successfully']);
     }
