@@ -75,7 +75,7 @@
         .info-value1 {
             font-size: 10px;
             text-align: right; 
-            line-height: 0.5;
+            line-height: 0.9;
         }
                 
         .supplier-receiver {

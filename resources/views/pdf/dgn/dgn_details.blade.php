@@ -69,13 +69,13 @@
             font-weight: bold;
             font-size: 12px;
             text-align: left;
-            line-height: 0.7;
+            line-height: 1;
         }
 
         .info-value1 {
             font-size: 10px;
             text-align: right; 
-            line-height: 0.5;
+            line-height: 0.9;
         }
                 
         .supplier-receiver {

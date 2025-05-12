@@ -3,109 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nandi Foods - PRD List</title>
+    <title>Nandi Foods - PRD List (PO)</title>
     <style>
         body {
-            font-family: "Times New Roman", sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #fff;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: center;
+            padding: 20px;
+            background-color: white;
+            color: #000;
         }
-
-        .container {
+        
+        table {
+            border-collapse: collapse;
             width: 100%;
-            max-width: 1000px;
-            padding: 10px;
-            box-sizing: border-box;
         }
-
-        header {
-            text-align: center;
+        
+        table, th, td {
+            border: none;
+        }
+        
+        .header-table {
             margin-bottom: 20px;
         }
-
-        header img {
-            max-width: 150px;
-            margin-bottom: 10px;
+        
+        .logo {
+            width: 100px;
+            vertical-align: top;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .address {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .info-table td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 0.7;
         }
 
-        h1 {
-            font-size: 14px;
-            color: #333;
+        .info-value {
+            font-size: 12px;
+            line-height: 0.7;
+           
+        }
+        .info-label1 {
+            font-weight: bold;
+            font-size: 12px;
+            text-align: left;
+            line-height: 0.7;
         }
 
-        h4 {
+        .info-value1 {
+            font-size: 10px;
+            text-align: right; 
+            line-height: 0.5;
+        }
+                
+        .supplier-receiver {
+            margin: 20px 0;
+        }
+        
+        .supplier-receiver td {
+            padding: 5px;
+            vertical-align: top;
+            width: 50%;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .products-table {
+            margin: 20px 0;
+        }
+        
+        .products-table th {
+            background-color: #8bc34a;
+            color: black;
+            padding: 8px;
             text-align: left;
             font-size: 12px;
-            color: #333;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #000;
-            margin-top: 20px;
-            font-size: 10px;
+        
+        .products-table td {
+            padding: 8px;
+            font-size: 12px;
+            border-bottom: 1px solid #ddd;
         }
-
-        th, td {
-            border: 1px solid #000;
-            padding: 4px;
-            word-wrap: break-word;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .left-align {
-            text-align: left;
-        }
-
-        .right-align {
+        
+        .total-row td {
+            padding: 8px;
+            font-weight: bold;
             text-align: right;
         }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 10px;
-            color: #777;
+        
+        .notes-table {
+            margin-top: 20px;
         }
-
-        @page {
-            size: A4;
-            margin: 20mm;
+        
+        .notes-title {
+            font-weight: bold;
+            font-size: 14px;
         }
+        
+        .notes-content {
+            font-size: 12px;
+            padding: 5px 0;
+        }
+        
+      
     </style>
 </head>
 <body>
-<div class="container">
-    <header>
-        <table style="border: none; width: 100%;">
-            <tr style="border: none;">
-                <td style="border: none; text-align: left;">
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents('https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png')) }}" alt="Nandi Foods Logo">
+    <div class="border-container">
+        <table class="header-table">
+            <tr>
+                <td style="border: none; text-align:center;">
+                    <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
                 </td>
-                <td style="border: none;" colspan="5">
-                    <h1 style="font-size: 24px; line-height: 0.2; padding-top:20px;">Nandi Foods</h1>
-                    <p style="line-height: 0.5;">A Passion for Good Food</p>
-                    <h1 style="font-size: 18px; line-height: 2;">Production (PRD) List</h1>
+                <td width="60%">
+                    <div class="company-name">Nandi Foods</div>
+                    <div class="address">7931 Coronet Road, Edmonton, Alberta T5E 4N7 CANADA  <br/> Email: info@nandifoods.com <br/>  Phone: +1 780 328 0957 <br/> Visit Us: www.nandifoods.com</div>
                 </td>
+                <td width="20%"></td>
             </tr>
         </table>
-    </header>
-
-    <table>
-        <thead>
+        
+        <table>
+            <tr>
+                <td class="title">Production Orders List (PRD)</td>
+            </tr>
+        </table>
+     <br>
+     <table class="products-table">
+     <thead>
         <tr>
             <th>SI</th>
             <th>PRD No</th>
@@ -143,8 +195,8 @@
         @endforeach
         </tbody>
     </table>
-
-    <h4 class="center-align">Printed By: __________ | Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
-</div>
+        <p class="center-align">Printed By: __________ | Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</p>
+    </div>
 </body>
 </html>
+

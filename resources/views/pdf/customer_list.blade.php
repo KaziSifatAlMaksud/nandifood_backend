@@ -1,182 +1,169 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Nandi Foods - All Customer List</title>
     <style>
         body {
-            font-family: "Times New Roman", sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #fff;
-            width: 100%;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-            justify-content: flex-start; 
-            text-align: center;
+            padding: 20px;
+            background-color: white;
+            color: #000;
         }
-
-        .container {
-            width: 100%; 
-            max-width: 100%; /* full width for print */
-            padding: 10px;
-            box-sizing: border-box;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        header img {
-            max-width: 150px;
-            margin-bottom: 10px;
-        }
-
-        h1 {   
-            font-size: 16px;
-            color: #333;
-            margin: 10px 0;
-        }
-
-        h4 {
-            text-align: left;
-            font-size: 12px;
-            color: #333;
-        }
-
-        .header-info {
-            display: flex;
-            justify-content: space-between; 
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .left-section {
-            width: 50%; 
-            text-align: left;
-            font-size: 12px;
-        }
-
-        .right-section {
-            width: 50%;
-            text-align: right;
-            font-size: 12px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 10px;
-            color: #777;
-        }
-
+        
         table {
-            width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
-            table-layout: fixed; 
-            margin: 0 auto; 
+            width: 100%;
         }
-
-        th, td {
+        
+        table, th, td {
+            border: none;
+        }
+        
+        .header-table {
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            width: 100px;
+            vertical-align: top;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
             text-align: center;
+        }
+        
+        .address {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .info-table td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 0.7;
+        }
+
+        .info-value {
+            font-size: 12px;
+            line-height: 0.7;
+           
+        }
+        .info-label1 {
+            font-weight: bold;
+            font-size: 12px;
+            text-align: left;
+            line-height: 0.7;
+        }
+
+        .info-value1 {
             font-size: 10px;
-            word-wrap: break-word;
-            border: 1px solid #000;
-            padding: 4px;
-        }
-
-        th.right-align, td.right-align {
             text-align: right; 
+            line-height: 0.5;
         }
-        th.left-align, td.left-align {
-            text-align: left; 
+                
+        .supplier-receiver {
+            margin: 20px 0;
         }
-
-        th {
-            background-color: #f2f2f2;
+        
+        .supplier-receiver td {
+            padding: 5px;
+            vertical-align: top;
+            width: 50%;
         }
-
-        /* Make header-table completely borderless */
-        .header-table, 
-        .header-table tr, 
-        .header-table td, 
-        .header-table th {
-            border: none !important;
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
         }
-
-        /* Print styles */
-        @page {
-            size: A4 landscape; 
-            margin: 15mm;
+        
+        .products-table {
+            margin: 20px 0;
         }
-
-        @media print {
-            body {
-                width: 100%;
-                height: auto;
-            }
-
-            .container {
-                max-width: 100%;
-                padding: 0;
-            }
-
-            table {
-                page-break-inside: auto;
-            }
-
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            thead {
-                display: table-header-group;
-            }
-
-            tfoot {
-                display: table-footer-group;
-            }
+        
+        .products-table th {
+            background-color: #8bc34a;
+            color: black;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
         }
-
+        
+        .products-table td {
+            padding: 8px;
+            font-size: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .total-row td {
+            padding: 8px;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .notes-table {
+            margin-top: 20px;
+        }
+        
+        .notes-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .notes-content {
+            font-size: 12px;
+            padding: 5px 0;
+        }
+        
+      
     </style>
 </head>
 <body>
-
-<div class="container">
-
-    <header>
-        <table class="header-table" style="width: 100%;">
+    <div class="border-container">
+        <table class="header-table">
             <tr>
-                <td style="text-align:start;">
+                <td style="border: none; text-align:center;">
                     <img src="https://nanidifood.tor1.digitaloceanspaces.com/logo-horizontal.png" alt="Nandi Foods Logo" class="logo">
                 </td>
-               <td width="60%">
-                    <div class="company-name" style="font-weight:bold; font-size:24px;">Nandi Foods</div>
-                    <div class="address" style="font-size:14px; line-height: 1.6;">
-                        7931 Coronet Road, Edmonton, Alberta T5E 4N7 CANADA  <br/> 
-                        Email: info@nandifoods.com <br/>  
-                        Phone: +1 780 328 0957 <br/> 
-                        Visit Us: www.nandifoods.com
-                    </div>
+                <td width="60%">
+                    <div class="company-name">Nandi Foods</div>
+                    <div class="address">7931 Coronet Road, Edmonton, Alberta T5E 4N7 CANADA  <br/> Email: info@nandifoods.com <br/>  Phone: +1 780 328 0957 <br/> Visit Us: www.nandifoods.com</div>
                 </td>
-
                 <td width="20%"></td>
             </tr>
         </table>
+        
+        <table>
+            <tr>
+                <td class="title">Nandi Foods - All Customer List</td>
+            </tr>
+        </table>
+       
+        
 
-        <h1>All Customer List</h1>
-    </header>
+     <br>
 
-    <table>
+        
+     
+        <table class="products-table">
         <thead>
             <tr>
                 <th width="2%">SI</th>
@@ -223,10 +210,13 @@
                 @php $i++; @endphp
             @endforeach
         </tbody>
-    </table>
+        </table>
+        
 
-    <h4 class="center-align">Printed By:  Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</h4>
-</div>
-
+        <p class="center-align">Printed By: __________ | Printed Time: {{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</p>
+    </div>
 </body>
 </html>
+
+
+

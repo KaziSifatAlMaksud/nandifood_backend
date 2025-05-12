@@ -13,6 +13,9 @@ use App\Http\Controllers\EmployeeController;
 use App\Models\GRN;
 use App\Models\GTN;
 use App\Models\DGN;
+use App\Models\PO;
+use App\Models\RGN;
+use App\Models\PRD;
 use App\Models\Warehouse;
 
 Route::get('/', function () {
@@ -144,6 +147,48 @@ Route::get('/dgns_print_view/{id}', function ($id) {
   return view('pdf.dgn.dgn_details', [
       'dgns' => $dgns,
       'warehouse' => $defult_warehouse
+  ]);
+});
+
+Route::get('/grns/list', function() {
+  $grns = GRN::all(); 
+  return view('pdf.grns_list', [
+      'grns' => $grns
+  ]);
+});
+
+Route::get('/gtns/list', function() {
+  $grns = GTN::all(); 
+  return view('pdf.gtns_list', [
+      'gtn_lists' => $grns
+  ]);
+});
+
+Route::get('/dgns/list', function() {
+  $dgns = DGN::all(); 
+  return view('pdf.dgns_list', [
+      'dgn_lists' => $dgns
+  ]);
+});
+
+Route::get('/pos/list', function() {
+  $pos = PO::all(); 
+  return view('pdf.pos_list', [
+      'po_lists' => $pos
+  ]);
+});
+
+Route::get('/prds/list', function() {
+  $prds = PRD::all(); 
+  return view('pdf.prds_list', [
+      'prd_lists' => $prds
+  ]);
+});
+
+Route::get('/rgns/list', function() {
+  $rgns = RGN::all(); 
+  return view('pdf.rgns_list', [
+      'rgn_lists' => $rgns
   ]);
 });
 
