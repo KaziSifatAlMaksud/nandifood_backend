@@ -195,7 +195,7 @@ public function index(Request $request): JsonResponse
         $gtn->update($data);
 
         GtnTransferOutDetail::where('gtn_id', $gtn->id)->delete();
-        $transferOutDetail = $request->input('gtn_transferoutDetail');
+        $transferOutDetail = $request->input('transfer_out_detail');
 
 
         if (is_array($transferOutDetail)) {

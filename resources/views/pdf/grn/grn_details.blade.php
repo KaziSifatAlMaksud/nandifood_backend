@@ -69,7 +69,7 @@
             font-weight: bold;
             font-size: 12px;
             text-align: left;
-            line-height: 0.7;
+            line-height: 1;
         }
 
         .info-value1 {

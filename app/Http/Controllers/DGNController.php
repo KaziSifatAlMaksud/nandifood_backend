@@ -162,7 +162,7 @@ class DGNController extends Controller
         // Delete existing damage details
         DgnDamageDetail::where('dgn_id', $dgn->id)->delete();
 
-        $damageDetails = $request->input('dgn_damagedetails');
+        $damageDetails = $request->input('damage_details');
         if (is_array($damageDetails)) {
                          
             foreach ($damageDetails as $detail) {
