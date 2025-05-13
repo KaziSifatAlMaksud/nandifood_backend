@@ -137,6 +137,24 @@ Route::get('/gtns_print_view/{id}', function ($id) {
   ]);
 });
 
+
+Route::get('/rgns_print_view/{id}', function ($id) {
+  $rgns = RGN::with('rgnItemDetails')->find($id);
+  if (!$rgns) {
+      abort(404, "RGN not found");
+  }
+
+  $warehouse = Warehouse::find($rgns->warehouse_id);
+  $suppliers = Supplier::where('supplier_no', $rgns->supplier)->first();
+
+
+  return view('pdf.rgn.rgn_details', [
+      'rgns' => $rgns,
+      'warehouse' => $warehouse,
+      'suppliers' => $suppliers
+  ]);
+});
+
 Route::get('/dgns_print_view/{id}', function ($id) {
   $dgns = DGN::with('damageDetails')->find($id);
   if (!$dgns) {
@@ -193,7 +211,11 @@ Route::get('/rgns/list', function() {
 });
 
 Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
+
 Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('gtns.printpdf');
+
+Route::get('/rgns/printpdf/{id}', [PdfController::class, 'rgns_print_pdf'])->name('rgns.printpdf');
+
 Route::get('/dgns/printpdf/{id}', [PdfController::class, 'dgns_print_pdf'])->name('dgns.printpdf');
 
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);

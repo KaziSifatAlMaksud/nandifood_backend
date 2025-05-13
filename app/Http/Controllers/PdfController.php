@@ -239,6 +239,28 @@ class PdfController extends Controller
 
     }
 
+    public function rgns_print_pdf($id)
+    {
+        $rgns = RGN::with('rgnItemDetails')->find($id);
+
+        if (!$rgns) {
+            abort(404, "RGN not found");
+        }
+      
+        $warehouse = Warehouse::find($rgns->warehouse_id);
+        $suppliers = Supplier::where('supplier_no', $rgns->supplier)->first();
+
+        // Load the Blade view and pass the data
+        $pdf = Pdf::loadView('pdf.rgn.rgn_details', [
+            'rgns' => $rgns,
+            'warehouse' => $warehouse,
+            'suppliers' => $suppliers
+        ])->setPaper('a4', 'landscape');
+        // Download the generated PDF
+        return $pdf->download('rgn_details_' . $rgns->id . '.pdf');     
+
+    }
+
     public function gtns_print_pdf($id)
     {
         $gtns = GTN::with('transferOutDetail')->find($id);
