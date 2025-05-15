@@ -15,6 +15,7 @@ use App\Models\Warehouse;
 use App\Models\POItemDetail;
 use App\Models\POItemDetailAttachment;
 use App\Models\PoTracking;
+use App\Models\GRN;
 
 class POController extends Controller
 {
@@ -386,6 +387,27 @@ class POController extends Controller
             'data' => $poTracking
         ]);
     }
+
+    public function po_receiving_details($id)
+    {
+        $poinfo = PO::find($id);
+
+        if (!$poinfo) {
+            return response()->json(['message' => 'PO not found'], 404);
+        }
+
+        $grn_info = GRN::where('our_po', $poinfo->po_no)->get();
+
+        if ($grn_info->isEmpty()) {
+            return response()->json(['message' => 'No GRN records found for this PO'], 404);
+        }
+
+        return response()->json([
+            'message' => 'GRN records retrieved successfully.',
+            'data' => $grn_info
+        ]);
+    }
+
 
 
     // Update an existing PO Tracking entry

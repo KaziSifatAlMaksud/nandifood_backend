@@ -274,6 +274,9 @@ Route::post('/pos/po_trackings/{id}', [POController::class, 'update_tracking']);
 Route::get('/pos/po_tracking/show/{id}', [POController::class, 'show_tracking']);
 Route::delete('/pos/po_trackings/delete/{id}', [POController::class, 'destroy_tracking'])->name('po-tracking.destroy');
 
+// Helper PO Receiving Details
+Route::get('/pos/po_receiving_details/{po_id}', [POController::class, 'po_receiving_details']);
+
 // Get all route GRNs
 Route::get('/rgns', [RGNController::class, 'index']); 
 Route::post('/rgns/create', [RGNController::class, 'store']);
