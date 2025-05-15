@@ -211,25 +211,17 @@ Route::get('/rgns/list', function() {
 });
 
 Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
-
 Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('gtns.printpdf');
-
 Route::get('/rgns/printpdf/{id}', [PdfController::class, 'rgns_print_pdf'])->name('rgns.printpdf');
-
 Route::get('/dgns/printpdf/{id}', [PdfController::class, 'dgns_print_pdf'])->name('dgns.printpdf');
-
 route::get('/warehouse/downloadpdf', [PdfController::class, 'warehouse_pdf']);
 route::get('/uom_list/downloadpdf', [PdfController::class, 'uom_list_pdf']);
 route::get('/hu/downloadpdf', [PdfController::class, 'hu_list_pdf'] );
 route::get('/pu/downloadpdf', [PdfController::class, 'pu_list_pdf'] );
 route::get('/employee/downloadpdf', [PdfController::class, 'employee_list_pdf'] );
-
-
 route::get('/customer/downloadpdf', [PdfController::class, 'customer_list_pdf'] );
 route::get('/product/downloadpdf', [PdfController::class, 'product_list_pdf'] );
 route::get('/supplier/downloadpdf', [PdfController::class, 'supplier_list_pdf'] );
-
-
 route::get('/grns/downloadpdf', [PdfController::class, 'grns_list_pdf'] );
 
 

@@ -14,6 +14,7 @@ use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Models\POItemDetail;
 use App\Models\POItemDetailAttachment;
+use App\Models\PoTracking;
 
 class POController extends Controller
 {
@@ -208,6 +209,8 @@ class POController extends Controller
         // Delete associated PO item details
         POItemDetail::where('po_id', $id)->delete();
 
+        PoTracking::where('po_id', $id)->delete();
+
         // Delete the PO record
         $po->delete();
 
@@ -339,6 +342,113 @@ class POController extends Controller
                 ], 500);
             }
         }
+
+        public function index_tracking($po_id)
+        {
+            $data = PoTracking::where('po_id', $po_id)->get();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'PO Tracking records retrieved successfully.',
+                'result' => [
+                    'data' => $data
+                ],
+            ]);
+        }
+
+
+    // Store a new PO Tracking entry
+    public function sotre_tracking(Request $request)
+    {
+        // Force JSON response for validation errors
+        if (!$request->expectsJson()) {
+            return response()->json(['error' => 'Invalid request type.'], 400);
+        }
+
+        // Validate request data
+        $validated = $request->validate([
+            'po_id' => 'required|string|max:150',
+            'date_created' => 'nullable|string|max:150',
+            'date_submitted' => 'nullable|string|max:150',
+            'date_approved' => 'nullable|string|max:150',
+            'created_by' => 'required|string|max:150',
+            'submitted_by' => 'nullable|string|max:150',
+            'submitted_to' => 'nullable|string|max:150',
+            'approved_by' => 'nullable|string|max:150',
+        ]);
+
+        // Store data
+        $poTracking = PoTracking::create($validated);
+
+        return response()->json([
+            'status' => 201,
+            'message' => 'PO Tracking record created successfully.',
+            'data' => $poTracking
+        ]);
+    }
+
+
+    // Update an existing PO Tracking entry
+    public function update_tracking(Request $request, $id)
+    {
+        $request->validate([
+            'po_id' => 'required|string|max:150',
+            'date_created' => 'nullable|string|max:150',
+            'date_submitted' => 'nullable|string|max:150',
+            'date_approved' => 'nullable|string|max:150',
+            'created_by' => 'required|string|max:150',
+            'submitted_by' => 'nullable|string|max:150',
+            'submitted_to' => 'nullable|string|max:150',
+            'approved_by' => 'nullable|string|max:150',
+        ]);
+
+        $poTracking = PoTracking::find($id);
+
+        if (!$poTracking) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+        $poTracking->update($request->all());
+
+        return response()->json([
+            'message' => 'PO Tracking record updated successfully.',
+            'data' => $poTracking
+        ]);
+    }
+
+    // Show a single PO Tracking entry
+    public function show_tracking($id)
+    {
+        $poTracking = PoTracking::where('id', $id)->first();
+
+        if (!$poTracking) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+           return response()->json([
+            'message' => 'PO Tracking Record Fatch Successfully.',
+            'data' => $poTracking
+        ]);
+    }
+
+    // Delete a PO Tracking entry
+    public function destroy_tracking($id)
+    {
+        $poTracking = PoTracking::find($id);
+
+        if (!$poTracking) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+        $poTracking->delete();
+        return response()->json([
+            'message' => 'PO Tracking record deleted successfully.',
+            'data' => $poTracking
+        ]);
+    }
+
+
+
 
 
     

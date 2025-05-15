@@ -268,6 +268,11 @@ Route::post('/po_attachment/create', [POController::class, 'store_attachment']);
 Route::get('/po_attachment/{id}', [POController::class, 'get_all_attachments']);
 Route::delete('/po_attachment/delete/{id}', [POController::class, 'delete_attachment']);
 
+Route::get('/pos/po_trackings/{po_id}', [POController::class, 'index_tracking']);
+Route::post('/pos/po_trackings/create', [POController::class, 'sotre_tracking']);
+Route::post('/pos/po_trackings/{id}', [POController::class, 'update_tracking']);
+Route::get('/pos/po_tracking/show/{id}', [POController::class, 'show_tracking']);
+Route::delete('/pos/po_trackings/delete/{id}', [POController::class, 'destroy_tracking'])->name('po-tracking.destroy');
 
 // Get all route GRNs
 Route::get('/rgns', [RGNController::class, 'index']); 
@@ -327,6 +332,7 @@ Route::delete('/prds/{id}/delete', [PRDController::class, 'destroy']);
 Route::post('/prd_attachment/create', [PRDController::class, 'store_attachment']);
 Route::get('/prd_attachment/{id}', [PRDController::class, 'get_all_attachments']);
 Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_attachment']);
+
 
 
 //Helper Common API
