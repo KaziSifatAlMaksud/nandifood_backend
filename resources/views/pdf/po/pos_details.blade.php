@@ -155,45 +155,46 @@
                 <td class="title">Purchase Order (PO)</td>
             </tr>
         </table>
-        
+        <!-- {{ $pos }} -->
         <table class="info-table">
             <tr>
                 <td width="70%"></td>
                 <td width="30%">
                     <table>
+                       
                         <tr>
-                            <td class="info-label1">Date Received:</td>
+                            <td class="info-label1">PO Number:</td>
+                            <td class="info-value1">{{ $pos->po_no ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="info-label1"> PO Date:</td>
                             <td class="info-value1">
                                 {{ 
-                                    !empty($dgns->rgn_date) 
-                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->rgn_date))->format('d-m-Y') 
+                                    !empty($dgns->po_date) 
+                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->po_date))->format('d-m-Y') 
                                         : 'N/A' 
                                 }}
                               
                             </td>
                         </tr>
                         <tr>
-                            <td class="info-label1">Goods Receive Note No:</td>
-                            <td class="info-value1">{{ $pos->rgn_no ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">Bol No:</td>
-                            <td class="info-value1">{{ $pos->bol_no ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="info-label1">Shipping Company:</td>
-                            <td class="info-value1">{{ $pos->shipping_company ?? 'N/A' }}</td>
-                        </tr>
-                      
-                        <tr>
-                            <td class="info-label1">Returned by:</td>
-                            @php
-                                $employee = $pos->returned_by ? \App\Models\Employee::find($pos->returned_by) : null;
-                            @endphp
+                            <td class="info-label1"> PO Due Date:</td>
                             <td class="info-value1">
-                                {{ $employee ? ($employee->first_name . ' ' . $employee->middle_name . ' ' . $employee->last_name .' ('.$pos->returned_by .')'  ?? 'N/A') : 'N/A' }}
+                                {{ 
+                                    !empty($dgns->po_due_date) 
+                                        ? \Carbon\Carbon::parse(preg_replace('/\s*\(.*\)$/', '', $dgns->po_due_date))->format('d-m-Y') 
+                                        : 'N/A' 
+                                }}
+                              
                             </td>
-
+                        </tr>
+                        <tr>
+                            <td class="info-label1">Payment Terms:</td>
+                            <td class="info-value1">30 Days</td>
+                        </tr>
+                        <tr>
+                            <td class="info-label1">Priority:</td>
+                            <td class="info-value1">Standard</td>
                         </tr>
                     </table>
                     
@@ -289,13 +290,12 @@
                 <th>Product Name</th>
                 <th>Size</th>
                 <th>UOM</th>
-                <th>Batch No.</th>
-                <th>Expiration Date</th>
-                <th>Qty Received</th>
-                <th>QTY Variance</th>
-                <th>Unit Cost</th>
+                <th>Qty</th>
+                <th>Unit Price Cost</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>USD</th>
                 <th>Total Amount</th>
-                <th>Received</th>
             </tr>
             @php
                 $totalAmount = 0; 
@@ -306,13 +306,12 @@
                 <td>{{ $receiving_detail->product_name }}</td>
                 <td>{{ $receiving_detail->size }}</td>
                 <td>{{ $receiving_detail->uom }}</td>
-                <td>{{ $receiving_detail->batch_no ?? 'N/A' }}</td>
-                <td>{{ $receiving_detail->expiration_date ?? 'N/A' }}</td>
-                <td>{{ $receiving_detail->qty_received ?? 0 }}</td>
-                <td>{{ $receiving_detail->qty_variance ?? 0 }}</td>
+                <td>{{ $receiving_detail->qty ?? 0 }}</td>
+                <td>{{ $receiving_detail->unit_price ?? 0, 2 }}</td>
                 <td>${{ number_format($receiving_detail->unit_cost ?? 0, 2) }}</td>
                 <td>${{ number_format($receiving_detail->total_amount ?? 0, 2) }}</td>
-                <td>{{ $receiving_detail->receive_reject_action ? '✓' : '✗' }}</td>
+                <td>${{ number_format($receiving_detail->total_amount ?? 0, 2) }}</td>
+                <td>${{ number_format($receiving_detail->total_amount ?? 0, 2) }}</td>
             </tr>   
             @php
                 $totalAmount += $receiving_detail->total_amount ?? 0;

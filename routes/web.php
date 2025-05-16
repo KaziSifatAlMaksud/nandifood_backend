@@ -164,7 +164,7 @@ Route::get('/pos_print_view/{id}', function ($id) {
 
 
   $suppliers = Supplier::where('supplier_no', $pos->supplier)->first();
-  $warehouse = Warehouse::find($pos->warehouse_id);
+  $warehouse = Warehouse::find($pos->warehouse);
 
 
   return view('pdf.po.pos_details', [
