@@ -272,7 +272,7 @@ Route::get('/pos/po_trackings/{po_id}', [POController::class, 'index_tracking'])
 Route::post('/pos/po_trackings/create', [POController::class, 'sotre_tracking']);
 Route::post('/pos/po_trackings/{id}', [POController::class, 'update_tracking']);
 Route::get('/pos/po_tracking/show/{id}', [POController::class, 'show_tracking']);
-Route::delete('/pos/po_trackings/delete/{id}', [POController::class, 'destroy_tracking']);
+Route::delete('/pos/po_trackings/delete_traking/{id}', [POController::class, 'destroy_tracking']);
 
 // Helper PO Receiving Details
 Route::get('/pos/po_receiving_details/{po_id}', [POController::class, 'po_receiving_details']);
