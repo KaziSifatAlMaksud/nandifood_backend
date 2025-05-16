@@ -465,7 +465,7 @@ public function index(Request $request)
 
     public function get_employee_name()
     {
-        $employees = DB::table('employees')
+        $employees = DB::table('employee')
             ->join('positions', 'employee.position_id', '=', 'positions.id')
             ->select(
                 'employee.id',
