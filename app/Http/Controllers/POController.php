@@ -454,20 +454,38 @@ class POController extends Controller
     }
 
     // Delete a PO Tracking entry
-    public function destroy_tracking($id)
+    
+    public function destroy_tracking($id): JsonResponse
     {
-        $poTracking = PoTracking::find($id);
-
-        if (!$poTracking) {
-            return response()->json(['message' => 'Record not found'], 404);
+        try {
+            // Attempt to find the PO tracking record
+            $poTracking = PoTracking::find($id);
+    
+            // Check if the record exists
+            if (!$poTracking) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'PO Tracking record not found.'
+                ], 404);
+            }
+    
+            // Delete the record
+            $poTracking->delete();
+    
+            return response()->json([
+                'status' => 200,
+                'message' => 'PO Tracking record deleted successfully.'
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred while deleting the PO Tracking record.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $poTracking->delete();
-        return response()->json([
-            'message' => 'PO Tracking record deleted successfully.'
-        ]);
     }
-
+    
 
 
 
