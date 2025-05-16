@@ -155,6 +155,25 @@ Route::get('/rgns_print_view/{id}', function ($id) {
   ]);
 });
 
+
+Route::get('/pos_print_view/{id}', function ($id) {
+  $pos = PO::with('poItemDetails')->find($id);
+  if (!$pos) {
+      abort(404, "PO not found");
+  }
+
+
+  $suppliers = Supplier::where('supplier_no', $pos->supplier)->first();
+  $warehouse = Warehouse::find($pos->warehouse_id);
+
+
+  return view('pdf.po.pos_details', [
+      'pos' => $pos,
+      'warehouse' => $warehouse,
+      'suppliers' => $suppliers
+  ]);
+});
+
 Route::get('/dgns_print_view/{id}', function ($id) {
   $dgns = DGN::with('damageDetails')->find($id);
   if (!$dgns) {
@@ -209,6 +228,8 @@ Route::get('/rgns/list', function() {
       'rgn_lists' => $rgns
   ]);
 });
+
+
 
 Route::get('/grns/printpdf/{id}', [PdfController::class, 'grns_print_pdf'])->name('grns.printpdf');
 Route::get('/gtns/printpdf/{id}', [PdfController::class, 'gtns_print_pdf'])->name('gtns.printpdf');
