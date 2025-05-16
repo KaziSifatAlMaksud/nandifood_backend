@@ -64,8 +64,6 @@ route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_comp
 route::post('/warehouse_attachment/create', [WarehouseController::class, 'warehouse_attachment_store']);
 route::delete('/warehouse_attachment/delete/{id}', [WarehouseController::class, 'warehouse_attachment_destroy'])->name('warehouse-attachment.destroy');
 
-//warehouse information
-Route::get('/employee', [EmployeeController::class, 'index']);
 
 // route::get('/warehouse_attachment', [WarehouseController::class, 'warehouse_compliance']);
 route::post('/employee_notes/create', [EmployeeController::class, 'employee_notes_store']);

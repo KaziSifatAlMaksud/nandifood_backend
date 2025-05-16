@@ -463,19 +463,28 @@ public function index(Request $request)
         ]);
     }
 
-
-    public function get_employee_name(){
-    
-        $employee = Employee::select('id', 'first_name','middle_name', 'last_name')->get(); // Fetch only id and first_name columns
+    public function get_employee_name()
+    {
+        $employees = DB::table('employees')
+            ->join('positions', 'employees.position_id', '=', 'positions.id')
+            ->select(
+                'employees.id',
+                'employees.first_name',
+                'employees.middle_name',
+                'employees.last_name',
+                'positions.position_name'
+            )
+            ->get();
 
         return response()->json([
-        'status' => 200,
-        'message' => 'Employee name fetched successfully.',
-        'result' => [
-            'data' => $employee
+            'status' => 200,
+            'message' => 'Employee name fetched successfully.',
+            'result' => [
+                'data' => $employees
             ],
         ]);
     }
+
 
   public function employeeExport()
     {
