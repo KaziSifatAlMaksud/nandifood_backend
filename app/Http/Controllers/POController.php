@@ -464,8 +464,7 @@ class POController extends Controller
 
         $poTracking->delete();
         return response()->json([
-            'message' => 'PO Tracking record deleted successfully.',
-            'data' => $poTracking
+            'message' => 'PO Tracking record deleted successfully.'
         ]);
     }
 
