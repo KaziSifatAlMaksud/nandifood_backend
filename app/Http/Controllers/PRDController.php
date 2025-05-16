@@ -9,6 +9,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ProductionOrder;
+use App\Models\PrdCrew;
+use App\Models\Position;
+
 
 class PRDController extends Controller
 {
@@ -320,4 +323,73 @@ class PRDController extends Controller
                 ], 500);
             }
         }
+
+     
+        public function crew_index($prd_id)
+        {
+            $crews = PrdCrew::where('prd_id', $prd_id)->get();
+
+            $crews->map(function ($crew) {
+                // Get employee full name
+                $employee = DB::table('employee')
+                    ->where('id', $crew->emp_id)
+                    ->select(DB::raw('CONCAT(first_name, " ", last_name) AS full_name'), 'position_id')
+                    ->first();
+
+                if ($employee) {
+                    $crew->emp_name = $employee->full_name;
+
+                    // Get position name
+                    $position_name = DB::table('positions')
+                        ->where('id', $employee->position_id)
+                        ->value('position_name');
+
+                    $crew->position_name = $position_name;
+                } else {
+                    $crew->emp_name = null;
+                    $crew->position_name = null;
+                }
+
+                return $crew;
+            });
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'PRD Crew retrieved successfully.',
+                'result' => $crews
+            ]);
+        }
+
+
+           // Create a new crew
+        public function crew_store(Request $request)
+        {
+            $validated = $request->validate([
+                'prd_id' => 'required|integer',
+                'emp_id' => 'required|string|max:10'
+            ]);
+
+            $crew = PrdCrew::create($validated);
+
+            return response()->json([
+                'message' => 'Crew created successfully',
+                'data' => $crew
+            ], 201);
+        }
+
+
+        public function crew_destroy($id)
+        {
+            $crew = PrdCrew::find($id);
+    
+            if (!$crew) {
+                return response()->json(['message' => 'Crew not found'], 404);
+            }
+    
+            $crew->delete();
+    
+            return response()->json(['message' => 'Crew deleted successfully']);
+        }
+
+
 }
