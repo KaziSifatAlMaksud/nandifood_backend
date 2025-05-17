@@ -34,11 +34,11 @@ class PRD extends Model
     // {
     //     return $this->hasMany(ProductionOrder::class, 'prd_id');
     // }
-    public function prd_inputDetails()
+    public function prd_input_details()
     {
         return $this->hasMany(PrdInputDetail::class, 'prd_id');
     }
-    public function prd_outputDetails()
+    public function prd_output_details()
     {
         return $this->hasMany(PrdOutputDetail::class, 'prd_id');
     }

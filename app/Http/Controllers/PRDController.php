@@ -112,7 +112,7 @@ class PRDController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $prd = PRD::with('prd_inputDetails', 'prd_outputDetails')->find($id);
+        $prd = PRD::with('prd_input_details', 'prd_output_details')->find($id);
 
         if (!$prd) {
             return response()->json([
@@ -156,7 +156,7 @@ class PRDController extends Controller
          PrdInputDetail::where('prd_id', $prd->id)->delete();
          PrdOutputDetail::where('prd_id', $prd->id)->delete();
 
-         $prd_inputDetails = $request->input('prd_inputDetails');
+         $prd_inputDetails = $request->input('prd_input_details');
          if (is_array($prd_inputDetails)) {
              foreach ($prd_inputDetails as $prd_inputDetail) {
                 PrdInputDetail::create([
@@ -178,7 +178,7 @@ class PRDController extends Controller
                  ]);
              }
          }
-         $prd_outputDetails = $request->input('prd_outputDetails');
+         $prd_outputDetails = $request->input('prd_output_details');
         if (is_array($prd_outputDetails)) {
             foreach ($prd_outputDetails as $prd_outputDetail) {
                 PrdOutputDetail::create([
@@ -202,7 +202,7 @@ class PRDController extends Controller
         }
 
         // Load fresh relationships
-        $prd->load('prd_inputDetails', 'prd_outputDetails');
+        $prd->load('prd_input_details', 'prd_output_details');
      
          return response()->json([
              'status' => 200,
