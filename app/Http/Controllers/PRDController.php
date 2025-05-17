@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ProductionOrder;
 use App\Models\PrdCrew;
 use App\Models\Position;
+use App\Models\PrdInputDetail;
+use App\Models\PrdOutputDetail;
 
 
 class PRDController extends Controller
@@ -110,7 +112,7 @@ class PRDController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $prd = PRD::with('productionOrders')->find($id);
+        $prd = PRD::with('prd_inputDetails', 'prd_outputDetails')->find($id);
 
         if (!$prd) {
             return response()->json([
@@ -151,35 +153,56 @@ class PRDController extends Controller
      
          $prd->update($data);
 
-         ProductionOrder::where('prd_id', $prd->id)->delete();
+         PrdInputDetail::where('prd_id', $prd->id)->delete();
+         PrdOutputDetail::where('prd_id', $prd->id)->delete();
 
-         $productionOrders = $request->input('perchase_order');
-         if (is_array($productionOrders)) {
-             foreach ($productionOrders as $order) {
-                 ProductionOrder::create([
+         $prd_inputDetails = $request->input('prd_inputDetails');
+         if (is_array($prd_inputDetails)) {
+             foreach ($prd_inputDetails as $prd_inputDetail) {
+                PrdInputDetail::create([
                      'prd_id'           => $prd->id,
-                     'production_order_no' => $order['production_order_no'] ?? null,
-                     'type'             => $order['type'] ?? null,
-                     'production_date'  => $order['production_date'] ?? null,
-                     'product_category' => $order['product_category'] ?? null,
-                     'sub_category1'    => $order['sub_category1'] ?? null,
-                     'sub_category2'    => $order['sub_category2'] ?? null,
-                     'output_product'   => $order['output_product'] ?? null,
-                     'input_item'       => $order['input_item'] ?? null,
-                     'sku'              => $order['sku'] ?? null,
-                     'size'             => $order['size'] ?? null,
-                     'uom'              => $order['uom'] ?? null,
-                     'qty'              => $order['qty'] ?? null,
-                     'currency'         => $order['currency'] ?? null,
-                     'unit_cost'        => $order['unit_cost'] ?? null,
-                     'amount'           => $order['amount'] ?? null,
-                     'created_at'       => $order['created_at'] ?? now(),
+                     'production_order_no' => $prd_inputDetail['production_order_no'] ?? null,
+                     'production_date'  => $prd_inputDetail['production_date'] ?? null,
+                     'product_category' => $prd_inputDetail['product_category'] ?? null,
+                     'sub_category1'    => $prd_inputDetail['sub_category1'] ?? null,
+                     'sub_category2'    => $prd_inputDetail['sub_category2'] ?? null,
+                     'input_item'       => $prd_inputDetail['input_item'] ?? null,
+                     'sku'              => $prd_inputDetail['sku'] ?? null,
+                     'size'             => $prd_inputDetail['size'] ?? null,
+                     'uom'              => $prd_inputDetail['uom'] ?? null,
+                     'qty'              => $prd_inputDetail['qty'] ?? null,
+                     'currency'         => $prd_inputDetail['currency'] ?? null,
+                     'unit_cost'        => $prd_inputDetail['unit_cost'] ?? null,
+                     'amount'           => $prd_inputDetail['amount'] ?? null,
+                     'created_at'       => $prd_inputDetail['created_at'] ?? now(),
                  ]);
              }
          }
-     
-         // Load fresh related purchase orders
-         $prd->load('productionOrders');
+         $prd_outputDetails = $request->input('prd_outputDetails');
+        if (is_array($prd_outputDetails)) {
+            foreach ($prd_outputDetails as $prd_outputDetail) {
+                PrdOutputDetail::create([
+                    'prd_id'              => $prd->id,
+                    'production_order_no' => $prd_outputDetail['production_order_no'] ?? null,
+                    'production_date'     => $prd_outputDetail['production_date'] ?? null,
+                    'product_category'    => $prd_outputDetail['product_category'] ?? null,
+                    'sub_category1'       => $prd_outputDetail['sub_category1'] ?? null,
+                    'sub_category2'       => $prd_outputDetail['sub_category2'] ?? null,
+                    'output_item'         => $prd_outputDetail['output_item'] ?? null,
+                    'sku'                 => $prd_outputDetail['sku'] ?? null,
+                    'size'                => $prd_outputDetail['size'] ?? null,
+                    'uom'                 => $prd_outputDetail['uom'] ?? null,
+                    'qty'                 => $prd_outputDetail['qty'] ?? null,
+                    'currency'            => $prd_outputDetail['currency'] ?? null,
+                    'unit_cost'           => $prd_outputDetail['unit_cost'] ?? null,
+                    'amount'              => $prd_outputDetail['amount'] ?? null,
+                    'created_at'          => $prd_outputDetail['created_at'] ?? now(),
+                ]);
+            }
+        }
+
+        // Load fresh relationships
+        $prd->load('prd_inputDetails', 'prd_outputDetails');
      
          return response()->json([
              'status' => 200,
@@ -196,6 +219,10 @@ class PRDController extends Controller
     public function destroy($id): JsonResponse
     {
         $prd = PRD::find($id);
+
+
+        PrdInputDetail::where('prd_id', $prd->id)->delete();
+        PrdOutputDetail::where('prd_id', $prd->id)->delete();
 
         if (!$prd) {
             return response()->json(['message' => 'PRD not found'], 404);
