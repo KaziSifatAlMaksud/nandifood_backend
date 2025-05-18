@@ -15,7 +15,7 @@ class Rgn extends Model
 
     protected $fillable = [
         'rgn_no',
-        'date',
+        'rgn_date',
         'warehouse_id',
         'supplier',
 
