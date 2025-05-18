@@ -199,7 +199,7 @@ class RGNController extends Controller
         }
     
         // Reload the related item details
-        $rgn->load('rgnItemDetails');
+        $rgn->load('rgn_item_details');
 
     
         return response()->json([
