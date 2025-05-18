@@ -114,7 +114,7 @@ class RGNController extends Controller
     public function show($id): JsonResponse
     {
         // Find the GTN entry
-        $rgn = RGN::with('rgnitemDetails')->find($id);
+        $rgn = RGN::with('rgn_item_details')->find($id);
 
         // Check if GTN exists
         if (!$rgn) {

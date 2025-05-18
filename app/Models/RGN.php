@@ -38,7 +38,7 @@ class Rgn extends Model
     ];
 
     public $timestamps = false; 
-    public function rgnItemDetails()
+    public function rgn_item_details()
     {
         return $this->hasMany(RgnItemsDetail::class, 'rgn_id');
     }
