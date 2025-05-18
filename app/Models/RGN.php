@@ -18,9 +18,17 @@ class Rgn extends Model
         'date',
         'warehouse_id',
         'supplier',
+
+        'supplier_invoice_no',
+        'supplier_reference',
+        'grn_no',
+        'grn_date',
+
         'bol_no',
         'shipping_company',
         'returned_by',
+
+
         'status',
         'total_amount',
         'last_updated_by',

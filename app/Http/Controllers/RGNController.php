@@ -67,6 +67,13 @@ class RGNController extends Controller
             'rgn_date' => 'nullable|string|max:200',
             'warehouse_id' => 'nullable|string|max:10',
             'supplier' => 'nullable|string|max:50',
+            
+            'supplier_invoice_no' => 'nullable|string|max:100',
+            'supplier_reference' => 'nullable|string|max:100',
+            'grn_no' => 'nullable|string|max:100',
+            'grn_date' => 'nullable|string|max:100',
+
+
             'bol_no' => 'nullable|string|max:100',
             'shipping_company' => 'nullable|string|max:150',
             'returned_by' => 'nullable|string|max:100',
