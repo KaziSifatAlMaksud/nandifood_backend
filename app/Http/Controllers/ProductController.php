@@ -26,7 +26,7 @@ class ProductController extends Controller
     {
         try {
             // Fetch distinct rows based on the specified columns
-            $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name')->distinct()->get();
+            $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name','size')->distinct()->get();
 
             // Return the response with the fetched data
             return response()->json([
@@ -49,7 +49,7 @@ class ProductController extends Controller
     {
         try {
             // Fetch distinct rows based on the specified columns
-           $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name')
+           $products = Product::select('p_sku_no', 'p_long_name', 'product_short_name','size')
                 ->where('p_sku_no', $prductorsku) 
                 ->orWhere('p_long_name', 'like', "%$prductorsku%")  
                 ->orWhere('product_short_name', 'like', "%$prductorsku%") 
