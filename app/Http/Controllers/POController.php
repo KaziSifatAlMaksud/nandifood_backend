@@ -26,15 +26,21 @@ class POController extends Controller
             $id = $request->input('id');
             $limit = (int) $request->input('limit', 5);
             $page = (int) $request->input('page', 1);
-
-            $query = PO::query();
-
+    
+            $query = PO::with('poItemDetails'); // Eager load to avoid N+1 problem
+    
             if ($id) {
                 $query->where('id', $id);
             }
-
+    
             $pos = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
-
+    
+            // Add total_sum_amount for each PO
+            $pos->getCollection()->transform(function ($po) {
+                $po->total_sum_amount = $po->poItemDetails->sum('total_amount');
+                return $po;
+            });
+    
             return response()->json([
                 'status' => 200,
                 'message' => 'PO list retrieved successfully',
@@ -47,6 +53,7 @@ class POController extends Controller
             ], 500);
         }
     }
+    
 
     public function store(Request $request): JsonResponse
     {

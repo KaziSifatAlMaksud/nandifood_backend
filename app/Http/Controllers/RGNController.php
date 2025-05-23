@@ -39,6 +39,11 @@ class RGNController extends Controller
 
         // Transform each RGN item to include warehouse info
         $rgns->getCollection()->transform(function ($rgn) use ($warehouses) {
+
+
+            $rgn->total_sum_amount = $rgn->rgn_item_details->sum('total_amount');
+
+
             $warehouse = $warehouses[$rgn->warehouse_id] ?? null;
 
             $rgn->warehouse_name = $warehouse->warehouse_name ?? null;

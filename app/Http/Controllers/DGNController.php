@@ -22,13 +22,18 @@ class DGNController extends Controller
             $limit = (int) $request->input('limit', 5);
             $page = (int) $request->input('page', 1);
 
-            $query = DGN::query(); // Change from GRN to DGN
+            $query = DGN::with('damageDetails'); // Change from GRN to DGN
 
             if ($id) {
                 $query->where('id', $id);
             }
 
             $dgns = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
+
+            $dgns->getCollection()->transform(function ($dgn) {
+                $dgn->total_sum_amount = $dgn->damageDetails->sum('totalAmount');
+                return $dgn;
+            });
 
             return response()->json([
                 'status' => 200,

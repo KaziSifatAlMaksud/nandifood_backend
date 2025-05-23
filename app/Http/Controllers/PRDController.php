@@ -34,22 +34,7 @@ class PRDController extends Controller
 
         $prds = $query->orderBy('id', 'DESC')->paginate($limit, ['*'], 'page', $page);
 
-          // Get unique warehouse IDs from GRNs
-        // $warehouseIds = $grns->pluck('receiving_warehouse_id')->unique()->toArray();
-        
-        // $warehouses = Warehouse::whereIn('id', $warehouseIds)->get()->keyBy('id');
-
-        // foreach ($grns as $grn) {
-        //     $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
-
-        //     if ($warehouse) {
-        //         $grn->warehouse_name = $warehouse->name;
-        //         $grn->country = $warehouse->country;
-        //         $grn->state = $warehouse->state;
-        //         $grn->city = $warehouse->city;
-        //     }
-        // }
-
+    
         return response()->json([
             'status' => 200,
             'message' => 'PRD list retrieved successfully',

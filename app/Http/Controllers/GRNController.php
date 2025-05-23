@@ -42,7 +42,7 @@ class GRNController extends Controller
 
         foreach ($grns as $grn) {
             $warehouse = $warehouses[$grn->receiving_warehouse_id] ?? null;
-
+            $grn->total_sum_amount = $grn->receivingDetails->sum('total_amount');
             if ($warehouse) {
                 $grn->warehouse_name = $warehouse->warehouse_name;
                 $grn->country = $warehouse->country;

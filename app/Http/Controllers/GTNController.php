@@ -31,6 +31,10 @@ public function index(Request $request): JsonResponse
         // Get all warehouse IDs needed for both in and out warehouses
         $warehouseIds = collect();
         foreach ($gtns as $gtn) {
+     
+
+            $gtn->total_sum_amount = $gtn->transferOutDetail->sum('total_amount');
+
             if ($gtn->transfer_out_warehouse) {
                 $warehouseIds->push($gtn->transfer_out_warehouse);
             }
