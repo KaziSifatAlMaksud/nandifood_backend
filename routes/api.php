@@ -330,8 +330,7 @@ Route::post('/prds/{id}', [PRDController::class, 'update']);
 Route::delete('/prds/{id}/delete', [PRDController::class, 'destroy']);
 
 Route::get('/prd_crews/{prd_id}', [PRDController::class, 'crew_index']);        
-Route::post('/prd_crews/create', [PRDController::class, 'crew_store']);   
-Route::delete('/prd_crews/{id}', [PRDController::class, 'crew_destroy']);
+Route::post('/prd_crews/create/{prd_id}', [PRDController::class, 'crew_store']);   
 
 
 // PRD Attachment API

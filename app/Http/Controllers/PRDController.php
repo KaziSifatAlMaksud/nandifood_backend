@@ -374,34 +374,39 @@ class PRDController extends Controller
 
 
            // Create a new crew
-        public function crew_store(Request $request)
-        {
-            $validated = $request->validate([
-                'prd_id' => 'required|integer',
-                'emp_id' => 'required|string|max:10'
-            ]);
-
-            $crew = PrdCrew::create($validated);
-
-            return response()->json([
-                'message' => 'Crew created successfully',
-                'data' => $crew
-            ], 201);
-        }
-
-
-        public function crew_destroy($id)
-        {
-            $crew = PrdCrew::find($id);
-    
-            if (!$crew) {
-                return response()->json(['message' => 'Crew not found'], 404);
-            }
-    
-            $crew->delete();
-    
-            return response()->json(['message' => 'Crew deleted successfully']);
-        }
+           public function crew_store(Request $request, $prd_id)
+           {
+               $data = $request->all();
+           
+               // Validate each emp_id in the array
+               foreach ($data as $index => $item) {
+                   if (!isset($item['emp_id']) || !is_string($item['emp_id']) || strlen($item['emp_id']) > 10) {
+                       return response()->json([
+                           'message' => "Validation failed at index $index",
+                           'error' => 'emp_id is required and must be a string with max length 10'
+                       ], 422);
+                   }
+               }
+           
+               // Step 1: Delete all existing crews for this prd_id
+               PrdCrew::where('prd_id', $prd_id)->delete();
+           
+               // Step 2: Create new crew records
+               $created = [];
+               foreach ($data as $item) {
+                   $created[] = PrdCrew::create([
+                       'prd_id' => (int) $prd_id,
+                       'emp_id' => $item['emp_id']
+                   ]);
+               }
+           
+               return response()->json([
+                   'message' => 'Crew list updated successfully',
+                   'data' => $created
+               ], 201);
+           }
+           
+           
 
 
 }
