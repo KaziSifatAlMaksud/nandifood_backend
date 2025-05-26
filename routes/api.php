@@ -21,6 +21,7 @@ use App\Http\Controllers\DGNController;
 use App\Http\Controllers\PRDController;
 use App\Http\Controllers\RGNController;
 use App\Http\Controllers\POController;
+use App\Http\Controllers\CreditNotesController;
 
 
 
@@ -291,6 +292,19 @@ Route::delete('/rgn_attachment/delete/{id}', [RGNController::class, 'delete_atta
 Route::get('/grn/warehouse', [GRNController::class, 'getWarehouse']);
 
 // Get all route GRNs
+
+
+//CreditNotes API
+Route::get('/credit_notes', [CreditNotesController::class, 'index']);
+Route::post('/credit_notes/create', [CreditNotesController::class, 'store']);
+Route::get('/credit_notes/{id}', [CreditNotesController::class, 'show']);
+Route::post('/credit_notes/{id}', [CreditNotesController::class, 'update']);
+Route::delete('/credit_notes/{id}/delete', [CreditNotesController::class, 'destroy']);
+//CreditNotes Attachment API
+Route::post('/credit_notes_attachment/create', [CreditNotesController::class, 'store_attachment']);
+Route::get('/credit_notes_attachment/{id}', [CreditNotesController::class, 'get_all_attachments']);
+Route::delete('/credit_notes_attachment/delete/{id}', [CreditNotesController::class, 'delete_attachment']);
+
 
 //GTN API
 Route::get('/gtns', [GTNController::class, 'index']); 
