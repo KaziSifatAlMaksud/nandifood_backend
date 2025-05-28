@@ -235,7 +235,7 @@ class POController extends Controller
 
         // Fetch the PO info and update notes if type is 1 (example)
         $poInfo = PO::find($validated['po_id']);
-        if ($poInfo && $request->type == 1) {
+        if ($poInfo) {
             $poInfo->notes = $request->file_description;
             $poInfo->save();
         }
