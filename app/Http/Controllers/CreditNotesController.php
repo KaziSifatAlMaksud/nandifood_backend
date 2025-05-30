@@ -251,6 +251,7 @@ class CreditNotesController extends Controller
             ],
         ]);
     }
+    
     public function delete_attachment($id): JsonResponse
     {
         try {

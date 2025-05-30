@@ -127,7 +127,7 @@ class SalesInvoiceController extends Controller
             $validated = $request->all(); // Adjust if you want validation
 
             // Fetch the Sales Invoice and update memo_notes if type is 1 (example)
-            $salesInvoice = SalesInvoice::find($validated['invoice_id']);
+            $salesInvoice = SalesInvoice::find($validated['si_id']);
             if ($salesInvoice && $request->type == 1) {
                 $salesInvoice->memo_notes = $request->file_description;
                 $salesInvoice->save();
@@ -166,7 +166,7 @@ class SalesInvoiceController extends Controller
                     ),
                 'result' => [
                     'data' => $invoiceAttachment,
-                    'sales_invoice' => $salesInvoice
+                    'salesInvoice' => $salesInvoice
                 ]
             ]);
         } catch (\Exception $e) {
@@ -208,6 +208,47 @@ class SalesInvoiceController extends Controller
             ], 500);
         }
     }
+
+    public function get_all_attachments($id): JsonResponse
+    {
+        try {
+            // Retrieve all sales invoice attachments
+            $attachments = SalesInvoiceAttachment::where('si_id', $id)->get();
+
+            // Retrieve sales invoice notes/info
+            $invoice_info = new \stdClass();
+            $notes = SalesInvoice::where('id', $id)->value('notes');
+            $invoice_info->notes = $notes ?? '';
+
+            // Format attachment URLs
+            $attachments->map(function ($attachment) {
+                if ($attachment->file_path) {
+                    $attachment->file = Storage::disk('spaces')->url($attachment->file_path);
+                    $attachment->file_name = basename($attachment->file_path);
+                } else {
+                    $attachment->file = null;
+                    $attachment->file_name = null;
+                }
+                return $attachment;
+            });
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Sales invoice attachments retrieved successfully.',
+                'result' => [
+                    'data' => $attachments,
+                    'salesInvoice' => $invoice_info
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     public function delete_attachment($id): JsonResponse
     {
