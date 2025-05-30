@@ -145,11 +145,18 @@ class CreditNotesController extends Controller
         // Find the Credit Note record
         $creditNote = CreditNotes::find($id);
 
+        $attachments = CreditNotesAttachment::where('credit_id', $id)->get();
         // Check if the Credit Note exists
         if (!$creditNote) {
             return response()->json(['message' => 'Credit Note not found'], 404);
         }
         $creditNote->delete();
+        foreach ($attachments as $attachment) {
+            if ($attachment->file_path && Storage::disk('spaces')->exists($attachment->file_path)) {
+                Storage::disk('spaces')->delete($attachment->file_path);
+            }
+            $attachment->delete();
+        }
 
         return response()->json(['message' => 'Credit Note deleted successfully']);
     }

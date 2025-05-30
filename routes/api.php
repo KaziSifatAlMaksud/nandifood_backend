@@ -22,6 +22,9 @@ use App\Http\Controllers\PRDController;
 use App\Http\Controllers\RGNController;
 use App\Http\Controllers\POController;
 use App\Http\Controllers\CreditNotesController;
+use App\Http\Controllers\SalesInvoiceController;
+
+
 
 
 
@@ -304,6 +307,18 @@ Route::delete('/credit_notes/{id}/delete', [CreditNotesController::class, 'destr
 Route::post('/credit_notes_attachment/create', [CreditNotesController::class, 'store_attachment']);
 Route::get('/credit_notes_attachment/{id}', [CreditNotesController::class, 'get_all_attachments']);
 Route::delete('/credit_notes_attachment/delete/{id}', [CreditNotesController::class, 'delete_attachment']);
+
+//Sales Invoice API
+Route::get('/sales_invoices', [SalesInvoiceController::class, 'index']);
+Route::post('/sales_invoices/create', [SalesInvoiceController::class, 'store']);
+Route::get('/sales_invoices/{id}', [SalesInvoiceController::class, 'show']);
+Route::post('/sales_invoices/{id}', [SalesInvoiceController::class, 'update']);
+Route::delete('/sales_invoices/{id}/delete', [SalesInvoiceController::class, 'destroy']);
+//Sales Invoice Attachment API
+Route::post('/sales_invoices_attachment/create', [SalesInvoiceController::class, 'store_attachment']);
+Route::get('/sales_invoices_attachment/{id}', [SalesInvoiceController::class, 'get_all_attachments']);
+Route::delete('/sales_invoices_attachment/delete/{id}', [SalesInvoiceController::class, 'delete_attachment']);
+
 
 
 //GTN API

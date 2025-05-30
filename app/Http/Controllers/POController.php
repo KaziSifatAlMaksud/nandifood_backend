@@ -241,7 +241,7 @@ class POController extends Controller
         }
 
         // Handle file upload and attachment saving
-        $poAttachment = null;
+        $poAttachment = null; 
         if ($request->hasFile('file_path')) {
             $file = $request->file('file_path');
             $fileName = $file->getClientOriginalName();
