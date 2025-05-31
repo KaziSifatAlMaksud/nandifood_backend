@@ -56,6 +56,29 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function customerList()
+    {
+        $customers = Customer::select(
+            'customer_no',
+            'customer_legal_name',
+            'customer_trade_name',
+            'address1',
+            'address2',
+            'city',
+            'state',
+            'country',
+            'zip_code',
+            'phone',
+            'email'
+        )->get();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Customer list retrieved successfully',
+            'result' => $customers,
+        ]);
+    }
+
 
 
     public function customer_store(Request $request)

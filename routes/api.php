@@ -185,6 +185,7 @@ route::post('/customer_notes/create', [CustomerController::class, 'customer_note
 route::delete('/customer_notes/delete/{id}', [CustomerController::class, 'customer_notes_delete']);
 //Customer Helper API
 route::get('/customer_category', [CustomerController::class, 'customer_category']);
+route::get('/customer_list', [CustomerController::class, 'customerList']);
 
 
 // Supplier API Route
