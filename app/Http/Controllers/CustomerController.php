@@ -56,44 +56,53 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function customerList()
+    {
+        $subQuery = DB::table('shipping_info') // ✅ Use correct table name
+            ->select(
+                'cus_or_sup_id',
+                'address1 as shipping_address1',
+                'address2 as shipping_address2',
+                'city as shipping_city',
+                'state as shipping_state',
+                'country as shipping_country',
+                'zip_code as shipping_zip_code'
+            )
+            ->where('shipping_type', 1)
+            ->orderBy('id') // ✅ Optional: if "first" shipping info matters
+            ->limit(1);
 
-public function customerList()
-{
-    $customers = DB::table('customers')
-        ->leftJoin('shipping_infos', function ($join) {
-            $join->on('shipping_infos.cus_or_sup_id', '=', 'customers.id')
-                 ->where('shipping_infos.shipping_type', 1)
-                 ->orderBy('shipping_infos.id')
-                 ->limit(1);
-        })
-        ->select(
-            'customers.customer_no',
-            'customers.customer_legal_name',
-            'customers.customer_trade_name',
-            'customers.address1',
-            'customers.address2',
-            'customers.city',
-            'customers.state',
-            'customers.country',
-            'customers.zip_code',
-            'customers.phone',
-            'customers.email',
-            'shipping_infos.address1 as shipping_address1',
-            'shipping_infos.address2 as shipping_address2',
-            'shipping_infos.city as shipping_city',
-            'shipping_infos.state as shipping_state',
-            'shipping_infos.country as shipping_country',
-            'shipping_infos.zip_code as shipping_zip_code'
-        )
-        ->groupBy('customers.id') // Optional if you expect only one shipping record
-        ->get();
+        $customers = DB::table('customers')
+            ->leftJoinSub($subQuery, 'first_shipping', function ($join) {
+                $join->on('customers.id', '=', 'first_shipping.cus_or_sup_id');
+            })
+            ->select(
+                'customers.customer_no',
+                'customers.customer_legal_name',
+                'customers.customer_trade_name',
+                'customers.address1',
+                'customers.address2',
+                'customers.city',
+                'customers.state',
+                'customers.country',
+                'customers.zip_code',
+                'customers.phone',
+                'customers.email',
+                'first_shipping.shipping_address1',
+                'first_shipping.shipping_address2',
+                'first_shipping.shipping_city',
+                'first_shipping.shipping_state',
+                'first_shipping.shipping_country',
+                'first_shipping.shipping_zip_code'
+            )
+            ->get();
 
-    return response()->json([
-        'status' => 200,
-        'message' => 'Customer list retrieved successfully',
-        'result' => $customers,
-    ]);
-}
+        return response()->json([
+            'status' => 200,
+            'message' => 'Customer list retrieved successfully',
+            'result' => $customers,
+        ]);
+    }
 
 
 
