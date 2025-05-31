@@ -56,28 +56,44 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function customerList()
-    {
-        $customers = Customer::select(
-            'customer_no',
-            'customer_legal_name',
-            'customer_trade_name',
-            'address1',
-            'address2',
-            'city',
-            'state',
-            'country',
-            'zip_code',
-            'phone',
-            'email'
-        )->get();
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Customer list retrieved successfully',
-            'result' => $customers,
-        ]);
-    }
+public function customerList()
+{
+    $customers = DB::table('customers')
+        ->leftJoin('shipping_infos', function ($join) {
+            $join->on('shipping_infos.cus_or_sup_id', '=', 'customers.id')
+                 ->where('shipping_infos.shipping_type', 1)
+                 ->orderBy('shipping_infos.id')
+                 ->limit(1);
+        })
+        ->select(
+            'customers.customer_no',
+            'customers.customer_legal_name',
+            'customers.customer_trade_name',
+            'customers.address1',
+            'customers.address2',
+            'customers.city',
+            'customers.state',
+            'customers.country',
+            'customers.zip_code',
+            'customers.phone',
+            'customers.email',
+            'shipping_infos.address1 as shipping_address1',
+            'shipping_infos.address2 as shipping_address2',
+            'shipping_infos.city as shipping_city',
+            'shipping_infos.state as shipping_state',
+            'shipping_infos.country as shipping_country',
+            'shipping_infos.zip_code as shipping_zip_code'
+        )
+        ->groupBy('customers.id') // Optional if you expect only one shipping record
+        ->get();
+
+    return response()->json([
+        'status' => 200,
+        'message' => 'Customer list retrieved successfully',
+        'result' => $customers,
+    ]);
+}
 
 
 
