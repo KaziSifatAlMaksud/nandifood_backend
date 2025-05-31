@@ -69,8 +69,7 @@ class CustomerController extends Controller
                 'zip_code as shipping_zip_code'
             )
             ->where('shipping_type', 1)
-            ->orderBy('id') // ✅ Optional: if "first" shipping info matters
-            ->limit(1);
+            ->orderBy('id') ;
 
         $customers = DB::table('customers')
             ->leftJoinSub($subQuery, 'first_shipping', function ($join) {
