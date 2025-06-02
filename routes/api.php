@@ -23,8 +23,7 @@ use App\Http\Controllers\RGNController;
 use App\Http\Controllers\POController;
 use App\Http\Controllers\CreditNotesController;
 use App\Http\Controllers\SalesInvoiceController;
-
-
+use App\Http\Controllers\InvoicePaymentTermController;
 
 
 
@@ -345,6 +344,14 @@ Route::get('/dgns/{id}', [DGNController::class, 'show']);
 Route::post('/dgns/{id}', [DGNController::class, 'update']);
 Route::delete('/dgns/{id}/delete', [DGNController::class, 'destroy']);
 
+// Invoice Payment Terms API
+
+
+Route::get('/invoice_payment_terms', [InvoicePaymentTermController::class, 'index']);
+Route::post('/invoice_payment_terms/create', [InvoicePaymentTermController::class, 'store']);
+Route::get('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'show']);
+Route::put('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'update']);
+Route::delete('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'destroy']);
 
 
 //DGN Attachment API
@@ -367,7 +374,6 @@ Route::post('/prd_crews/create/{prd_id}', [PRDController::class, 'crew_store']);
 Route::post('/prd_attachment/create', [PRDController::class, 'store_attachment']);
 Route::get('/prd_attachment/{id}', [PRDController::class, 'get_all_attachments']);
 Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_attachment']);
-
 
 
 //Helper Common API
