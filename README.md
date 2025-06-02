@@ -2,7 +2,7 @@
 
 Welcome to the official **Nandiffod Backend**, a powerful RESTful API server developed using **Laravel 10+**.
 
-> 🏢 This project is designed as a **small ERP system** that supports **warehouse inventory management from A to Z** — including requisition, approval, purchasing, stock handling, reporting, and more.
+> 🏢 This project is designed as a **small ERP system** that supports **warehouse inventory management from A to Z** — including warehouse, products, pricing, and inventory processing like GRN, GTN, DGN, and PRD, Sales & Invoicing, and more.
 
 This backend application is built for **commercial and industrial purposes**, providing a robust foundation for real-world enterprise operations.
 
