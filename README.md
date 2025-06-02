@@ -11,13 +11,13 @@ This backend application is built for **commercial and industrial purposes**, pr
 ## 📦 Technologies Used
 
 * ✅ PHP 8.1+
-* ✅ Laravel 10.x
+* ✅ Laravel 11.x
 * ✅ MySQL / MariaDB
 * ✅ Laravel Sanctum (API Authentication)
 * ✅ RESTful API architecture
 * ✅ CORS (Cross-Origin Resource Sharing)
 * ✅ Postman / Thunder Client for API testing
-
+* ✅ Stripe Payment Gateway 
 ---
 
 ## 🔧 Installation Guide
