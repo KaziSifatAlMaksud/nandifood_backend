@@ -66,6 +66,8 @@ class CustomerController extends Controller
                 'city as shipping_city',
                 'state as shipping_state',
                 'country as shipping_country',
+                'email as shipping_email',
+                'phone as shipping_phone',
                 'zip_code as shipping_zip_code'
             )
             ->where('shipping_type', 1)
@@ -92,7 +94,9 @@ class CustomerController extends Controller
                 'first_shipping.shipping_city',
                 'first_shipping.shipping_state',
                 'first_shipping.shipping_country',
-                'first_shipping.shipping_zip_code'
+                'first_shipping.shipping_zip_code',
+                'first_shipping.shipping_email',
+                'first_shipping.shipping_phone',
             )
             ->get();
 

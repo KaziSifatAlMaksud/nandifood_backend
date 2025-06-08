@@ -10,7 +10,7 @@ class InvoicePaymentTermController extends Controller
     // Get all payment terms
     public function index()
     {
-        $invoicepaymentTerms = InvoicePaymentTerm::orderBy('id', 'desc')->paginate(10);
+        $invoicepaymentTerms = InvoicePaymentTerm::orderBy('id', 'desc')->get();
 
         return response()->json([
             'status' => 200,
