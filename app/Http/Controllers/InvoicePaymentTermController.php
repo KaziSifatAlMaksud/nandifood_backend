@@ -58,12 +58,12 @@ class InvoicePaymentTermController extends Controller
 
         public function get_payment_status()
     {
-        $invoicePaymentTerms = PaymentStatus::all();
+        $invoiceInvoicePaymentTerms = PaymentStatus::all();
 
         return response()->json([
             'status' => 200,
             'message' => 'Payment terms fetched successfully.',
-            'result' =>  $invoicePaymentTerms
+            'result' =>  $invoiceInvoicePaymentTerms
         ]);
     }
 
