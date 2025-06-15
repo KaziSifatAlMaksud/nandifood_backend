@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\InvoicePaymentTerm;
+use App\Models\InvoiceStatus;
+use App\Models\PaymentStatus;
+use Illuminate\Http\JsonResponse;
 
 class InvoicePaymentTermController extends Controller
 {
@@ -41,6 +44,30 @@ class InvoicePaymentTermController extends Controller
             
         ]);
     }
+
+    public function get_invoice_status()
+    {
+        $invoicePaymentTerms = InvoiceStatus::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Payment terms fetched successfully.',
+            'result' =>  $invoicePaymentTerms
+        ]);
+    }
+
+        public function get_payment_status()
+    {
+        $invoicePaymentTerms = PaymentStatus::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Payment terms fetched successfully.',
+            'result' =>  $invoicePaymentTerms
+        ]);
+    }
+
+    
 
     // Get a single payment term
     public function show($id)
