@@ -37,10 +37,9 @@ class InvoicePaymentTermController extends Controller
         return response()->json([
             'status' => 201,
             'message' => 'Payment term created successfully.',
-            'result' => [
-                'data' => $term,
-            ],
-        ], 201);
+            'result' => $term
+            
+        ]);
     }
 
     // Get a single payment term

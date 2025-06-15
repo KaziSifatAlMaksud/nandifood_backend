@@ -350,7 +350,7 @@ Route::delete('/dgns/{id}/delete', [DGNController::class, 'destroy']);
 Route::get('/invoice_payment_terms', [InvoicePaymentTermController::class, 'index']);
 Route::post('/invoice_payment_terms/create', [InvoicePaymentTermController::class, 'store']);
 Route::get('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'show']);
-Route::put('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'update']);
+Route::post('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'update']);
 Route::delete('/invoice_payment_terms/{id}', [InvoicePaymentTermController::class, 'destroy']);
 
 
