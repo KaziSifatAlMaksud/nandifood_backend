@@ -24,6 +24,8 @@ use App\Http\Controllers\POController;
 use App\Http\Controllers\CreditNotesController;
 use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\InvoicePaymentTermController;
+use App\Http\Controllers\CreateNewPickingTicketController;
+use App\Http\Controllers\loginController;
 
 
 
@@ -409,6 +411,17 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
 
+
+Route::get('picking-tickets', [CreateNewPickingTicketController::class, 'index']);
+Route::post('picking-tickets', [CreateNewPickingTicketController::class, 'store']);
+Route::get('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'show']);
+Route::put('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'update']);
+Route::delete('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'destroy']);
+
+
+
+
+Route::post('/login' , [loginController::class, 'login'])->name('login');
 
 
 
