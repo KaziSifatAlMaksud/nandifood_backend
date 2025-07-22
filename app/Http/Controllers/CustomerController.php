@@ -68,10 +68,10 @@ class CustomerController extends Controller
                 'country as shipping_country',
                 'email as shipping_email',
                 'phone as shipping_phone',
-                'zip_code as shipping_zip_code'
+                'zip_code as shipping_zip_code',
             )
             ->where('shipping_type', 1)
-            ->orderBy('id') ;
+            ->orderBy('id');
 
         $customers = DB::table('customers')
             ->leftJoinSub($subQuery, 'first_shipping', function ($join) {
@@ -81,14 +81,14 @@ class CustomerController extends Controller
                 'customers.customer_no',
                 'customers.customer_legal_name',
                 'customers.customer_trade_name',
-                'customers.address1',
-                'customers.address2',
-                'customers.city',
-                'customers.state',
-                'customers.country',
-                'customers.zip_code',
-                'customers.phone',
-                'customers.email',
+                'customers.address1 as billing_address1',
+                'customers.address2 as billing_address2',
+                'customers.city as billing_city',
+                'customers.state as billing_state',
+                'customers.country as billing_country',
+                'customers.zip_code as billing_zip_code',
+                'customers.phone as billing_phone',
+                'customers.email as billing_email',
                 'first_shipping.shipping_address1',
                 'first_shipping.shipping_address2',
                 'first_shipping.shipping_city',
