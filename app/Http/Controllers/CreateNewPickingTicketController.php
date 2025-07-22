@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CreateNewPickingTicket;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class CreateNewPickingTicketController extends Controller
 {
@@ -29,7 +30,7 @@ class CreateNewPickingTicketController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+  public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
             'sales_order' => 'required|string|max:50',
@@ -61,8 +62,13 @@ class CreateNewPickingTicketController extends Controller
 
         $ticket = CreateNewPickingTicket::create($data);
 
-        return response()->json($ticket, 201);
+        return response()->json([
+            'status' => 201,
+            'message' => 'Picking ticket created successfully',
+            'result' => $ticket
+        ]);
     }
+
 
     public function show($id): JsonResponse
     {

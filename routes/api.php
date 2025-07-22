@@ -26,6 +26,7 @@ use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\InvoicePaymentTermController;
 use App\Http\Controllers\CreateNewPickingTicketController;
 use App\Http\Controllers\loginController;
+use App\Http\Controllers\CreateNewPickingTicket;
 
 
 
@@ -378,6 +379,14 @@ Route::get('/prd_attachment/{id}', [PRDController::class, 'get_all_attachments']
 Route::delete('/prd_attachment/delete/{id}', [PRDController::class, 'delete_attachment']);
 
 
+// Picking Ticket API
+Route::get('/picking-tickets', [CreateNewPickingTicketController::class, 'index']);
+Route::post('/picking-tickets/create', [CreateNewPickingTicketController::class, 'store']);
+Route::get('/picking-tickets/{id}', [CreateNewPickingTicketController::class, 'show']);
+Route::post('/picking-tickets/{id}', [CreateNewPickingTicketController::class, 'update']);
+Route::delete('/picking-tickets/{id}/delete', [CreateNewPickingTicketController::class, 'destroy']);
+
+
 //Helper Common API
 
 //Supplier Helper API
@@ -411,12 +420,6 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
 
-
-Route::get('picking-tickets', [CreateNewPickingTicketController::class, 'index']);
-Route::post('picking-tickets', [CreateNewPickingTicketController::class, 'store']);
-Route::get('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'show']);
-Route::put('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'update']);
-Route::delete('picking-tickets/{id}', [CreateNewPickingTicketController::class, 'destroy']);
 
 
 
