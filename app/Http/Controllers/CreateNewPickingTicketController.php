@@ -58,6 +58,9 @@ class CreateNewPickingTicketController extends Controller
             'last_updated_by' => 'nullable|string|max:100',
             'status' => 'nullable|string|max:50',
             'performance' => 'nullable|string|max:50',
+            'sales_order_status' => 'nullable|string|max:50',
+            'picking_method' => 'nullable|string|max:50',
+            'picking_operation' => 'nullable|string|max:50',
         ]);
 
         $ticket = CreateNewPickingTicket::create($data);

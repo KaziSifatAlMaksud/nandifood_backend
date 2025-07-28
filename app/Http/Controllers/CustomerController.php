@@ -10,7 +10,7 @@ use App\Models\Warehouse;
 use App\Models\EmployeeNotes;
 use App\Models\CustomerNote;
 use App\Models\CustomerCategory;
- use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\Positions;
 use App\Models\ShippingInfo;
 use Illuminate\Support\Str;

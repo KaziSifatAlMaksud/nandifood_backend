@@ -34,6 +34,9 @@ class CreateNewPickingTicket extends Model
         'last_updated_by',
         'status',
         'performance',
+        'sales_order_status',
+        'picking_method',
+        'picking_operation',
     ];
 
     public $timestamps = false;
