@@ -117,6 +117,29 @@ class CreateNewPickingTicketController extends Controller
         ]);
     }
 
+
+    public function performance_status_list(): JsonResponse
+    {
+        $performanceStatuses = \App\Models\PerformanceStatus::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Performance status list retrieved successfully',
+            'result' => $performanceStatuses
+        ]);
+    }
+
+    public function picking_ticket_status_list(): JsonResponse
+    {
+        $pickingTicketStatuses = \App\Models\PickingTicketStatusList::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Picking ticket status list retrieved successfully',
+            'result' => $pickingTicketStatuses
+        ]);
+    }
+
     public function destroy($id): JsonResponse
     {
         $ticket = CreateNewPickingTicket::find($id);

@@ -387,7 +387,10 @@ Route::post('/picking-tickets/{id}', [CreateNewPickingTicketController::class, '
 Route::delete('/picking-tickets/{id}/delete', [CreateNewPickingTicketController::class, 'destroy']);
 
 
-//Helper Common API
+//Helper PERFORMANCE STATUS API
+
+route::get('/performance_status_list', [CreateNewPickingTicketController::class, 'performance_status_list']);
+route::get('/picking_ticket_status_list', [CreateNewPickingTicketController::class, 'picking_ticket_status_list']);
 
 //Supplier Helper API
 route::get('/supplier_category', [SupplierController::class, 'supplier_category']);
