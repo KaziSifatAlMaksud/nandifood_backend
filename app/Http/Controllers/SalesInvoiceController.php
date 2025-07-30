@@ -35,66 +35,78 @@ class SalesInvoiceController extends Controller
             ]);
         }
 
-        public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'invoice_no' => 'nullable|string|max:100',
-            'customer' => 'nullable|string|max:150',
-            'customer_billing_address' => 'nullable|string|max:255',
-            'customer_shipping_address' => 'nullable|string|max:255',
-            'customer_shipping_address2' => 'nullable|string|max:255',
-            'customer_shipping_city' => 'nullable|string|max:100',
-            'customer_shipping_state' => 'nullable|string|max:100',
-            'customer_shipping_zip' => 'nullable|string|max:20',
-            'customer_shipping_phone' => 'nullable|string|max:20',
-            'customer_shipping_email' => 'nullable|string|max:100',
-            'customer_shipping_country' => 'nullable|string|max:100',
-            'customer_po' => 'nullable|string|max:100',
-            'reference_no' => 'nullable|string|max:100',
-            'invoice_date' => 'nullable|date',
-            'payment_terms' => 'nullable|string|max:100',
-            'payment_due_date' => 'nullable|date',
-            'invoice_currency' => 'nullable|string|max:10',
-            'sales_rep' => 'nullable|string|max:100',
-            'warehouse' => 'nullable|string|max:100',
-            'planned_ship_out_date' => 'nullable|date',
-            'last_updated' => 'nullable|date',
-            'last_updated_by' => 'nullable|string|max:100',
-            'invoice_status' => 'nullable|string|max:50',
-            'payment_status' => 'nullable|string|max:50',
-            'notes' => 'nullable|string|max:1000',
-            'memo_notes' => 'nullable|string|max:1000',
-        ]);
+       public function store(Request $request): JsonResponse
+        {
+            $validated = $request->validate([
+                'invoice_no'                 => 'nullable|string|max:150',
+                'customer'                   => 'nullable|string|max:150',
+                'customer_billing_address1'  => 'nullable|string|max:150',
+                'customer_billing_address2'  => 'nullable|string|max:150',
+                'customer_billing_city'      => 'nullable|string|max:150',
+                'customer_billing_state'     => 'nullable|string|max:150',
+                'customer_billing_country'   => 'nullable|string|max:150',
+                'customer_billing_zip'       => 'nullable|string|max:150',
+                'customer_billing_phone'     => 'nullable|string|max:150',
+                'customer_billing_email'     => 'nullable|string|max:150',
+                'customer_shipping_address1' => 'nullable|string|max:150',
+                'customer_shipping_address2' => 'nullable|string|max:150',
+                'customer_shipping_city'     => 'nullable|string|max:150',
+                'customer_shipping_state'    => 'nullable|string|max:150',
+                'customer_shipping_country'  => 'nullable|string|max:150',
+                'customer_shipping_zip'      => 'nullable|string|max:150',
+                'customer_shipping_phone'    => 'nullable|string|max:150',
+                'customer_shipping_email'    => 'nullable|string|max:150',
+                'customer_po'                => 'nullable|string|max:150',
+                'reference_no'               => 'nullable|string|max:150',
+                'invoice_date'               => 'nullable|string|max:150',
+                'payment_terms'              => 'nullable|string|max:150',
+                'payment_due_date'           => 'nullable|string|max:150',
+                'invoice_currency'           => 'nullable|string|max:150',
+                'sales_rep'                  => 'nullable|string|max:150',
+                'warehouse'                  => 'nullable|string|max:150',
+                'planned_ship_out_date'      => 'nullable|string|max:150',
+                'last_updated'               => 'nullable|string|max:150',
+                'last_updated_by'            => 'nullable|string|max:150',
+                'invoice_status'             => 'nullable|string|max:150',
+                'payment_status'             => 'nullable|string|max:150',
+                'notes'                      => 'nullable|string|max:150',
+                'memo_notes'                 => 'nullable|string|max:150',
+            ]);
 
-        // Determine approval status
-        $action = $request->input('action');
-        $validated['is_approved'] = ($action === 'approve') ? 2 : 1;
+            // Determine approval status
+            $action = $request->input('action');
+            $validated['is_approved'] = match ($action) {
+                'approve' => 2,
+                'reject'  => 0,
+                default   => 1, // pending
+            };
 
-        // Auto-generate invoice number if not provided
-        if (empty($validated['invoice_no'])) {
-            $todayDate = now()->format('ymd');
-            $lastInvoice = SalesInvoice::where('invoice_no', 'LIKE', "INV{$todayDate}-%")
-                                ->orderBy('invoice_no', 'DESC')
-                                ->first();
+            // Auto-generate invoice number if not provided
+            if (empty($validated['invoice_no'])) {
+                $todayDate = now()->format('ymd');
+                $prefix = "INV{$todayDate}-";
 
-            $count = 1;
-            if ($lastInvoice) {
-                $lastCount = (int) substr($lastInvoice->invoice_no, -3);
-                $count = $lastCount + 1;
+                $lastInvoice = SalesInvoice::where('invoice_no', 'LIKE', "$prefix%")
+                    ->orderBy('invoice_no', 'DESC')
+                    ->first();
+
+                $count = $lastInvoice
+                    ? (int) substr($lastInvoice->invoice_no, -3) + 1
+                    : 1;
+
+                $validated['invoice_no'] = $prefix . str_pad($count, 3, '0', STR_PAD_LEFT);
             }
 
-            $validated['invoice_no'] = "INV{$todayDate}-" . str_pad($count, 3, '0', STR_PAD_LEFT);
+            // Create the Sales Invoice
+            $salesInvoice = SalesInvoice::create($validated);
+
+            return response()->json([
+                'status'  => 201,
+                'message' => 'Sales Invoice created successfully',
+                'result'  => $salesInvoice
+            ]);
         }
 
-        // Create the Sales Invoice
-        $salesInvoice = SalesInvoice::create($validated);
-
-        return response()->json([
-            'status' => 201,
-            'message' => 'Sales Invoice created successfully',
-            'result' => $salesInvoice
-        ]);
-    }
 
     public function update(Request $request, $id): JsonResponse
     {

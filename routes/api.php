@@ -28,6 +28,8 @@ use App\Http\Controllers\CreateNewPickingTicketController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\CreateNewPickingTicket;
 
+use App\Http\Controllers\AuthController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -429,6 +431,27 @@ Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId'])
 
 Route::post('/login' , [loginController::class, 'login'])->name('login');
 
+
+Route::middleware(['auth:sanctum', 'role:admin'])->get('/dashboard', function () {
+    return response()->json(['message' => 'Welcome Admin!']);
+});
+
+
+
+
+// Public routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// Protected routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Example protected route
+    Route::get('/profile', function (Request $request) {
+        return $request->user();
+    });
+});
 
 
 

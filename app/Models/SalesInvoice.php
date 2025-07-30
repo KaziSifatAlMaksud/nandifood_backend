@@ -10,11 +10,19 @@ class SalesInvoice extends Model
    protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = false;
-    protected $fillable = [
+    
+        protected $fillable = [
         'invoice_no',
         'customer',
-        'customer_billing_address',
-        'customer_shipping_address',
+        'customer_billing_address1',
+        'customer_billing_address2',
+        'customer_billing_city',
+        'customer_billing_state',
+        'customer_billing_country',
+        'customer_billing_zip',
+        'customer_billing_phone',
+        'customer_billing_email',
+        'customer_shipping_address1',
         'customer_shipping_address2',
         'customer_shipping_city',
         'customer_shipping_state',
@@ -40,3 +48,5 @@ class SalesInvoice extends Model
         'is_approved',
     ];
 }
+
+
