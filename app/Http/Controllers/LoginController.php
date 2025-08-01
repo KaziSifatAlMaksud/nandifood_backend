@@ -18,7 +18,6 @@ class LoginController extends Controller
 
         // Attempt to log the user in
         if (auth()->attempt($request->only('email', 'password'))) {
-            // Redirect to intended page or default home
             Helper::sendError("Email Or Password is wrong !!!");
             return redirect()->intended('/home');
         }

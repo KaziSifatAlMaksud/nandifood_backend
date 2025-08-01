@@ -197,6 +197,28 @@ class SalesInvoiceController extends Controller
         }
     }
 
+        /**
+     * Get a single PRD by ID
+     */
+        public function show($id): JsonResponse
+        {
+            $salesInvoice = SalesInvoice::find($id);
+
+            if (!$salesInvoice) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Sales Invoice not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Sales Invoice details retrieved successfully',
+                'result' => $salesInvoice
+            ]);
+        }
+
+
     public function destroy($id): JsonResponse
     {
         try {
