@@ -47,6 +47,13 @@ class SalesInvoice extends Model
         'memo_notes',
         'is_approved',
     ];
+
+
+    public function details()
+    {
+        return $this->hasMany(SalesInvoiceDetailsAmountInfo::class, 'sales_invoice_id');
+    }
+
 }
 
 

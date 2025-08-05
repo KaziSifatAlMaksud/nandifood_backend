@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\SalesInvoiceAttachment;
 use App\Http\Resources\SalesInvoiceResource;
 use App\Http\Resources\SalesInvoiceCollection;
+use App\Models\SalesInvoiceDetailsAmountInfo;
 
 class SalesInvoiceController extends Controller
 {
@@ -36,7 +37,7 @@ class SalesInvoiceController extends Controller
         }
 
        public function store(Request $request): JsonResponse
-        {
+       {
             $validated = $request->validate([
                 'invoice_no'                 => 'nullable|string|max:150',
                 'customer'                   => 'nullable|string|max:150',
@@ -113,6 +114,7 @@ class SalesInvoiceController extends Controller
         // Find the Sales Invoice record
         $salesInvoice = SalesInvoice::find($id);
 
+        // Check if Sales Invoice exists
         if (!$salesInvoice) {
             return response()->json([
                 'status' => 404,
@@ -122,6 +124,8 @@ class SalesInvoiceController extends Controller
 
         // Get all incoming request data
         $data = $request->all();
+        
+
 
         // Determine approval status
         if ($request->has('action')) {
@@ -131,12 +135,49 @@ class SalesInvoiceController extends Controller
         // Update the Sales Invoice record
         $salesInvoice->update($data);
 
+        // Delete existing details first
+        SalesInvoiceDetailsAmountInfo::where('sales_invoice_id', $salesInvoice->id)->delete();
+
+        // Handle invoice detail items
+        $invoiceDetails = $request->input('invoice_details');
+
+        if (is_array($invoiceDetails)) {
+            foreach ($invoiceDetails as $detail) {
+                SalesInvoiceDetailsAmountInfo::create([
+                    'sales_invoice_id' => $salesInvoice->id,
+                    'product_id'       => $detail['product_id'] ?? null,
+                    'p_sku_no'         => $detail['p_sku_no'] ?? null,
+                    'size'             => $detail['size'] ?? null,
+                    'uom'              => $detail['uom'] ?? null,
+                    'on_hand_qty'      => $detail['on_hand_qty'] ?? null,
+                    'invoice_qty'      => $detail['invoice_qty'] ?? null,
+                    'unit_cost'        => $detail['unit_cost'] ?? null,
+                    'unit_price'       => $detail['unit_price'] ?? null,
+                    'amount'           => $detail['amount'] ?? null,
+                    'discount'         => $detail['discount'] ?? null,
+                    'tax_name_1'       => $detail['tax_name_1'] ?? null,
+                    'tax_rate_1'       => $detail['tax_rate_1'] ?? null,
+                    'tax_amount_1'     => $detail['tax_amount_1'] ?? null,
+                    'tax_name_2'       => $detail['tax_name_2'] ?? null,
+                    'tax_rate_2'       => $detail['tax_rate_2'] ?? null,
+                    'tax_amount_2'     => $detail['tax_amount_2'] ?? null,
+                    'total_amount'     => $detail['total_amount'] ?? null,
+                    'created_at'       => $detail['created_at'] ?? now(),
+                    'updated_at'       => $detail['updated_at'] ?? now(),
+                ]);
+            }
+        }
+
+        // Reload invoice with details
+        $salesInvoice->load('details');
+
         return response()->json([
             'status' => 200,
             'message' => 'Sales Invoice updated successfully',
             'result' => $salesInvoice
         ]);
     }
+
 
     public function store_attachment(Request $request): JsonResponse
     {
@@ -202,7 +243,7 @@ class SalesInvoiceController extends Controller
      */
         public function show($id): JsonResponse
         {
-            $salesInvoice = SalesInvoice::find($id);
+            $salesInvoice = SalesInvoice::with('details', 'details.product')->find($id);
 
             if (!$salesInvoice) {
                 return response()->json([

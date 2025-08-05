@@ -246,7 +246,6 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            // Get the price list for the product based on SKU (combining results)
         $price_list = Uom::whereIn('id', [
                     $product->default_sales_uom,
                     $product->inventory_uom,

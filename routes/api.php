@@ -318,7 +318,7 @@ Route::get('/sales_invoices', [SalesInvoiceController::class, 'index']);
 Route::post('/sales_invoices/create', [SalesInvoiceController::class, 'store']);
 Route::get('/sales_invoices/{id}', [SalesInvoiceController::class, 'show']);
 Route::post('/sales_invoices/{id}', [SalesInvoiceController::class, 'update']);
-Route::delete('/sales_invoices/{id}/delete', [SalesInvoiceController::class, 'destroy']);
+Route::delete('/sales_invoices/delete/{id}', [SalesInvoiceController::class, 'destroy']);
 //Sales Invoice Attachment API
 Route::post('/sales_invoices_attachment/create', [SalesInvoiceController::class, 'store_attachment']);
 Route::get('/sales_invoices_attachment/{id}', [SalesInvoiceController::class, 'get_all_attachments']);
