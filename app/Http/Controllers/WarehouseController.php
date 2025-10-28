@@ -883,6 +883,37 @@ public function warehouse_attachment_store(Request $request)
         ]);
     }
 
+    public function testPerm()
+    {
+        // ✅ Fetch user (replace 1 with actual admin user id or make it dynamic)
+        $user = \App\Models\User::find(2);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        // ✅ Get roles and permissions
+        $roles = $user->getRoleNames();                     // Collection of roles
+        $permissions = $user->getAllPermissions()->pluck('name'); // Collection of permission names
+        $isAdmin = $user->hasRole('admin');                 // Boolean check
+
+        // ✅ Return everything in JSON
+        return response()->json([
+            'status' => 200,
+            'message' => 'Permission test successful.',
+            'data' => [
+                'user_id' => $user->id,
+                'roles' => $roles,
+                'permissions' => $permissions,
+                'is_admin' => $isAdmin,
+            ],
+        ]);
+    }
+
+
 
 
 

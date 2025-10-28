@@ -425,7 +425,7 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
 
-
+Route::get('/test-perm', [WarehouseController::class, 'testPerm']);
 
 
 
@@ -435,6 +435,9 @@ Route::post('/login' , [loginController::class, 'login'])->name('login');
 Route::middleware(['auth:sanctum', 'role:admin'])->get('/dashboard', function () {
     return response()->json(['message' => 'Welcome Admin!']);
 });
+
+
+
 
 
 
