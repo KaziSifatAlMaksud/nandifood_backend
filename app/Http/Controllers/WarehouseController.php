@@ -22,6 +22,11 @@ use App\Models\BinAisle;
 use App\Models\BinRack;
 use App\Models\BinShelf;
   use Illuminate\Support\Facades\Storage;
+  use App\Models\User;
+  use Spatie\Permission\Models\Role;
+  
+use Spatie\Permission\Models\Permission;  
+
 
 class WarehouseController extends Controller
 {
@@ -886,7 +891,7 @@ public function warehouse_attachment_store(Request $request)
     public function testPerm()
     {
         // ✅ Fetch user (replace 1 with actual admin user id or make it dynamic)
-        $user = \App\Models\User::find(2);
+        $user = \App\Models\User::find(3);
 
         if (!$user) {
             return response()->json([
@@ -896,9 +901,9 @@ public function warehouse_attachment_store(Request $request)
         }
 
         // ✅ Get roles and permissions
-        $roles = $user->getRoleNames();                     // Collection of roles
-        $permissions = $user->getAllPermissions()->pluck('name'); // Collection of permission names
-        $isAdmin = $user->hasRole('admin');                 // Boolean check
+        $roles = $user->getRoleNames();               
+        $permissions = $user->getAllPermissions()->pluck('admin'); 
+        $isAdmin = $user->hasRole('admin');              
 
         // ✅ Return everything in JSON
         return response()->json([
@@ -913,7 +918,64 @@ public function warehouse_attachment_store(Request $request)
         ]);
     }
 
+   
+   public function giveAdminRole($userId)
+{
+    $user = User::find($userId);
 
+    if (!$user) {
+        return response()->json([
+            'status' => 404,
+            'message' => 'User not found.',
+        ], 404);
+    }
+
+    $permissions = ['view users', 'edit users', 'delete users'];
+
+    // 1️⃣ Create permissions if they don't exist
+    foreach ($permissions as $perm) {
+        Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+    }
+
+    // 2️⃣ Assign permissions manually with team_id = 1
+    foreach ($permissions as $perm) {
+        $permission = Permission::where('name', $perm)->first();
+
+        DB::table('model_has_permissions')->updateOrInsert([
+            'permission_id' => $permission->id,
+            'model_type' => User::class,
+            'model_id' => $user->id,
+        ], [
+            'team_id' => 1
+        ]);
+    }
+
+    // 3️⃣ Assign role with team_id = 1
+    $role = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+
+    DB::table('model_has_roles')->updateOrInsert([
+        'role_id' => $role->id,
+        'model_type' => User::class,
+        'model_id' => $user->id,
+    ], [
+        'team_id' => 1
+    ]);
+
+    // 4️⃣ Refresh the user's permissions & roles from DB
+    $user = $user->fresh(); // reload user from database
+    $user->load('roles', 'permissions'); // eager load relationships
+
+    // 5️⃣ Return JSON with stored data
+    return response()->json([
+        'status' => 200,
+        'message' => 'Admin role assigned successfully with team_id = 1.',
+        'data' => [
+            'user_id' => $user->id,
+            'roles' => $user->getRoleNames(),                 // ['admin']
+            'permissions' => $user->getAllPermissions()->pluck('name'), // ['view users','edit users','delete users']
+        ],
+    ]);
+}
 
 
 

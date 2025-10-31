@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\BinLocationController; 
@@ -27,14 +28,60 @@ use App\Http\Controllers\InvoicePaymentTermController;
 use App\Http\Controllers\CreateNewPickingTicketController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\CreateNewPickingTicket;
-
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+// All routes inside this group require authentication via Sanctum
+Route::middleware('auth:sanctum')->group(function () {
+
+
+    // Get authenticated user info
+
+
+    Route::get('/user32', function (Request $request) {
+        return $request->user();
+
+    });
+
+
+    // Logout route
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // User management with dynamic permission checking
+    Route::get('/users33', function () {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User list fetched successfully',
+            'data' => User::all(),
+        ]);
+    })->middleware('check.permission:view users');
+
+    Route::post('/users', [UserController::class, 'store'])->middleware('check.permission:create users');
+    Route::put('/users/{id}', [UserController::class, 'update'])->middleware('check.permission:edit users');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('check.permission:delete users');
+
+    // Profile route to see logged-in user info, roles, and permissions
+    Route::get('/profile', function (Request $request) {
+        $user = Auth::user();
+
+        return response()->json([
+            'user' => $user->only(['id', 'name', 'email']),
+            'roles' => $user->getRoleNames(), // returns array of role names
+            'permissions' => $user->getAllPermissions()->pluck('name'), // returns all permissions by name
+        ]);
+    });
+});
+
 
 // Route::get('/welcom', function () {
 //     return 'welcome';
@@ -425,40 +472,9 @@ Route::get('/cities/{stateName}', [WarehouseController::class, 'getCities']);
 
 Route::get('/price/get_excel_id', [ProductPriceController::class, 'getExcelId']);
 
-Route::get('/test-perm', [WarehouseController::class, 'testPerm']);
+Route::get('/testPerm', [WarehouseController::class, 'testPerm']);
 
-
-
-Route::post('/login' , [loginController::class, 'login'])->name('login');
-
-
-Route::middleware(['auth:sanctum', 'role:admin'])->get('/dashboard', function () {
-    return response()->json(['message' => 'Welcome Admin!']);
-});
-
-
-
-
-
-
-
-// Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    // Example protected route
-    Route::get('/profile', function (Request $request) {
-        return $request->user();
-    });
-});
-
-
-
-
+Route::get('/give-admin-role/{userId}', [WarehouseController::class, 'giveAdminRole']);
 
 
 
